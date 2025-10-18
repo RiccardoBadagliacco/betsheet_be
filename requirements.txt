@@ -1,0 +1,9 @@
+fastapi>=0.95
+uvicorn[standard]>=0.20
+SQLAlchemy>=1.4
+alembic>=1.10
+passlib[argon2]>=1.7
+pydantic>=1.10
+pytest>=7.0
+httpx>=0.24
+python-jose>=3.3
