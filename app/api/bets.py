@@ -175,6 +175,7 @@ def _build_bet_response(bet: Bet):
         "backroll_name": getattr(bet.backroll, "name", None),
         "link": bet.link,
         "note": bet.note,
+        "created_at": bet.created_at,
         "profitto_percent": profit_pct,
     }
 
@@ -246,9 +247,9 @@ def list_bets(
             # not in in_progress
             q = q.filter(~((Bet.esito == None) | (Bet.esito == "") | (Bet.esito == "pending") | (Bet.esito == "in_progress") | (Bet.esito == "p")))
 
-    # ensure bets are ordered by date descending
+    # ensure bets are ordered by date descending, then by created_at descending for same date
     # join backroll to fetch its name in the same query
-    bets = q.outerjoin(Backroll, Bet.backroll_id == Backroll.id).order_by(Bet.data.desc()).all()
+    bets = q.outerjoin(Backroll, Bet.backroll_id == Backroll.id).order_by(Bet.data.desc(), Bet.created_at.desc()).all()
 
     out = [_build_bet_response(b) for b in bets]
     return out
@@ -358,6 +359,7 @@ def create_bet(payload: BetCreate, db: Session = Depends(get_db)):
         "backroll_name": backroll_name,
         "link": bet.link,
         "note": bet.note,
+        "created_at": bet.created_at,
         "profitto_percent": None,
     }
 

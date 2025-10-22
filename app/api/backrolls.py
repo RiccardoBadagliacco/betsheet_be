@@ -35,7 +35,7 @@ def list_backrolls(id: Optional[str] = Query(None, alias="id"), db: Session = De
         parsed_bets = []
         print("Raw bets for backroll", br.name, ":", len(raw_bets))
         for b in raw_bets:
-            # parse date if possible
+            # parse date if possible, fallback to created_at
             dt = None
             date_raw = getattr(b, "data", None)
             if date_raw:
@@ -48,10 +48,15 @@ def list_backrolls(id: Optional[str] = Query(None, alias="id"), db: Session = De
                         dt = datetime.strptime(s, "%Y-%m-%d %H:%M:%S")
                     except Exception:
                         dt = None
+            
+            # If we couldn't parse from data field, use created_at
+            if dt is None and hasattr(b, 'created_at') and b.created_at:
+                dt = b.created_at
+            
             parsed_bets.append((b, dt))
 
-        # sort bets by parsed datetime (None go last)
-        parsed_bets.sort(key=lambda x: (x[1] is None, x[1] or datetime.min))
+        # sort bets by datetime (None go last), with created_at as secondary sort for same data
+        parsed_bets.sort(key=lambda x: (x[1] is None, x[1] or datetime.min, getattr(x[0], 'created_at', None) or datetime.min))
 
         # use running total to compute per-day backroll
         bets_by_date = {}
@@ -320,9 +325,14 @@ def backrolls_stats(include_per_backroll: bool = Query(True, description="Includ
                         dt = datetime.strptime(s, "%Y-%m-%d %H:%M:%S")
                     except Exception:
                         dt = None
+            
+            # If we couldn't parse from data field, use created_at
+            if dt is None and hasattr(b, 'created_at') and b.created_at:
+                dt = b.created_at
+            
             parsed_bets.append((b, dt))
 
-        parsed_bets.sort(key=lambda x: (x[1] is None, x[1] or datetime.min))
+        parsed_bets.sort(key=lambda x: (x[1] is None, x[1] or datetime.min, getattr(x[0], 'created_at', None) or datetime.min))
 
         running_total = float(br.backroll or 0)
         for b, dt in parsed_bets:

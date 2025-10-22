@@ -61,5 +61,6 @@ class Bet(Base):
     tipo_giocata = Column(String, nullable=True)
     link = Column(Text, nullable=True)
     note = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     backroll = relationship("Backroll", back_populates="bets")

@@ -68,6 +68,7 @@ class BetBase(BaseModel):
     tipo_giocata: Optional[str] = None
     link: Optional[str] = None
     note: Optional[str] = None
+    created_at: Optional[datetime] = None
     backroll_name: Optional[str] = None
     # percentage profit for this bet relative to importo
     profitto_percent: Optional[float] = None
