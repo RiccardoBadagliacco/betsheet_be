@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from . import users, auth, backrolls, health, bets, csv_download, football_db
+from . import users, auth, backrolls, health, bets, csv_download, football_db, leagues_seasons
 
 # Istanza di router principale dell'API
 api_router = APIRouter()
@@ -12,3 +12,4 @@ api_router.include_router(health.router, prefix="", tags=["Health"])
 api_router.include_router(bets.router, prefix="/bets", tags=["Bets"])
 api_router.include_router(csv_download.router, prefix="/csv", tags=["CSV Download"])
 api_router.include_router(football_db.router, prefix="/api/v1", tags=["Football Database"])
+api_router.include_router(leagues_seasons.router, prefix="/api/v1", tags=["Leagues & Seasons"])
