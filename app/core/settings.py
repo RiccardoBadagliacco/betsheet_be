@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     # Support both sqlite and postgres urls
     SQLALCHEMY_DATABASE_URL: str = "sqlite:///./bets.db"
+    FOOTBALL_DATABASE_URL: str = "sqlite:///./football_dataset.db"
     # Comma-separated origins or list
     CORS_ORIGINS: List[AnyHttpUrl] = ["http://localhost:4200", "http://127.0.0.1:8000"]
     SECRET_KEY: str = "replace-me"

@@ -4,6 +4,9 @@ from datetime import datetime
 from app.db.database import Base
 from sqlalchemy.orm import relationship
 
+# Import football models to ensure they're registered with Base
+from app.db.models_football import Country, League, Season, Team, Match
+
 
 class User(Base):
     __tablename__ = "users"
