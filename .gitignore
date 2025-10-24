@@ -1,0 +1,99 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+nohup.out
+
+# Database
+*.db-journal
+*.sqlite3-journal
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Test files
+test_*.py
+*_test.py
+pytest_cache/
+.coverage
+htmlcov/
+
+# Output files (keep structure but ignore content)
+data/*.csv
+data/*.db
+!data/README.md
+reports/*.html
+reports/*.txt
+reports/*.pdf
+
+# Model artifacts
+*.pkl
+*.joblib
+models/*.h5
+models/*.pkl
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Large data files
+*.zip
+*.tar.gz
+*.rar
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Cache
+.cache/
