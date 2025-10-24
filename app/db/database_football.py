@@ -28,3 +28,11 @@ def get_football_db():
         yield db
     finally:
         db.close()
+
+def get_football_db_session():
+    """Generator to get football database session for scripts."""
+    db = FootballSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
