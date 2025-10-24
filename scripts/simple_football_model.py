@@ -297,6 +297,12 @@ class SimpleFooballPredictor:
             **probs
         }
         
+        # Add betting odds if available
+        if pd.notna(match.get('AvgH')) and pd.notna(match.get('AvgD')) and pd.notna(match.get('AvgA')):
+            result['odds_1'] = float(match['AvgH'])
+            result['odds_X'] = float(match['AvgD'])
+            result['odds_2'] = float(match['AvgA'])
+        
         # Add actual results if available
         if pd.notna(match.get('FTHG')) and pd.notna(match.get('FTAG')):
             result['actual_home_goals'] = int(match['FTHG'])
@@ -437,6 +443,10 @@ def main():
         'O_0_5', 'O_1_5', 'MG_Casa_1_3', 'MG_Casa_1_4', 'MG_Casa_1_5', 'MG_Ospite_1_3', 'MG_Ospite_1_4', 'MG_Ospite_1_5',
         '1X2_H', '1X2_D', '1X2_A'
     ]
+    
+    # Add betting odds if available
+    if 'odds_1' in results_df.columns:
+        output_cols.extend(['odds_1', 'odds_X', 'odds_2'])
     
     # Add actual results if available
     if 'actual_scoreline' in results_df.columns:
