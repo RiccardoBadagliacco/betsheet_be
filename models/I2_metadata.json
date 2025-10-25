@@ -1,0 +1,10 @@
+{
+  "training_matches": 2360,
+  "model_version": "EXACT_REPLICA",
+  "league_name": "Serie B",
+  "league_code": "I2",
+  "saved_at": "2025-10-25T18:26:00.516338",
+  "model_class": "ExactSimpleFooballPredictor",
+  "training_data_size": 0,
+  "is_trained": false
+}

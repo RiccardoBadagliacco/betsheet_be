@@ -1,0 +1,10 @@
+{
+  "training_matches": 2102,
+  "model_version": "EXACT_REPLICA",
+  "league_name": "Jupiler Pro League",
+  "league_code": "B1",
+  "saved_at": "2025-10-25T18:25:58.895131",
+  "model_class": "ExactSimpleFooballPredictor",
+  "training_data_size": 0,
+  "is_trained": false
+}

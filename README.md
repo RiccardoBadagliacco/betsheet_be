@@ -40,7 +40,8 @@ source .venv/bin/activate  # Linux/Mac3. Run the app
 
 ```bash
 
-# Installa dipendenzeuvicorn app.main:app --reload --port 8000
+# Installa dipendenze 
+uvicorn app.main:app --reload --port 8000
 
 pip install -r requirements.txt```
 

@@ -1,0 +1,10 @@
+{
+  "training_matches": 1368,
+  "model_version": "EXACT_REPLICA",
+  "league_name": "Premier League",
+  "league_code": "SC0",
+  "saved_at": "2025-10-25T18:26:00.947768",
+  "model_class": "ExactSimpleFooballPredictor",
+  "training_data_size": 0,
+  "is_trained": false
+}

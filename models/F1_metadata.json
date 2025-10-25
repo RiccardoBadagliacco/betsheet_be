@@ -1,0 +1,10 @@
+{
+  "training_matches": 2483,
+  "model_version": "EXACT_REPLICA",
+  "league_name": "Ligue 1",
+  "league_code": "F1",
+  "saved_at": "2025-10-25T18:26:00.196408",
+  "model_class": "ExactSimpleFooballPredictor",
+  "training_data_size": 0,
+  "is_trained": false
+}

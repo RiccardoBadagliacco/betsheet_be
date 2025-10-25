@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "BetSheet API"
     DEBUG: bool = False
     # Support both sqlite and postgres urls
-    SQLALCHEMY_DATABASE_URL: str = "sqlite:///./bets.db"
+    SQLALCHEMY_DATABASE_URL: str = "sqlite:///./data/bets.db"
     FOOTBALL_DATABASE_URL: str = "sqlite:///./data/football_dataset.db"
     # Comma-separated origins or list
     CORS_ORIGINS: List[AnyHttpUrl] = ["http://localhost:4200", "http://127.0.0.1:8000"]
