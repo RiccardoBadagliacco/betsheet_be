@@ -119,3 +119,51 @@ class Match(FootballBase):
     season = relationship("Season", back_populates="matches")
     home_team = relationship("Team", foreign_keys=[home_team_id], back_populates="home_matches")
     away_team = relationship("Team", foreign_keys=[away_team_id], back_populates="away_matches")
+
+
+class Fixture(FootballBase):
+    """Modello per le partite in programma (fixtures)"""
+    __tablename__ = "fixtures"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    season_id = Column(UUID(as_uuid=True), ForeignKey("seasons.id"), nullable=True, index=True)
+    home_team_id = Column(UUID(as_uuid=True), ForeignKey("teams.id"), nullable=True)
+    away_team_id = Column(UUID(as_uuid=True), ForeignKey("teams.id"), nullable=True)
+    
+    # Dati temporali
+    match_date = Column(Date, nullable=False, index=True)
+    match_time = Column(String(10), nullable=True)  # es. "15:00"
+    
+    # Risultati tempo pieno (sempre NULL per fixtures)
+    home_goals_ft = Column(Integer, nullable=True)  # FTHG
+    away_goals_ft = Column(Integer, nullable=True)  # FTAG
+    
+    # Risultati primo tempo (sempre NULL per fixtures)
+    home_goals_ht = Column(Integer, nullable=True)  # HTHG  
+    away_goals_ht = Column(Integer, nullable=True)  # HTAG
+    
+    # Statistiche partita (sempre NULL per fixtures)
+    home_shots = Column(Integer, nullable=True)       # HS
+    away_shots = Column(Integer, nullable=True)       # AS
+    home_shots_target = Column(Integer, nullable=True)  # HST
+    away_shots_target = Column(Integer, nullable=True)  # AST
+    
+    # Quote medie
+    avg_home_odds = Column(Float, nullable=True)      # AvgH
+    avg_draw_odds = Column(Float, nullable=True)      # AvgD  
+    avg_away_odds = Column(Float, nullable=True)      # AvgA
+    avg_over_25_odds = Column(Float, nullable=True)   # Avg>2.5
+    avg_under_25_odds = Column(Float, nullable=True)  # Avg<2.5
+    
+    # Dati grezzi per identificazione
+    league_code = Column(String(10), nullable=True)      # Codice lega dal CSV (es. "E0", "I1")
+    league_name = Column(String(100), nullable=True)     # Nome lega completo
+    
+    # Metadati
+    csv_row_number = Column(Integer, nullable=True)   # Numero riga nel CSV originale
+    downloaded_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    
+    # Relazioni (opzionali per fixtures)
+    season = relationship("Season")
+    home_team = relationship("Team", foreign_keys=[home_team_id])
+    away_team = relationship("Team", foreign_keys=[away_team_id])

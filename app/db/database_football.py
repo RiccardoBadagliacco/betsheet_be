@@ -29,6 +29,10 @@ def get_football_db():
     finally:
         db.close()
 
+def create_football_tables():
+    """Create all football tables in the database."""
+    FootballBase.metadata.create_all(bind=football_engine)
+
 def get_football_db_session():
     """Generator to get football database session for scripts."""
     db = FootballSessionLocal()

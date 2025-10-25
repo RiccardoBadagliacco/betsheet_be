@@ -317,7 +317,8 @@ class FootballDataService:
                     
         return False
 
-    # Metodi di utilità    def _generate_country_code(self, country_name: str) -> str:
+    # Metodi di utilità
+    def _generate_country_code(self, country_name: str) -> str:
         """Genera codice paese a 3 lettere"""
         country_codes = {
             "Italy": "ITA", "England": "ENG", "Germany": "GER", "Spain": "ESP",
