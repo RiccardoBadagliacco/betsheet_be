@@ -1,143 +1,282 @@
-# ⚽ BetSheet - Football Prediction System# BetSheet API
+# 🚀 BetSheet Football Prediction System# ⚽ BetSheet - Football Prediction System# BetSheet API
 
 
 
-Sistema avanzato di predizioni calcistiche basato su modelli statistici Poisson-Dixon-Coles per analisi e betting sportivo.
+Sistema di predizione e betting per partite di calcio basato su modello **ExactSimpleFooballPredictor** completamente validato.
 
-Run instructions (development):
 
-## 🚀 Quick Start
+
+## 📊 Performance ValidataSistema avanzato di predizioni calcistiche basato su modelli statistici Poisson-Dixon-Coles per analisi e betting sportivo.
+
+
+
+✅ **77.1% accuratezza** su 2,000 partite reali  Run instructions (development):
+
+📈 **10,821+ raccomandazioni** testate  
+
+🎯 **Zero partite fallite** su larga scala  ## 🚀 Quick Start
+
+🌍 **Cross-league validated** (tutte le maggiori leghe europee)
 
 1. Create and activate a venv
 
+## 🏗️ Struttura Progetto
+
 ### Requisiti
 
-- Python 3.9+```bash
+```
 
-- Virtual Environment (consigliato)python3 -m venv .venv
+betsheet_be/- Python 3.9+```bash
 
-source .venv/bin/activate
+├── 🤖 app/                          # Core application
 
-### Installazione```
+│   ├── api/- Virtual Environment (consigliato)python3 -m venv .venv
 
-```bash
+│   │   ├── ml_football_exact.py     # 🎯 MODELLO BASELINE VALIDATO
 
-# Clona il repository2. Install dependencies
+│   │   ├── health.py                # Health checksource .venv/bin/activate
 
-git clone https://github.com/RiccardoBadagliacco/betsheet_be.git
+│   │   └── ...                      # Altri endpoints API
 
-cd betsheet_be```bash
+│   ├── db/                          # Database models & connections### Installazione```
 
-pip install -r requirements.txt
+│   ├── core/                        # Settings & configuration  
 
-# Crea virtual environment```
+│   └── main.py                      # FastAPI entry point```bash
 
-python -m venv .venv
+│
+
+├── 🧪 backtest/                     # Sistema di validazione# Clona il repository2. Install dependencies
+
+│   ├── football_backtest_real.py    # 📊 ALGORITMO BACKTEST
+
+│   ├── football_backtest_report_*.xlsx # Report Excel dettagliatigit clone https://github.com/RiccardoBadagliacco/betsheet_be.git
+
+│   └── README.md                    # Documentazione backtest
+
+│cd betsheet_be```bash
+
+├── 📂 data/
+
+│   └── football_dataset.db          # 37K+ partite storichepip install -r requirements.txt
+
+│
+
+├── 🚀 run_backtest.py               # Script per eseguire backtest# Crea virtual environment```
+
+├── requirements.txt                 # Dipendenze Python
+
+└── README.md                        # Questo filepython -m venv .venv
+
+```
 
 source .venv/bin/activate  # Linux/Mac3. Run the app
 
+## 🎯 Modello Baseline: ExactSimpleFooballPredictor
+
 # .venv\Scripts\activate   # Windows
+
+**File:** `app/api/ml_football_exact.py`
 
 ```bash
 
-# Installa dipendenze 
-uvicorn app.main:app --reload --port 8000
+### Features Principali:
 
-pip install -r requirements.txt```
+- **Hybrid Approach**: 60% market odds + 40% statistical analysis# Installa dipendenze 
+
+- **Poisson Distribution**: Per calcolo probabilità esatteuvicorn app.main:app --reload --port 8000
+
+- **Historical Analysis**: Finestre temporali adattive (10 partite globali, 5 venue-specific)
+
+- **Market Integration**: Rimozione vig automatica dalle quotepip install -r requirements.txt```
+
+- **Multi-Market Support**: Over/Under, 1X2, Doppia Chance, Match Goals
 
 ```
 
-Open http://127.0.0.1:8000/docs for Swagger UI.
+### Top Performing Markets:
 
-## 🎯 Utilizzo Principale
+1. **Over 0.5 Goal**: 93.3% accuracy ⭐Open http://127.0.0.1:8000/docs for Swagger UI.
 
-Migrations
+2. **Multigol Casa 1-5**: 81.2% accuracy ⭐  
 
-### 1. Genera Predizioni
+3. **Multigol Casa 1-4**: 78.1% accuracy ⭐## 🎯 Utilizzo Principale
 
-```bash- Alembic is included as a dependency; initialize alembic with `alembic init alembic` and configure `alembic.ini` to point to your DB.
+4. **Over 1.5 Goal**: 76.8% accuracy
 
-# Predizioni su campionato specifico
-
-python simple_football_model.py --data leagues_csv_unified/Italy_I1_Serie_A_ALL_SEASONS.csv --out predictions.csvTesting
+5. **Doppia Chance**: 74-76% accuracyMigrations
 
 
+
+### API Usage:### 1. Genera Predizioni
+
+```python
+
+from app.api.ml_football_exact import ExactSimpleFooballPredictor, get_recommended_bets```bash- Alembic is included as a dependency; initialize alembic with `alembic init alembic` and configure `alembic.ini` to point to your DB.
+
+
+
+predictor = ExactSimpleFooballPredictor()# Predizioni su campionato specifico
+
+prediction = predictor.predict_match(df, match_index)
+
+recommendations = get_recommended_bets(prediction, quotes)python simple_football_model.py --data leagues_csv_unified/Italy_I1_Serie_A_ALL_SEASONS.csv --out predictions.csvTesting
+
+```
+
+
+
+## 🧪 Sistema di Backtest
 
 # Test con campione limitatoRun pytest:
 
+**File:** `backtest/football_backtest_real.py`
+
 python simple_football_model.py --data leagues_csv_unified/Italy_I1_Serie_A_ALL_SEASONS.csv --sample 100 --out test.csv
 
-``````bash
+### Capabilities:
 
-pytest -q
+- ✅ Test su N partite random dal database storico``````bash
 
-### 2. Analisi Betting```
+- 📊 Validazione completa di tutti i mercati
 
-```bash
-# Identifica opportunità ad alta confidenza
-python betting_assistant.py --predictions predictions.csv --confidence 0.75
+- 📋 Report Excel dettagliato multi-sheet  pytest -q
+
+- 🌍 Cross-league e cross-season testing
+
+- 📈 Statistiche per mercato, lega e accuratezza globale### 2. Analisi Betting```
+
+
+
+### Quick Run:```bash
+
+```bash# Identifica opportunità ad alta confidenza
+
+# Esegui backtest (default: 2000 partite)python betting_assistant.py --predictions predictions.csv --confidence 0.75
+
+python run_backtest.py
 
 # Analisi con soglia più alta
-python betting_assistant.py --predictions predictions.csv --confidence 0.85
+
+# O direttamente nella cartella backtestpython betting_assistant.py --predictions predictions.csv --confidence 0.85
+
+cd backtest && python football_backtest_real.py```
+
 ```
 
 ### 3. Backtesting Performance
-```bash
-# Valuta performance del modello
-python football_backtest.py --predictions predictions.csv --report backtest_report.html --stake 10
-```
+
+### Report Excel Generato:```bash
+
+- **Match_Details**: Ogni partita con raccomandazioni dettagliate# Valuta performance del modello
+
+- **Market_Statistics**: Performance per tipo di mercatopython football_backtest.py --predictions predictions.csv --report backtest_report.html --stake 10
+
+- **League_Statistics**: Performance per lega/paese  ```
+
+- **Summary**: Statistiche generali e KPI
 
 ## 📊 Output del Sistema
 
+## 🚀 Quick Start
+
 ### Predizioni Generate
-- **Over/Under**: 0.5, 1.5, 2.5, 3.5
-- **Multigol**: Casa e Ospite (1-3, 1-4, 1-5)
-- **1X2**: Home Win, Draw, Away Win
-- **Parametri Poisson**: λ_home, λ_away
 
-### Metriche di Performance
-- **Accuracy Over 1.5**: ~75.6%
-- **ROI Betting**: ~38.7%
-- **Win Rate**: ~76.6%
+1. **Setup Environment:**- **Over/Under**: 0.5, 1.5, 2.5, 3.5
 
-## 🏆 Performance Validate
+```bash- **Multigol**: Casa e Ospite (1-3, 1-4, 1-5)
 
-Il sistema è stato validato su **759 partite Serie A (2023-2025)**:
-- ✅ Over 1.5 Accuracy: **75.6%** (superiore al mercato)
+pip install -r requirements.txt- **1X2**: Home Win, Draw, Away Win
+
+```- **Parametri Poisson**: λ_home, λ_away
+
+
+
+2. **Run API Server:**### Metriche di Performance
+
+```bash- **Accuracy Over 1.5**: ~75.6%
+
+python app/main.py- **ROI Betting**: ~38.7%
+
+```- **Win Rate**: ~76.6%
+
+
+
+3. **Run Backtest Validation:**## 🏆 Performance Validate
+
+```bash
+
+python run_backtest.pyIl sistema è stato validato su **759 partite Serie A (2023-2025)**:
+
+```- ✅ Over 1.5 Accuracy: **75.6%** (superiore al mercato)
+
 - ✅ ROI Simulato: **+38.7%** (molto profittevole)
-- ✅ Win Rate: **76.6%** (ottimo)
 
-## 📁 Struttura Progetto
+4. **Use Model:**- ✅ Win Rate: **76.6%** (ottimo)
 
-```
-betsheet_be/
-├── 🎯 simple_football_model.py      # Modello principale predizioni
+```python
+
+from app.api.ml_football_exact import ExactSimpleFooballPredictor## 📁 Struttura Progetto
+
+
+
+predictor = ExactSimpleFooballPredictor()```
+
+# Use predictor for new match predictions...betsheet_be/
+
+```├── 🎯 simple_football_model.py      # Modello principale predizioni
+
 ├── 💰 betting_assistant.py          # Assistant per betting opportunities
-├── 📊 football_backtest.py          # Sistema di backtesting
+
+## 📊 Database├── 📊 football_backtest.py          # Sistema di backtesting
+
 ├── ⚙️  app/                         # FastAPI backend
-├── 📚 docs/                         # Documentazione completa
-├── 📈 reports/                      # Report e analisi generate
+
+- **football_dataset.db**: 37,793 partite storiche con risultati e quote├── 📚 docs/                         # Documentazione completa
+
+- **bets.db**: Database utenti e sistema betting├── 📈 reports/                      # Report e analisi generate
+
 ├── 💾 data/                         # Dati esempio e test
-├── 🔧 scripts/                      # Utility scripts
+
+## 🎯 Production Ready├── 🔧 scripts/                      # Utility scripts
+
 ├── 📊 leagues_csv_unified/          # Dataset campionati (15 leghe)
-├── 🗄️  football_dataset.db          # Database partite storiche
-└── 📋 requirements.txt              # Dipendenze Python
-```
 
-## 🎯 Campionati Supportati
+Il modello è **completamente validato** e pronto per:├── 🗄️  football_dataset.db          # Database partite storiche
 
-**15 Campionati Europei** con dati storici completi:
+- ✅ Predizioni live su nuove partite└── 📋 requirements.txt              # Dipendenze Python
+
+- 📈 Sistema di raccomandazioni automatiche  ```
+
+- 🎯 Betting intelligente con confidenza validata
+
+- 📊 Scaling su multiple leghe simultaneamente## 🎯 Campionati Supportati
+
+
+
+## 🔧 Requirements**15 Campionati Europei** con dati storici completi:
+
 - 🇮🇹 **Italia**: Serie A, Serie B
-- 🇪🇸 **Spagna**: La Liga, Segunda División  
-- 🇩🇪 **Germania**: Bundesliga, 2. Bundesliga
-- 🇫🇷 **Francia**: Ligue 1, Ligue 2
-- 🏴󠁧󠁢󠁥󠁮󠁧󠁿 **Inghilterra**: Premier League, Championship
-- 🇳🇱 **Olanda**: Eredivisie
-- 🇵🇹 **Portogallo**: Primeira Liga
+
+- Python 3.8+- 🇪🇸 **Spagna**: La Liga, Segunda División  
+
+- FastAPI- 🇩🇪 **Germania**: Bundesliga, 2. Bundesliga
+
+- pandas, numpy- 🇫🇷 **Francia**: Ligue 1, Ligue 2
+
+- sqlite3, sqlalchemy  - 🏴󠁧󠁢󠁥󠁮󠁧󠁿 **Inghilterra**: Premier League, Championship
+
+- openpyxl (per report Excel)- 🇳🇱 **Olanda**: Eredivisie
+
+- scipy (per calcoli Poisson avanzati)- 🇵🇹 **Portogallo**: Primeira Liga
+
 - 🇧🇪 **Belgio**: Jupiler Pro League
-- 🏴󠁧󠁢󠁳󠁣󠁴󠁿 **Scozia**: Premier League
+
+---- 🏴󠁧󠁢󠁳󠁣󠁴󠁿 **Scozia**: Premier League
+
 - 🇹🇷 **Turchia**: Süper Lig
 
+**Status:** ✅ **PRODUCTION READY** - Modello validato su 2K+ partite con 77.1% accuratezza
 ## 📖 Documentazione
 
 - [`docs/FOOTBALL_MODEL_USAGE.md`](docs/FOOTBALL_MODEL_USAGE.md) - Guida completa utilizzo

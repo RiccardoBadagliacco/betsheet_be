@@ -140,11 +140,17 @@ class ExactSimpleFooballPredictor:
         
         team_matches = pd.concat(all_matches).sort_values('Date').tail(self.global_window)
         
-        # Venue specific matches (EXACTLY like original)
+        # Venue specific matches (EXACTLY like original) - FIX: Check if matches exist before accessing columns
         if is_home:
-            venue_matches = home_matches[['Date', 'goals_for', 'goals_against']].tail(self.venue_window)
+            if len(home_matches) > 0:
+                venue_matches = home_matches[['Date', 'goals_for', 'goals_against']].tail(self.venue_window)
+            else:
+                venue_matches = pd.DataFrame(columns=['Date', 'goals_for', 'goals_against'])
         else:
-            venue_matches = away_matches[['Date', 'goals_for', 'goals_against']].tail(self.venue_window)
+            if len(away_matches) > 0:
+                venue_matches = away_matches[['Date', 'goals_for', 'goals_against']].tail(self.venue_window)
+            else:
+                venue_matches = pd.DataFrame(columns=['Date', 'goals_for', 'goals_against'])
         
         # Calculate averages (EXACTLY like original)
         features = {
@@ -372,15 +378,29 @@ class ExactSimpleFooballPredictor:
 
 def _convert_numpy_types(obj):
     """Convert numpy types to Python native types for JSON serialization"""
-    if hasattr(obj, 'item'):  # numpy scalar
+    import numpy as np
+    
+    if obj is None:
+        return None
+    elif hasattr(obj, 'item'):  # numpy scalar
         return obj.item()
-    elif isinstance(obj, np.integer):
+    elif isinstance(obj, (np.integer, np.int32, np.int64)):
         return int(obj)
-    elif isinstance(obj, np.floating):
+    elif isinstance(obj, (np.floating, np.float32, np.float64)):
         return float(obj)
     elif isinstance(obj, np.ndarray):
         return obj.tolist()
-    return obj
+    elif isinstance(obj, dict):
+        return {k: _convert_numpy_types(v) for k, v in obj.items()}
+    elif isinstance(obj, (list, tuple)):
+        return [_convert_numpy_types(item) for item in obj]
+    elif hasattr(obj, 'dtype'):  # Any other numpy type
+        try:
+            return obj.item()
+        except (ValueError, AttributeError):
+            return float(obj) if 'float' in str(obj.dtype) else int(obj)
+    else:
+        return obj
 
 
 def get_recommended_bets(prediction: dict, quotes: dict = None) -> list:
@@ -806,21 +826,44 @@ async def exact_predict_match(
         
         # Generate betting recommendations
         try:
-            betting_recommendations = get_recommended_bets(prediction)
+            # Convert all numpy types in prediction to Python native types
+            clean_prediction = {}
+            for key, value in prediction.items():
+                clean_prediction[key] = _convert_numpy_types(value)
+            
+            betting_recommendations = get_recommended_bets(clean_prediction)
+            
+            # Ensure betting recommendations are also clean
+            clean_recommendations = []
+            for rec in betting_recommendations:
+                clean_rec = {}
+                for k, v in rec.items():
+                    clean_rec[k] = _convert_numpy_types(v)
+                clean_recommendations.append(clean_rec)
+            betting_recommendations = clean_recommendations
+            
         except Exception as e:
             print(f"Error generating betting recommendations: {e}")
+            import traceback
+            traceback.print_exc()
             betting_recommendations = []
         
-        return {
+        # Clean the entire response to ensure no numpy types
+        response = {
             "success": True,
-            "prediction": prediction,
+            "prediction": clean_prediction,  # Use the cleaned prediction
             "betting_recommendations": betting_recommendations,
             "model_info": {
                 "version": "EXACT_REPLICA", 
                 "data_source": "database",
-                "matches_loaded": len(df)
+                "matches_loaded": int(len(df))  # Ensure this is a Python int
             }
         }
+        
+        # Final cleaning of the entire response
+        clean_response = _convert_numpy_types(response)
+        
+        return clean_response
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
