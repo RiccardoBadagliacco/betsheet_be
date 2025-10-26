@@ -3,7 +3,7 @@
   "model_version": "EXACT_REPLICA",
   "league_name": "Premier League",
   "league_code": "E0",
-  "saved_at": "2025-10-25T18:25:59.366514",
+  "saved_at": "2025-10-26T11:14:50.805763",
   "model_class": "ExactSimpleFooballPredictor",
   "training_data_size": 0,
   "is_trained": false

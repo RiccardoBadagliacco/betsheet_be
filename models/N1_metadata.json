@@ -3,7 +3,7 @@
   "model_version": "EXACT_REPLICA",
   "league_name": "Eredivisie",
   "league_code": "N1",
-  "saved_at": "2025-10-25T18:26:00.698827",
+  "saved_at": "2025-10-26T11:14:51.746237",
   "model_class": "ExactSimpleFooballPredictor",
   "training_data_size": 0,
   "is_trained": false

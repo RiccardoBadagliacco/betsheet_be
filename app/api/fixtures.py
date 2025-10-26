@@ -11,6 +11,8 @@ from datetime import datetime, date
 from app.db.database_football import get_football_db, create_football_tables
 from app.db.models_football import Fixture, Team, Season, League
 import logging
+import json
+import os
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -50,6 +52,179 @@ def get_league_name_from_code(league_code: str) -> str:
         'G1': 'Super League Greece'
     }
     return league_names.get(league_code, f'League {league_code}')
+
+
+async def generate_all_predictions_and_save():
+    """
+    Genera le predizioni per tutte le fixture chiamando la logica esistente
+    e salva il risultato in un file JSON
+    """
+    try:
+        # Import della funzione esistente per evitare circular imports
+        from app.api.ml_football_exact import get_all_fixtures_recommendations
+        from app.db.database_football import get_football_db
+        
+        # Ottieni sessione database
+        db = next(get_football_db())
+        
+        try:
+            # Chiama la logica esistente per ottenere tutte le predizioni
+            logger.info("Chiamando get_all_fixtures_recommendations...")
+            
+            # Chiamiamo la funzione senza limit per ottenere tutte le fixture
+            result = await get_all_fixtures_recommendations(
+                league_code=None,  # Tutte le leghe
+                limit=1000,        # Limite alto per prendere tutte
+                db=db
+            )
+            
+            # Crea directory se non esiste
+            os.makedirs("data", exist_ok=True)
+            
+            # Aggiungi timestamp al risultato
+            result["generated_at"] = datetime.utcnow().isoformat()
+            result["generated_by"] = "fixtures_download_auto"
+            
+            # Salva in file JSON
+            json_file = "data/all_predictions.json"
+            with open(json_file, 'w', encoding='utf-8') as f:
+                json.dump(result, f, indent=2, ensure_ascii=False, default=str)
+            
+            logger.info(f"Predizioni salvate in {json_file}")
+            
+            return {
+                "success": True,
+                "total_fixtures": result.get("total_fixtures", 0),
+                "successful_predictions": result.get("successful_predictions", 0),
+                "total_recommendations": result.get("total_recommendations", 0),
+                "json_file": json_file
+            }
+            
+        finally:
+            db.close()
+            
+    except Exception as e:
+        logger.error(f"Errore nel generare e salvare predizioni: {e}")
+        return {
+            "success": False,
+            "error": str(e),
+            "total_recommendations": 0
+        }
+
+
+def get_country_from_league_code(league_code: str) -> str:
+    """
+    Mappa il codice lega al paese corrispondente
+    """
+    league_country_mapping = {
+        # Inghilterra
+        'E0': 'England',
+        'E1': 'England', 
+        'E2': 'England',
+        'E3': 'England',
+        
+        # Scozia
+        'SC0': 'Scotland',
+        'SC1': 'Scotland',
+        
+        # Germania
+        'D1': 'Germany',
+        'D2': 'Germany',
+        
+        # Italia
+        'I1': 'Italy',
+        'I2': 'Italy',
+        
+        # Spagna
+        'SP1': 'Spain',
+        'SP2': 'Spain',
+        
+        # Francia
+        'F1': 'France',
+        'F2': 'France',
+        
+        # Olanda
+        'N1': 'Netherlands',
+        
+        # Belgio
+        'B1': 'Belgium',
+        
+        # Portogallo
+        'P1': 'Portugal',
+        
+        # Turchia
+        'T1': 'Turkey',
+        
+        # Grecia
+        'G1': 'Greece'
+    }
+    
+    return league_country_mapping.get(league_code, 'Unknown')
+
+
+def organize_predictions_by_hierarchy(fixtures: list) -> dict:
+    """
+    Organizza le fixture gerarchicamente: data → paese → lega → fixture
+    
+    Args:
+        fixtures: Lista delle fixture con predizioni
+        
+    Returns:
+        Dizionario organizzato gerarchicamente
+    """
+    organized = {}
+    
+    for fixture in fixtures:
+        # Estrai informazioni
+        match_date = fixture.get('match_date', 'Unknown')
+        league_code = fixture.get('league_code', 'Unknown')
+        country = get_country_from_league_code(league_code)
+        league_name = get_league_name_from_code(league_code)
+        
+        # Crea struttura gerarchica se non esiste
+        if match_date not in organized:
+            organized[match_date] = {}
+        
+        if country not in organized[match_date]:
+            organized[match_date][country] = {}
+        
+        if league_code not in organized[match_date][country]:
+            organized[match_date][country][league_code] = {
+                "league_name": league_name,
+                "country": country,
+                "fixtures": []
+            }
+        
+        # Aggiungi la fixture alla struttura
+        organized[match_date][country][league_code]["fixtures"].append(fixture)
+    
+    # Ordina le date
+    sorted_organized = {}
+    for date_key in sorted(organized.keys()):
+        sorted_organized[date_key] = {}
+        
+        # Ordina i paesi alfabeticamente
+        for country_key in sorted(organized[date_key].keys()):
+            sorted_organized[date_key][country_key] = {}
+            
+            # Ordina le leghe alfabeticamente
+            for league_key in sorted(organized[date_key][country_key].keys()):
+                league_data = organized[date_key][country_key][league_key]
+                
+                # Ordina le fixture per orario se disponibile
+                fixtures_sorted = sorted(
+                    league_data["fixtures"], 
+                    key=lambda x: (x.get('match_time') or '00:00', x.get('home_team', ''))
+                )
+                
+                sorted_organized[date_key][country_key][league_key] = {
+                    "league_name": league_data["league_name"],
+                    "country": league_data["country"],
+                    "fixture_count": len(fixtures_sorted),
+                    "fixtures": fixtures_sorted
+                }
+    
+    return sorted_organized
 
 
 def normalize_team_name(team_name: str) -> str:
@@ -428,13 +603,28 @@ async def download_fixtures():
         finally:
             db.close()
         
+        # 5. Calcola automaticamente le predizioni chiamando la logica esistente
+        predictions_result = None
+        try:
+            logger.info("Iniziando calcolo predizioni per tutte le fixture...")
+            predictions_result = await generate_all_predictions_and_save()
+            logger.info(f"Predizioni calcolate e salvate: {predictions_result.get('total_recommendations', 0)} raccomandazioni")
+        except Exception as e:
+            logger.error(f"Errore nel calcolo predizioni (non bloccante): {e}")
+            predictions_result = {
+                "success": False,
+                "error": str(e),
+                "total_recommendations": 0
+            }
+        
         return {
             "success": True,
             "message": f"Fixtures scaricate e salvate con successo",
             "total_downloaded": len(df),
             "fixtures_saved": fixtures_saved,
             "fixtures_skipped": fixtures_skipped,
-            "url": FIXTURES_CSV_URL
+            "url": FIXTURES_CSV_URL,
+            "predictions": predictions_result
         }
         
     except requests.RequestException as e:
@@ -443,6 +633,83 @@ async def download_fixtures():
     
     except Exception as e:
         logger.error(f"Errore generico: {e}")
+        raise HTTPException(status_code=500, detail=f"Errore: {str(e)}")
+
+
+@router.get("/predictions")
+async def get_all_predictions():
+    """
+    Ritorna tutte le predizioni organizzate gerarchicamente per data → paese → lega → fixture
+    """
+    try:
+        json_file = "data/all_predictions.json"
+        
+        # Verifica se il file esiste
+        if not os.path.exists(json_file):
+            return {
+                "success": False,
+                "message": "Nessuna predizione trovata. Esegui prima il download delle fixture.",
+                "predictions": None,
+                "file_exists": False
+            }
+        
+        # Leggi il file JSON
+        with open(json_file, 'r', encoding='utf-8') as f:
+            predictions_data = json.load(f)
+        
+        # Organizza i dati gerarchicamente: data → paese → lega → fixture
+        organized_data = organize_predictions_by_hierarchy(predictions_data.get('fixtures', []))
+        
+        # Aggiungi informazioni sul file e metadata
+        file_stats = os.stat(json_file)
+        
+        return {
+            "success": True,
+            "predictions_by_date": organized_data,
+            "metadata": {
+                "total_fixtures": predictions_data.get('total_fixtures', 0),
+                "successful_predictions": predictions_data.get('successful_predictions', 0),
+                "total_recommendations": predictions_data.get('total_recommendations', 0),
+                "generated_at": predictions_data.get('generated_at'),
+                "generated_by": predictions_data.get('generated_by'),
+                "model_info": predictions_data.get('model_info', {}),
+                "file_info": {
+                    "last_modified": datetime.fromtimestamp(file_stats.st_mtime).isoformat(),
+                    "file_size_kb": round(file_stats.st_size / 1024, 2)
+                }
+            }
+        }
+        
+    except json.JSONDecodeError as e:
+        logger.error(f"Errore nel parsing del JSON: {e}")
+        raise HTTPException(status_code=500, detail="File delle predizioni corrotto")
+    except Exception as e:
+        logger.error(f"Errore nel recupero predizioni: {e}")
+        raise HTTPException(status_code=500, detail=f"Errore: {str(e)}")
+
+
+@router.post("/predictions/regenerate")
+async def regenerate_predictions():
+    """
+    Rigenera le predizioni per tutte le fixture esistenti nel database
+    """
+    try:
+        logger.info("Rigenerazione predizioni richiesta...")
+        
+        result = await generate_all_predictions_and_save()
+        
+        return {
+            "success": result.get("success", False),
+            "message": "Predizioni rigenerate con successo" if result.get("success") else "Errore nella rigenerazione",
+            "total_fixtures": result.get("total_fixtures", 0),
+            "successful_predictions": result.get("successful_predictions", 0),
+            "total_recommendations": result.get("total_recommendations", 0),
+            "json_file": result.get("json_file"),
+            "error": result.get("error")
+        }
+        
+    except Exception as e:
+        logger.error(f"Errore nella rigenerazione predizioni: {e}")
         raise HTTPException(status_code=500, detail=f"Errore: {str(e)}")
 
 @router.get("/fixtures")

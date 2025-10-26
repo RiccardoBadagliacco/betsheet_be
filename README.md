@@ -84,7 +84,8 @@ source .venv/bin/activate  # Linux/Mac3. Run the app
 
 - **Hybrid Approach**: 60% market odds + 40% statistical analysis# Installa dipendenze 
 
-- **Poisson Distribution**: Per calcolo probabilità esatteuvicorn app.main:app --reload --port 8000
+- **Poisson Distribution**: Per calcolo probabilità esatte 
+uvicorn app.main:app --reload --port 8000
 
 - **Historical Analysis**: Finestre temporali adattive (10 partite globali, 5 venue-specific)
 

@@ -512,7 +512,7 @@ class FootballBacktest:
 
 def main():
     """Entry point del backtest"""
-    backtest = FootballBacktest(num_matches=10000)  # 🚀 MASSIVE SCALE TEST - 10K matches
+    backtest = FootballBacktest(num_matches=10000)  # 🎯 FULL SCALE - 10K matches 
     backtest.run_backtest()
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@
   "model_version": "EXACT_REPLICA",
   "league_name": "Serie A",
   "league_code": "I1",
-  "saved_at": "2025-10-25T18:25:58.748691",
+  "saved_at": "2025-10-26T11:14:50.191863",
   "model_class": "ExactSimpleFooballPredictor",
   "training_data_size": 0,
   "is_trained": false

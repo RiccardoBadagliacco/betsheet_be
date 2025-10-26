@@ -3,7 +3,7 @@
   "model_version": "EXACT_REPLICA",
   "league_name": "2. Bundesliga",
   "league_code": "D2",
-  "saved_at": "2025-10-25T18:25:59.197872",
+  "saved_at": "2025-10-26T11:14:50.637352",
   "model_class": "ExactSimpleFooballPredictor",
   "training_data_size": 0,
   "is_trained": false
