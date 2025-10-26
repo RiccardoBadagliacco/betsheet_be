@@ -21,7 +21,7 @@ class FootballBacktest:
     
     def __init__(self, num_matches=50):
         self.num_matches = num_matches
-        self.db_path = '../data/football_dataset.db'
+        self.db_path = './data/football_dataset.db'  # Correct path to football database
         self.predictor = ExactSimpleFooballPredictor()
         self.market_stats = defaultdict(lambda: {'total': 0, 'correct': 0, 'incorrect': 0})
         self.failed_matches = 0
@@ -512,7 +512,7 @@ class FootballBacktest:
 
 def main():
     """Entry point del backtest"""
-    backtest = FootballBacktest(num_matches=2000)
+    backtest = FootballBacktest(num_matches=10000)  # 🚀 MASSIVE SCALE TEST - 10K matches
     backtest.run_backtest()
 
 if __name__ == "__main__":

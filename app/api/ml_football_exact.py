@@ -606,7 +606,43 @@ def get_recommended_bets(prediction: dict, quotes: dict = None) -> list:
             'threshold': thresholds['BTTS No']
         })
     
-    # Check Multigol markets (with quote-based filtering)
+    # Check Multigol markets (refactored to separate function)
+    multigol_recommendations = _get_multigol_recommendations_baseline(prediction, quotes, thresholds)
+    recommendations.extend(multigol_recommendations)
+    return recommendations
+
+
+def _get_multigol_recommendations_baseline(prediction: dict, quotes: dict = None, thresholds: dict = None) -> list:
+    """
+    Logica Multigol baseline estratta per modularità
+    
+    Args:
+        prediction: Dizionario con probabilità predette
+        quotes: Quote 1X2 per determinare favorito
+        thresholds: Soglie per i mercati Multigol
+        
+    Returns:
+        Lista di raccomandazioni Multigol baseline
+    """
+    recommendations = []
+    
+    if thresholds is None:
+        # V3 AGGRESSIVE THRESHOLDS - Ridotte per generare più raccomandazioni
+        thresholds = {
+            'MG Casa 1-4': 60,  # Era 75
+            'MG Ospite 1-3': 60,  # Era 75
+            'MG Casa 2-5': 65,  # Era 75
+            'MG Ospite 2-4': 65,  # Era 75
+            'MG Casa 3-6': 70,  # Era 75
+            'MG Ospite 3-5': 70,  # Era 75
+            'MG Casa 4+': 70,  # Era 75
+            'MG Ospite 4+': 70   # Era 75
+        }
+    
+    # Extract probabilities from prediction and convert to Python floats
+    prob_home = float(prediction.get('prob_home', prediction.get('1X2_H', 0))) * 100
+    prob_away = float(prediction.get('prob_away', prediction.get('1X2_A', 0))) * 100
+    
     home_goals_avg = float(prediction.get('home_goals', prediction.get('lambda_home', 0)))
     away_goals_avg = float(prediction.get('away_goals', prediction.get('lambda_away', 0)))
     
@@ -627,13 +663,13 @@ def get_recommended_bets(prediction: dict, quotes: dict = None) -> list:
         mg_casa_36_prob = float(prediction.get('MG_Casa_3_6', 0)) * 100
         mg_casa_4plus_prob = float(prediction.get('MG_Casa_4+', 0)) * 100
         
-        # Add Multigol Casa 1-3 market (missing from original thresholds)
-        if mg_casa_13_prob >= 70:  # Use 70% threshold like other Multigol markets
+        # Add Multigol Casa 1-3 market - V3 AGGRESSIVE threshold
+        if mg_casa_13_prob >= 62:  # Era 70% - ridotto per più raccomandazioni
             recommendations.append({
                 'market': 'Multigol Casa 1-3',
                 'prediction': 'Casa 1-3',
                 'confidence': round(mg_casa_13_prob, 1),
-                'threshold': 70
+                'threshold': 62
             })
         
         if mg_casa_14_prob >= thresholds['MG Casa 1-4']:
@@ -644,13 +680,13 @@ def get_recommended_bets(prediction: dict, quotes: dict = None) -> list:
                 'threshold': thresholds['MG Casa 1-4']
             })
         
-        # Add Multigol Casa 1-5 market (missing from original thresholds)
-        if mg_casa_15_prob >= 70:  # Use 70% threshold like other Multigol markets
+        # Add Multigol Casa 1-5 market - V3 AGGRESSIVE threshold
+        if mg_casa_15_prob >= 65:  # Era 70% - ridotto per più raccomandazioni
             recommendations.append({
                 'market': 'Multigol Casa 1-5',
                 'prediction': 'Casa 1-5',
                 'confidence': round(mg_casa_15_prob, 1),
-                'threshold': 70
+                'threshold': 65
             })
         
         if mg_casa_25_prob >= thresholds['MG Casa 2-5']:
@@ -692,6 +728,24 @@ def get_recommended_bets(prediction: dict, quotes: dict = None) -> list:
                 'prediction': 'Ospite 1-3',
                 'confidence': round(mg_ospite_13_prob, 1),
                 'threshold': thresholds['MG Ospite 1-3']
+            })
+        
+        # Multigol Ospite 1-4 - AGGIUNTO V3
+        if mg_ospite_14_prob >= 60:  # Soglia V3 aggressive
+            recommendations.append({
+                'market': 'Multigol Ospite 1-4',
+                'prediction': 'Ospite 1-4',
+                'confidence': round(mg_ospite_14_prob, 1),
+                'threshold': 60
+            })
+        
+        # Multigol Ospite 1-5 - AGGIUNTO V3
+        if mg_ospite_15_prob >= 65:  # Soglia V3 aggressive
+            recommendations.append({
+                'market': 'Multigol Ospite 1-5',
+                'prediction': 'Ospite 1-5',
+                'confidence': round(mg_ospite_15_prob, 1),
+                'threshold': 65
             })
         
         if mg_ospite_24_prob >= thresholds['MG Ospite 2-4']:
