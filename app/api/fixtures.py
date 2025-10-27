@@ -75,7 +75,8 @@ async def generate_all_predictions_and_save():
             result = await get_all_fixtures_recommendations(
                 league_code=None,  # Tutte le leghe
                 limit=1000,        # Limite alto per prendere tutte
-                db=db
+                db=db,
+                use_context=True
             )
             
             # Crea directory se non esiste

@@ -11,18 +11,24 @@ import os
 # Add parent directory to path to import from app/
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
+import argparse
 import pandas as pd
 import sqlite3
 from collections import defaultdict
 from datetime import datetime
 from app.api.ml_football_exact import ExactSimpleFooballPredictor, get_recommended_bets
 
+# Addon disabled: do not import or use the optional enhancer
+enhancer = None  # sentinel: addon intentionally disabled (safe default)
+
 class FootballBacktest:
     
-    def __init__(self, num_matches=50):
+    def __init__(self, num_matches=50, ev_threshold: float = 0.05):
         self.num_matches = num_matches
         self.db_path = './data/football_dataset.db'  # Correct path to football database
         self.predictor = ExactSimpleFooballPredictor()
+        # Addon removed: enhancer is not used anymore
+        self.ev_threshold = ev_threshold
         self.market_stats = defaultdict(lambda: {'total': 0, 'correct': 0, 'incorrect': 0})
         self.failed_matches = 0
         self.detailed_results = []  # Per salvare risultati dettagliati
@@ -219,8 +225,10 @@ class FootballBacktest:
                     'under_25': match.get('Avg<2.5', 2.0)
                 }
                 
-                # Ottieni raccomandazioni
+                # Ottieni raccomandazioni baseline
                 recommendations = get_recommended_bets(prediction, quotes)
+
+                # Addon removed: keep baseline recommendations as returned by get_recommended_bets
                 
                 # Debug prima partita
                 if idx == 0:
@@ -512,7 +520,12 @@ class FootballBacktest:
 
 def main():
     """Entry point del backtest"""
-    backtest = FootballBacktest(num_matches=10000)  # 🎯 FULL SCALE - 10K matches 
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--num-matches', type=int, default=500, help='Numero di partite da testare')
+    parser.add_argument('--ev-threshold', type=float, default=0.05, help='Soglia EV minima per raccomandare')
+    args = parser.parse_args()
+
+    backtest = FootballBacktest(num_matches=args.num_matches, ev_threshold=args.ev_threshold)
     backtest.run_backtest()
 
 if __name__ == "__main__":

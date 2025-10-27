@@ -14,13 +14,18 @@ from datetime import datetime
 from typing import Dict, List, Tuple, Optional
 import warnings
 warnings.filterwarnings('ignore')
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.db.models import Match, Team, Season, League
 from pydantic import BaseModel
+import os
+import json
+from addons.context_scoring_v4 import build_signals_map, compute_context_signals, compute_context_directives
 
+USE_CUSTOM_THRESHOLDS = True
 
 class BettingRecommendation(BaseModel):
     market: str
@@ -45,14 +50,76 @@ except ImportError:
 
 router = APIRouter()
 
+# ==============================
+# 📌 Caricamento soglie dinamiche
+# ==============================
+DEFAULT_THRESHOLDS = {
+    'Over 0.5 Goal': 85,
+    'Over 1.5 Goal': 70,
+    'Over 2.5 Goal': 65,
+    'Over 3.5 Goal': 60,
+    'Under 0.5 Goal': 85,
+    'Under 1.5 Goal': 70,
+    'Under 2.5 Goal': 65,
+    'Under 3.5 Goal': 70,
+    'Multigol Casa 1-4': 75,
+    'Multigol Ospite 1-3': 75,
+    'Multigol Casa 2-5': 75,
+    'Multigol Ospite 2-4': 75,
+    'Multigol Casa 3-6': 75,
+    'Multigol Ospite 3-5': 75,
+    'Multigol Casa 4+': 75,
+    'Multigol Ospite 4+': 75,
+    'BTTS Si': 70,
+    'BTTS No': 70,
+    '1X2 H': 60,
+    '1X2 X': 60,
+    '1X2 A': 60,
+    'DC 1X': 70,
+    'DC X2': 70,
+    'DC 12': 70
+}
+
+THRESHOLD_FILE = Path("optimal_thresholds.json")
+
+# Caricamento soglie una sola volta
+optimal_thresholds = {}
+if THRESHOLD_FILE.exists():
+    try:
+        with open(THRESHOLD_FILE) as f:
+            optimal_thresholds = json.load(f)
+        #print(f"[THR LOADER] ✅ Soglie personalizzate caricate da {THRESHOLD_FILE}")
+        #print(f"[THR LOADER] Totale mercati caricati: {len(optimal_thresholds)}")
+    except Exception as e:
+        print(f"[THR LOADER] ⚠️ Errore caricando soglie personalizzate: {e}")
+else:
+    print(f"[THR LOADER] ⚠️ File {THRESHOLD_FILE} non trovato — uso soglie default")
+
+
+def get_threshold(label: str) -> int:
+    if USE_CUSTOM_THRESHOLDS and label in optimal_thresholds:
+        thr = optimal_thresholds[label]
+        if label.startswith('Over') or 'Multigol' in label:
+            thr -= 5  # offset soft
+        #print(f"[THR] {label}: soglia custom {thr}%")
+        return thr
+    elif label in DEFAULT_THRESHOLDS:
+        thr = DEFAULT_THRESHOLDS[label]
+        #print(f"[THR] {label}: soglia default {thr}%")
+        return thr
+    else:
+        #print(f"[THR] {label}: ❌ non trovata — fallback 70%")
+        return 70
+
 class ExactSimpleFooballPredictor:
     """EXACT replica of original SimpleFooballPredictor but using database data"""
     
-    def __init__(self):
+    def __init__(self, use_context_scoring: bool = True):
         """Initialize with EXACT same settings as original."""
         self.global_window = 10  # Last N matches for features
         self.venue_window = 5    # Last N home/away matches
         self.market_weight = 0.6 # Weight for market vs stats (60% market, 40% stats)
+        self.use_context_scoring = use_context_scoring
         
     def load_data(self, db: Session, league_code: str) -> pd.DataFrame:
         """Load and clean match data - EXACTLY replicating original CSV load logic."""
@@ -315,7 +382,7 @@ class ExactSimpleFooballPredictor:
         return probs
     
     def predict_match(self, df: pd.DataFrame, match_idx: int) -> Dict:
-        """Predict a single match - EXACT copy of original method."""
+        """Predict a single match - EXACT copy of original method, con context scoring opzionale."""
         match = df.iloc[match_idx]
         
         # Get team features
@@ -373,6 +440,16 @@ class ExactSimpleFooballPredictor:
             result['actual_total_goals'] = int(match['FTHG']) + int(match['FTAG'])
             result['actual_scoreline'] = f"{int(match['FTHG'])}-{int(match['FTAG'])}"
         
+        # Context scoring v4: arricchisci prediction con direttive context se attivo
+        #if self.use_context_scoring:
+        # Costruisci signals map per la partita
+        signals_map = build_signals_map([result])
+        ctx_directives = compute_context_directives([result], signals_map)
+        # Applica direttive context alla prediction
+        mid = result.get("match_id") or result.get("id") or result.get("fixture_id") or match_idx
+        if mid in ctx_directives:
+            result.update(ctx_directives[mid])
+        
         return result
 
 
@@ -408,411 +485,159 @@ def get_recommended_bets(prediction: dict, quotes: dict = None) -> list:
     Generate betting recommendations based on prediction probabilities
     EXACT replica of the betting logic from generate_html_report.py
     """
+    
+    ctx_delta = prediction.get('ctx_delta_thresholds', {}) or {}
+    ctx_skip  = set(prediction.get('skip_recommendations', []) or [])
+    ctx_force = set(prediction.get('force_recommendations', []) or [])
+    
+    
+    # --- LOG INIZIALE ---
+    """ if ctx_delta or ctx_skip or ctx_force:
+        print(f"[CTX DETECTED] Context attivo in get_recommended_bets")
+        print(f"    Δ soglie: {ctx_delta}")
+        print(f"    Skip: {ctx_skip}")
+        print(f"    Force: {ctx_force}") """
+
+    
+    def apply_delta(label, base_thr):
+        return base_thr + int(ctx_delta.get(label, 0))
+    
     recommendations = []
     
-    # Define minimum thresholds for each market
-    thresholds = {
-        'Over 0.5': 85,
-        'Over 1.5': 70,
-        'Over 2.5': 65,
-        'Over 3.5': 60,
-        'Under 0.5': 85,
-        'Under 1.5': 70,
-        'Under 2.5': 65,
-        'Under 3.5': 70,
-        'MG Casa 1-4': 75,
-        'MG Ospite 1-3': 75,
-        'MG Casa 2-5': 75,
-        'MG Ospite 2-4': 75,
-        'MG Casa 3-6': 75,
-        'MG Ospite 3-5': 75,
-        'MG Casa 4+': 75,
-        'MG Ospite 4+': 75,
-        'BTTS Si': 70,
-        'BTTS No': 70,
-        '1X2 H': 60,
-        '1X2 X': 60,
-        '1X2 A': 60,
-        'DC 1X': 70,
-        'DC X2': 70,
-        'DC 12': 70
-    }
-    
-    # Extract probabilities from prediction and convert to Python floats
-    # Check different possible keys for probabilities
+    # --- utility locale per aggiungere una pick applicando skip/force/delta ---
+    def maybe_add(label: str, market: str, confidence: float, prediction_text: str):
+        # gestisci context skip/force + delta soglie
+        if label in ctx_skip:
+            return
+        base_thr = get_threshold(label)
+        thr_eff = apply_delta(label, base_thr)
+        forced = (label in ctx_force)
+        if confidence >= thr_eff or forced:
+            recommendations.append({
+                'market': market,
+                'prediction': prediction_text,
+                'confidence': round(confidence, 1),
+                'threshold': thr_eff,
+                'forced': forced
+            })
+            
+    # ===== 1X2 =====
     prob_home = float(prediction.get('prob_home', prediction.get('1X2_H', 0))) * 100
-    prob_draw = float(prediction.get('prob_draw', prediction.get('1X2_D', 0))) * 100  
+    prob_draw = float(prediction.get('prob_draw', prediction.get('1X2_D', 0))) * 100
     prob_away = float(prediction.get('prob_away', prediction.get('1X2_A', 0))) * 100
-    
-    # Goal probabilities
-    goal_probs = prediction.get('goal_probabilities', {})
-    
-    # Check 1X2 markets
-    if prob_home >= thresholds['1X2 H']:
-        recommendations.append({
-            'market': '1X2 Casa',
-            'prediction': 'Casa',
-            'confidence': round(prob_home, 1),
-            'threshold': thresholds['1X2 H']
-        })
-    
-    if prob_draw >= thresholds['1X2 X']:
-        recommendations.append({
-            'market': '1X2 Pareggio',
-            'prediction': 'Pareggio',
-            'confidence': round(prob_draw, 1),
-            'threshold': thresholds['1X2 X']
-        })
-    
-    if prob_away >= thresholds['1X2 A']:
-        recommendations.append({
-            'market': '1X2 Ospite',
-            'prediction': 'Ospite',
-            'confidence': round(prob_away, 1),
-            'threshold': thresholds['1X2 A']
-        })
-    
-    # Check Double Chance markets
+
+    if prob_home: maybe_add('1X2 Casa', '1X2 Casa', prob_home,'1X2 Casa')
+    if prob_draw: maybe_add('1X2 Pareggio', '1X2 Pareggio', prob_draw, '1X2 Pareggio')
+    if prob_away: maybe_add('1X2 Ospite', '1X2 Ospite', prob_away, '1X2 Ospite')
+
+    # ===== DC =====
     prob_1x = prob_home + prob_draw
     prob_x2 = prob_draw + prob_away
     prob_12 = prob_home + prob_away
-    
-    if prob_1x >= thresholds['DC 1X']:
-        recommendations.append({
-            'market': 'Doppia Chance 1X',
-            'prediction': '1X',
-            'confidence': round(prob_1x, 1),
-            'threshold': thresholds['DC 1X']
-        })
-    
-    if prob_x2 >= thresholds['DC X2']:
-        recommendations.append({
-            'market': 'Doppia Chance X2',
-            'prediction': 'X2',
-            'confidence': round(prob_x2, 1),
-            'threshold': thresholds['DC X2']
-        })
-    
-    if prob_12 >= thresholds['DC 12']:
-        recommendations.append({
-            'market': 'Doppia Chance 12',
-            'prediction': '12',
-            'confidence': round(prob_12, 1),
-            'threshold': thresholds['DC 12']
-        })
-    
-    # Check Over/Under markets - use direct values from prediction
-    # The prediction already contains O_0_5, O_1_5, etc. as probabilities (0-1 scale)
+    maybe_add('Doppia Chance 1X', 'Doppia Chance 1X', prob_1x, 'Doppia Chance 1X')
+    maybe_add('Doppia Chance X2', 'Doppia Chance X2', prob_x2, 'Doppia Chance X2')
+    maybe_add('Doppia Chance 12', 'Doppia Chance 12', prob_12, 'Doppia Chance 12')
+
+    # ===== Over/Under =====
     over_05 = float(prediction.get('O_0_5', 0)) * 100
-    over_15 = float(prediction.get('O_1_5', 0)) * 100 
+    over_15 = float(prediction.get('O_1_5', 0)) * 100
     over_25 = float(prediction.get('O_2_5', 0)) * 100
     over_35 = float(prediction.get('O_3_5', 0)) * 100
-    
-    # Calculate Under probabilities (complement of Over)
     under_05 = 100 - over_05
     under_15 = 100 - over_15
     under_25 = 100 - over_25
     under_35 = 100 - over_35
+
+    maybe_add('Over 0.5 Goal', 'Over 0.5 Goal', over_05, 'Over 0.5 Goal')
+    maybe_add('Over 1.5 Goal', 'Over 1.5 Goal', over_15, 'Over 1.5 Goal')
+    maybe_add('Over 2.5 Goal', 'Over 2.5 Goal', over_25, 'Over 2.5 Goal')
+    maybe_add('Over 3.5 Goal', 'Over 3.5 Goal', over_35, 'Over 3.5 Goal')
+
+    maybe_add('Under 0.5 Goal', 'Under 0.5 Goal', under_05, 'Under 0.5 Goal')
+    maybe_add('Under 1.5 Goal', 'Under 1.5 Goal', under_15, 'Under 1.5 Goal')
+    maybe_add('Under 2.5 Goal', 'Under 2.5 Goal', under_25, 'Under 2.5 Goal')
+    maybe_add('Under 3.5 Goal', 'Under 3.5 Goal', under_35, 'Under 3.5 Goal')
+
     
-    # Check Over markets
-    if over_05 >= thresholds['Over 0.5']:
-        recommendations.append({
-            'market': 'Over 0.5 Goal',
-            'prediction': 'Over 0.5',
-            'confidence': round(over_05, 1),
-            'threshold': thresholds['Over 0.5']
-        })
-    
-    if over_15 >= thresholds['Over 1.5']:
-        recommendations.append({
-            'market': 'Over 1.5 Goal',
-            'prediction': 'Over 1.5',
-            'confidence': round(over_15, 1),
-            'threshold': thresholds['Over 1.5']
-        })
-    
-    if over_25 >= thresholds['Over 2.5']:
-        recommendations.append({
-            'market': 'Over 2.5 Goal',
-            'prediction': 'Over 2.5',
-            'confidence': round(over_25, 1),
-            'threshold': thresholds['Over 2.5']
-        })
-    
-    if over_35 >= thresholds['Over 3.5']:
-        recommendations.append({
-            'market': 'Over 3.5 Goal',
-            'prediction': 'Over 3.5',
-            'confidence': round(over_35, 1),
-            'threshold': thresholds['Over 3.5']
-        })
-    
-    # Check Under markets
-    if under_05 >= thresholds['Under 0.5']:
-        recommendations.append({
-            'market': 'Under 0.5 Goal',
-            'prediction': 'Under 0.5',
-            'confidence': round(under_05, 1),
-            'threshold': thresholds['Under 0.5']
-        })
-    
-    if under_15 >= thresholds['Under 1.5']:
-        recommendations.append({
-            'market': 'Under 1.5 Goal',
-            'prediction': 'Under 1.5',
-            'confidence': round(under_15, 1),
-            'threshold': thresholds['Under 1.5']
-        })
-    
-    if under_25 >= thresholds['Under 2.5']:
-        recommendations.append({
-            'market': 'Under 2.5 Goal',
-            'prediction': 'Under 2.5',
-            'confidence': round(under_25, 1),
-            'threshold': thresholds['Under 2.5']
-        })
-    
-    if under_35 >= thresholds['Under 3.5']:
-        recommendations.append({
-            'market': 'Under 3.5 Goal',
-            'prediction': 'Under 3.5',
-            'confidence': round(under_35, 1),
-            'threshold': thresholds['Under 3.5']
-        })
-    
-    # Check BTTS (Both Teams To Score)
-    # Use simple approximation if exact BTTS probabilities not available
-    btts_home_prob = float(prediction.get('btts_home_prob', 0.7)) * 100  # Assume 70% if missing
-    btts_away_prob = float(prediction.get('btts_away_prob', 0.6)) * 100  # Assume 60% if missing
-    
-    # BTTS Si = both teams score
-    btts_si = btts_home_prob * btts_away_prob / 100
-    # BTTS No = at least one team doesn't score  
-    btts_no = 100 - btts_si
-    
-    if btts_si >= thresholds['BTTS Si']:
-        recommendations.append({
-            'market': 'BTTS Si',
-            'prediction': 'Si',
-            'confidence': round(btts_si, 1),
-            'threshold': thresholds['BTTS Si']
-        })
-    
-    if btts_no >= thresholds['BTTS No']:
-        recommendations.append({
-            'market': 'BTTS No',
-            'prediction': 'No',
-            'confidence': round(btts_no, 1),
-            'threshold': thresholds['BTTS No']
-        })
-    
-    # Check Multigol markets (refactored to separate function)
-    multigol_recommendations = _get_multigol_recommendations_baseline(prediction, quotes, thresholds)
-    recommendations.extend(multigol_recommendations)
+    multigol = _get_multigol_recommendations_baseline(prediction, quotes)
+    for rec in multigol:
+        label = rec['market'].replace('Multigol ', 'MG ')
+        if label in ctx_skip:
+            continue
+        rec['threshold'] = apply_delta(label, rec['threshold'])
+        if label in ctx_force:
+            rec['forced'] = True
+        recommendations.append(rec)
+
+        # --- LOG FINALE ---
+        """ if ctx_delta or ctx_skip or ctx_force:
+            print(f"[CTX RESULT] Tot raccomandazioni finali: {len(recommendations)}") """
+
     return recommendations
 
-
-def _get_multigol_recommendations_baseline(prediction: dict, quotes: dict = None, thresholds: dict = None) -> list:
+def _get_multigol_recommendations_baseline(prediction, quotes=None):
     """
-    Logica Multigol baseline estratta per modularità
-    
-    Args:
-        prediction: Dizionario con probabilità predette
-        quotes: Quote 1X2 per determinare favorito
-        thresholds: Soglie per i mercati Multigol
-        
-    Returns:
-        Lista di raccomandazioni Multigol baseline
+    Logica Multigol baseline modulare, ora con soglie dinamiche da get_threshold()
     """
     recommendations = []
-    
-    if thresholds is None:
-        # V3 AGGRESSIVE THRESHOLDS - Ridotte per generare più raccomandazioni
-        thresholds = {
-            'MG Casa 1-4': 60,  # Era 75
-            'MG Ospite 1-3': 60,  # Era 75
-            'MG Casa 2-5': 65,  # Era 75
-            'MG Ospite 2-4': 65,  # Era 75
-            'MG Casa 3-6': 70,  # Era 75
-            'MG Ospite 3-5': 70,  # Era 75
-            'MG Casa 4+': 70,  # Era 75
-            'MG Ospite 4+': 70   # Era 75
-        }
-    
-    # Extract probabilities from prediction and convert to Python floats
+
+    # Probabilità base
     prob_home = float(prediction.get('prob_home', prediction.get('1X2_H', 0))) * 100
     prob_away = float(prediction.get('prob_away', prediction.get('1X2_A', 0))) * 100
-    
+
     home_goals_avg = float(prediction.get('home_goals', prediction.get('lambda_home', 0)))
     away_goals_avg = float(prediction.get('away_goals', prediction.get('lambda_away', 0)))
-    
-    # Determine team favoritism for Multigol filtering
+
+    # Determina favorito: quote o probabilità
     if quotes:
         home_quote = quotes.get('1', 999)
         away_quote = quotes.get('2', 999)
-        # Require minimum 10% difference in odds (0.2 points) to consider a favorite
         quote_diff_threshold = 0.2
-        
         if abs(home_quote - away_quote) < quote_diff_threshold:
-            favorite_team = None  # Too close to call - no Multigol recommendations
+            favorite_team = None
         else:
-            # Determine who is favorite
-            if home_quote < away_quote:
-                # Casa favorita - check if quote is attractive (< 1.70)
-                if home_quote <= 1.70:
-                    favorite_team = 'home'
-                else:
-                    favorite_team = None  # Quote troppo alta per Casa
+            if home_quote < away_quote and home_quote <= 1.70:
+                favorite_team = 'home'
+            elif away_quote < home_quote and away_quote <= 1.90:
+                favorite_team = 'away'
             else:
-                # Ospite favorita - check if quote is attractive (< 1.90)  
-                if away_quote <= 1.90:
-                    favorite_team = 'away'
-                else:
-                    favorite_team = None  # Quote troppo alta per Ospite
+                favorite_team = None
     else:
-        # Require minimum 5% probability difference to consider a favorite
-        prob_diff_threshold = 5.0  # 5%
+        prob_diff_threshold = 5.0
         if abs(prob_home - prob_away) < prob_diff_threshold:
-            favorite_team = None  # Too close to call - no Multigol recommendations
+            favorite_team = None
         else:
             favorite_team = 'home' if prob_home > prob_away else 'away'
-    
-    # Multigol Casa markets - use direct values from prediction
-    if favorite_team == 'home' and home_goals_avg >= 1.0:  # Lowered threshold
-        mg_casa_13_prob = float(prediction.get('MG_Casa_1_3', 0)) * 100
-        mg_casa_14_prob = float(prediction.get('MG_Casa_1_4', 0)) * 100
-        mg_casa_15_prob = float(prediction.get('MG_Casa_1_5', 0)) * 100
-        mg_casa_25_prob = float(prediction.get('MG_Casa_2_5', 0)) * 100
-        mg_casa_36_prob = float(prediction.get('MG_Casa_3_6', 0)) * 100
-        mg_casa_4plus_prob = float(prediction.get('MG_Casa_4+', 0)) * 100
-        
-        # Add Multigol Casa 1-3 market - V3 AGGRESSIVE threshold
-        if mg_casa_13_prob >= 62:  # Era 70% - ridotto per più raccomandazioni
+
+    def maybe_add(label, market, p):
+        thr = get_threshold(label)
+        if p >= thr:
             recommendations.append({
-                'market': 'Multigol Casa 1-3',
-                'prediction': 'Casa 1-3',
-                'confidence': round(mg_casa_13_prob, 1),
-                'threshold': 62
+                'market': market,
+                'prediction': market,  # es. "Casa 1-4"
+                'confidence': round(p, 1),
+                'threshold': thr
             })
-        
-        if mg_casa_14_prob >= thresholds['MG Casa 1-4']:
-            recommendations.append({
-                'market': 'Multigol Casa 1-4',
-                'prediction': 'Casa 1-4',
-                'confidence': round(mg_casa_14_prob, 1),
-                'threshold': thresholds['MG Casa 1-4']
-            })
-        
-        # Add Multigol Casa 1-5 market - V3 AGGRESSIVE threshold
-        if mg_casa_15_prob >= 65:  # Era 70% - ridotto per più raccomandazioni
-            recommendations.append({
-                'market': 'Multigol Casa 1-5',
-                'prediction': 'Casa 1-5',
-                'confidence': round(mg_casa_15_prob, 1),
-                'threshold': 65
-            })
-        
-        if mg_casa_25_prob >= thresholds['MG Casa 2-5']:
-            recommendations.append({
-                'market': 'Multigol Casa 2-5',
-                'prediction': 'Casa 2-5',
-                'confidence': round(mg_casa_25_prob, 1),
-                'threshold': thresholds['MG Casa 2-5']
-            })
-        
-        if mg_casa_36_prob >= thresholds['MG Casa 3-6']:
-            recommendations.append({
-                'market': 'Multigol Casa 3-6',
-                'prediction': 'Casa 3-6',
-                'confidence': round(mg_casa_36_prob, 1),
-                'threshold': thresholds['MG Casa 3-6']
-            })
-        
-        if mg_casa_4plus_prob >= thresholds['MG Casa 4+']:
-            recommendations.append({
-                'market': 'Multigol Casa 4+',
-                'prediction': 'Casa 4+',
-                'confidence': round(mg_casa_4plus_prob, 1),
-                'threshold': thresholds['MG Casa 4+']
-            })
-    
-    # Multigol Ospite markets - use direct values from prediction  
-    if favorite_team == 'away' and away_goals_avg >= 1.0:  # Lowered threshold
-        mg_ospite_13_prob = float(prediction.get('MG_Ospite_1_3', 0)) * 100
-        mg_ospite_14_prob = float(prediction.get('MG_Ospite_1_4', 0)) * 100
-        mg_ospite_15_prob = float(prediction.get('MG_Ospite_1_5', 0)) * 100
-        mg_ospite_24_prob = float(prediction.get('MG_Ospite_2_4', 0)) * 100
-        mg_ospite_35_prob = float(prediction.get('MG_Ospite_3_5', 0)) * 100
-        mg_ospite_4plus_prob = float(prediction.get('MG_Ospite_4+', 0)) * 100
-        
-        if mg_ospite_13_prob >= thresholds['MG Ospite 1-3']:
-            recommendations.append({
-                'market': 'Multigol Ospite 1-3',
-                'prediction': 'Ospite 1-3',
-                'confidence': round(mg_ospite_13_prob, 1),
-                'threshold': thresholds['MG Ospite 1-3']
-            })
-        
-        # Multigol Ospite 1-4 - AGGIUNTO V3
-        if mg_ospite_14_prob >= 60:  # Soglia V3 aggressive
-            recommendations.append({
-                'market': 'Multigol Ospite 1-4',
-                'prediction': 'Ospite 1-4',
-                'confidence': round(mg_ospite_14_prob, 1),
-                'threshold': 60
-            })
-        
-        # Multigol Ospite 1-5 - AGGIUNTO V3
-        if mg_ospite_15_prob >= 65:  # Soglia V3 aggressive
-            recommendations.append({
-                'market': 'Multigol Ospite 1-5',
-                'prediction': 'Ospite 1-5',
-                'confidence': round(mg_ospite_15_prob, 1),
-                'threshold': 65
-            })
-        
-        if mg_ospite_24_prob >= thresholds['MG Ospite 2-4']:
-            recommendations.append({
-                'market': 'Multigol Ospite 2-4',
-                'prediction': 'Ospite 2-4',
-                'confidence': round(mg_ospite_24_prob, 1),
-                'threshold': thresholds['MG Ospite 2-4']
-            })
-        
-        if mg_ospite_35_prob >= thresholds['MG Ospite 3-5']:
-            recommendations.append({
-                'market': 'Multigol Ospite 3-5',
-                'prediction': 'Ospite 3-5',
-                'confidence': round(mg_ospite_35_prob, 1),
-                'threshold': thresholds['MG Ospite 3-5']
-            })
-        
-        if mg_ospite_4plus_prob >= thresholds['MG Ospite 4+']:
-            recommendations.append({
-                'market': 'Multigol Ospite 4+',
-                'prediction': 'Ospite 4+',
-                'confidence': round(mg_ospite_4plus_prob, 1),
-                'threshold': thresholds['MG Ospite 4+']
-            })
-    
+
+    # Multigol Casa
+    if favorite_team == 'home' and home_goals_avg >= 1.0:
+        maybe_add('Multigol Casa 1-3', 'Multigol Casa 1-3', float(prediction.get('MG_Casa_1_3', 0)) * 100)
+        maybe_add('Multigol Casa 1-4', 'Multigol Casa 1-4', float(prediction.get('MG_Casa_1_4', 0)) * 100)
+        maybe_add('Multigol Casa 1-5', 'Multigol Casa 1-5', float(prediction.get('MG_Casa_1_5', 0)) * 100)
+        maybe_add('Multigol Casa 2-5', 'Multigol Casa 2-5', float(prediction.get('MG_Casa_2_5', 0)) * 100)
+        maybe_add('Multigol Casa 3-6', 'Multigol Casa 3-6', float(prediction.get('MG_Casa_3_6', 0)) * 100)
+        maybe_add('Multigol Casa 4+', 'Multigol Casa 4+', float(prediction.get('MG_Casa_4_plus', 0)) * 100)
+
+    # Multigol Ospite
+    if favorite_team == 'away' and away_goals_avg >= 1.0:
+        maybe_add('Multigol Ospite 1-3', 'Multigol Ospite 1-3', float(prediction.get('MG_Ospite_1_3', 0)) * 100)
+        maybe_add('Multigol Ospite 1-4', 'Multigol Ospite 1-4', float(prediction.get('MG_Ospite_1_4', 0)) * 100)
+        maybe_add('Multigol Ospite 1-5', 'Multigol Ospite 1-5', float(prediction.get('MG_Ospite_1_5', 0)) * 100)
+        maybe_add('Multigol Ospite 2-4', 'Multigol Ospite 2-4', float(prediction.get('MG_Ospite_2_4', 0)) * 100)
+        maybe_add('Multigol Ospite 3-5', 'Multigol Ospite 3-5', float(prediction.get('MG_Ospite_3_5', 0)) * 100)
+        maybe_add('Multigol Ospite 4+', 'Multigol Ospite 4+', float(prediction.get('MG_Ospite_4_plus', 0)) * 100)
     return recommendations
 
-
-def _calculate_multigol_prob(avg_goals: float, min_goals: int, max_goals: int) -> float:
-    """Calculate probability of scoring between min_goals and max_goals using Poisson distribution"""
-    if not HAS_SCIPY:
-        # Simple approximation without scipy
-        if avg_goals >= min_goals and avg_goals <= max_goals:
-            return 0.7  # High probability if average is in range
-        elif abs(avg_goals - (min_goals + max_goals) / 2) <= 1:
-            return 0.5  # Medium probability if close to range
-        else:
-            return 0.2  # Low probability otherwise
-    
-    total_prob = 0
-    for goals in range(min_goals, max_goals + 1):
-        total_prob += poisson.pmf(goals, avg_goals)
-    return total_prob
 
 
 # Models are now managed by model_management.py
@@ -1078,7 +903,8 @@ async def exact_predict_match(
 async def get_all_fixtures_recommendations(
     league_code: str = None,
     limit: int = 50,
-    db: Session = Depends(get_football_db)
+    db: Session = Depends(get_football_db),
+    use_context: bool = True
 ):
     """Get betting recommendations for all fixtures using V3 Complete system"""
     try:
@@ -1125,7 +951,7 @@ async def get_all_fixtures_recommendations(
                 if fixture.league_code not in league_predictors:
                     from app.api.model_management import get_model_for_league
                     predictor = get_model_for_league(fixture.league_code)
-                    # Load data once per league
+                    # Load data once per leagueget_all_fixtures_recommendations
                     df = predictor.load_data(db, fixture.league_code)
                     predictor.data = df  # Cache the data
                     league_predictors[fixture.league_code] = predictor

@@ -1,0 +1,2012 @@
+{
+  "Genoa": {
+    "gf": 0.75,
+    "ga": 1.51,
+    "style": "balanced"
+  },
+  "Lecce": {
+    "gf": 0.94,
+    "ga": 1.45,
+    "style": "balanced"
+  },
+  "Sassuolo": {
+    "gf": 0.98,
+    "ga": 1.02,
+    "style": "balanced"
+  },
+  "Napoli": {
+    "gf": 1.77,
+    "ga": 0.91,
+    "style": "balanced"
+  },
+  "Milan": {
+    "gf": 1.72,
+    "ga": 0.86,
+    "style": "balanced"
+  },
+  "Cremonese": {
+    "gf": 1.18,
+    "ga": 1.33,
+    "style": "balanced"
+  },
+  "Roma": {
+    "gf": 1.14,
+    "ga": 0.45,
+    "style": "defensive"
+  },
+  "Bologna": {
+    "gf": 1.67,
+    "ga": 1.16,
+    "style": "balanced"
+  },
+  "Cagliari": {
+    "gf": 1.08,
+    "ga": 1.45,
+    "style": "balanced"
+  },
+  "Fiorentina": {
+    "gf": 1.17,
+    "ga": 1.57,
+    "style": "balanced"
+  },
+  "Como": {
+    "gf": 1.13,
+    "ga": 0.61,
+    "style": "defensive"
+  },
+  "Lazio": {
+    "gf": 1.31,
+    "ga": 0.85,
+    "style": "balanced"
+  },
+  "Atalanta": {
+    "gf": 1.54,
+    "ga": 0.85,
+    "style": "balanced"
+  },
+  "Pisa": {
+    "gf": 0.9,
+    "ga": 1.48,
+    "style": "balanced"
+  },
+  "Juventus": {
+    "gf": 1.04,
+    "ga": 1.02,
+    "style": "balanced"
+  },
+  "Parma": {
+    "gf": 0.52,
+    "ga": 0.79,
+    "style": "defensive"
+  },
+  "Udinese": {
+    "gf": 1.25,
+    "ga": 1.68,
+    "style": "balanced"
+  },
+  "Verona": {
+    "gf": 0.62,
+    "ga": 1.24,
+    "style": "balanced"
+  },
+  "Inter": {
+    "gf": 2.01,
+    "ga": 1.23,
+    "style": "attacking"
+  },
+  "Torino": {
+    "gf": 1.02,
+    "ga": 1.54,
+    "style": "balanced"
+  },
+  "Antwerp": {
+    "gf": 0.63,
+    "ga": 1.2,
+    "style": "balanced"
+  },
+  "St. Gilloise": {
+    "gf": 1.94,
+    "ga": 0.47,
+    "style": "balanced"
+  },
+  "Dender": {
+    "gf": 0.65,
+    "ga": 1.62,
+    "style": "balanced"
+  },
+  "Cercle Brugge": {
+    "gf": 1.41,
+    "ga": 1.58,
+    "style": "balanced"
+  },
+  "Waregem": {
+    "gf": 1.72,
+    "ga": 1.11,
+    "style": "balanced"
+  },
+  "Mechelen": {
+    "gf": 1.45,
+    "ga": 1.13,
+    "style": "balanced"
+  },
+  "RAAL La Louviere": {
+    "gf": 0.65,
+    "ga": 0.64,
+    "style": "defensive"
+  },
+  "Standard": {
+    "gf": 0.66,
+    "ga": 1.44,
+    "style": "balanced"
+  },
+  "Anderlecht": {
+    "gf": 1.08,
+    "ga": 1.02,
+    "style": "balanced"
+  },
+  "Westerlo": {
+    "gf": 1.43,
+    "ga": 1.43,
+    "style": "balanced"
+  },
+  "Oud-Heverlee Leuven": {
+    "gf": 0.63,
+    "ga": 1.59,
+    "style": "balanced"
+  },
+  "Charleroi": {
+    "gf": 1.22,
+    "ga": 1.47,
+    "style": "balanced"
+  },
+  "Club Brugge": {
+    "gf": 1.59,
+    "ga": 0.8,
+    "style": "balanced"
+  },
+  "Genk": {
+    "gf": 1.5,
+    "ga": 1.36,
+    "style": "balanced"
+  },
+  "St Truiden": {
+    "gf": 1.31,
+    "ga": 1.58,
+    "style": "balanced"
+  },
+  "Gent": {
+    "gf": 2.01,
+    "ga": 1.54,
+    "style": "attacking"
+  },
+  "Beerschot VA": {
+    "gf": 1.5,
+    "ga": 1.68,
+    "style": "balanced"
+  },
+  "Kortrijk": {
+    "gf": 1.76,
+    "ga": 1.42,
+    "style": "balanced"
+  },
+  "Eupen": {
+    "gf": 0.65,
+    "ga": 1.42,
+    "style": "balanced"
+  },
+  "RWD Molenbeek": {
+    "gf": 1.08,
+    "ga": 2.12,
+    "style": "balanced"
+  },
+  "Seraing": {
+    "gf": 0.62,
+    "ga": 2.2,
+    "style": "balanced"
+  },
+  "Oostende": {
+    "gf": 1.12,
+    "ga": 2.51,
+    "style": "balanced"
+  },
+  "Mouscron": {
+    "gf": 1.19,
+    "ga": 1.97,
+    "style": "balanced"
+  },
+  "Waasland-Beveren": {
+    "gf": 1.55,
+    "ga": 2.04,
+    "style": "balanced"
+  },
+  "Lokeren": {
+    "gf": 1.1,
+    "ga": 1.69,
+    "style": "balanced"
+  },
+  "Bayern Munich": {
+    "gf": 3.38,
+    "ga": 0.52,
+    "style": "attacking"
+  },
+  "RB Leipzig": {
+    "gf": 2.2,
+    "ga": 1.13,
+    "style": "attacking"
+  },
+  "Ein Frankfurt": {
+    "gf": 2.36,
+    "ga": 1.88,
+    "style": "attacking"
+  },
+  "Werder Bremen": {
+    "gf": 1.45,
+    "ga": 1.47,
+    "style": "balanced"
+  },
+  "Freiburg": {
+    "gf": 1.34,
+    "ga": 1.58,
+    "style": "balanced"
+  },
+  "Augsburg": {
+    "gf": 1.17,
+    "ga": 2.6,
+    "style": "balanced"
+  },
+  "Heidenheim": {
+    "gf": 0.95,
+    "ga": 1.93,
+    "style": "balanced"
+  },
+  "Wolfsburg": {
+    "gf": 0.95,
+    "ga": 1.66,
+    "style": "balanced"
+  },
+  "Leverkusen": {
+    "gf": 2.16,
+    "ga": 1.31,
+    "style": "attacking"
+  },
+  "Hoffenheim": {
+    "gf": 1.91,
+    "ga": 1.76,
+    "style": "balanced"
+  },
+  "Union Berlin": {
+    "gf": 1.32,
+    "ga": 1.69,
+    "style": "balanced"
+  },
+  "Stuttgart": {
+    "gf": 1.93,
+    "ga": 0.86,
+    "style": "balanced"
+  },
+  "St Pauli": {
+    "gf": 0.72,
+    "ga": 1.7,
+    "style": "balanced"
+  },
+  "Dortmund": {
+    "gf": 1.94,
+    "ga": 0.81,
+    "style": "balanced"
+  },
+  "Mainz": {
+    "gf": 1.32,
+    "ga": 2.14,
+    "style": "balanced"
+  },
+  "FC Koln": {
+    "gf": 1.38,
+    "ga": 1.2,
+    "style": "balanced"
+  },
+  "M'gladbach": {
+    "gf": 0.95,
+    "ga": 2.43,
+    "style": "balanced"
+  },
+  "Hamburg": {
+    "gf": 1.44,
+    "ga": 1.39,
+    "style": "balanced"
+  },
+  "Holstein Kiel": {
+    "gf": 1.17,
+    "ga": 1.09,
+    "style": "balanced"
+  },
+  "Bochum": {
+    "gf": 1.24,
+    "ga": 1.67,
+    "style": "balanced"
+  },
+  "Darmstadt": {
+    "gf": 1.22,
+    "ga": 0.82,
+    "style": "balanced"
+  },
+  "Hertha": {
+    "gf": 1.34,
+    "ga": 1.05,
+    "style": "balanced"
+  },
+  "Schalke 04": {
+    "gf": 1.4,
+    "ga": 0.61,
+    "style": "balanced"
+  },
+  "Bielefeld": {
+    "gf": 1.72,
+    "ga": 1.82,
+    "style": "balanced"
+  },
+  "Greuther Furth": {
+    "gf": 1.31,
+    "ga": 2.79,
+    "style": "balanced"
+  },
+  "Paderborn": {
+    "gf": 1.88,
+    "ga": 1.06,
+    "style": "balanced"
+  },
+  "Fortuna Dusseldorf": {
+    "gf": 1.04,
+    "ga": 1.73,
+    "style": "balanced"
+  },
+  "Nurnberg": {
+    "gf": 1.24,
+    "ga": 1.55,
+    "style": "balanced"
+  },
+  "Hannover": {
+    "gf": 1.74,
+    "ga": 1.38,
+    "style": "balanced"
+  },
+  "Elversberg": {
+    "gf": 2.4,
+    "ga": 0.79,
+    "style": "attacking"
+  },
+  "Karlsruhe": {
+    "gf": 1.98,
+    "ga": 1.44,
+    "style": "balanced"
+  },
+  "Preußen Münster": {
+    "gf": 1.51,
+    "ga": 1.83,
+    "style": "balanced"
+  },
+  "Dresden": {
+    "gf": 1.45,
+    "ga": 1.93,
+    "style": "balanced"
+  },
+  "Kaiserslautern": {
+    "gf": 1.9,
+    "ga": 1.43,
+    "style": "balanced"
+  },
+  "Magdeburg": {
+    "gf": 0.97,
+    "ga": 1.74,
+    "style": "balanced"
+  },
+  "Braunschweig": {
+    "gf": 1.04,
+    "ga": 2.18,
+    "style": "balanced"
+  },
+  "Regensburg": {
+    "gf": 0.97,
+    "ga": 1.91,
+    "style": "balanced"
+  },
+  "Ulm": {
+    "gf": 1.14,
+    "ga": 1.99,
+    "style": "balanced"
+  },
+  "Osnabruck": {
+    "gf": 0.97,
+    "ga": 2.12,
+    "style": "balanced"
+  },
+  "Wehen": {
+    "gf": 0.84,
+    "ga": 1.86,
+    "style": "balanced"
+  },
+  "Hansa Rostock": {
+    "gf": 0.75,
+    "ga": 1.79,
+    "style": "balanced"
+  },
+  "Sandhausen": {
+    "gf": 0.81,
+    "ga": 1.71,
+    "style": "balanced"
+  },
+  "Ingolstadt": {
+    "gf": 0.95,
+    "ga": 1.89,
+    "style": "balanced"
+  },
+  "Erzgebirge Aue": {
+    "gf": 0.94,
+    "ga": 2.49,
+    "style": "balanced"
+  },
+  "Wurzburger Kickers": {
+    "gf": 1.16,
+    "ga": 1.9,
+    "style": "balanced"
+  },
+  "Duisburg": {
+    "gf": 1.55,
+    "ga": 2.3,
+    "style": "balanced"
+  },
+  "Liverpool": {
+    "gf": 1.65,
+    "ga": 1.75,
+    "style": "balanced"
+  },
+  "Bournemouth": {
+    "gf": 1.79,
+    "ga": 1.16,
+    "style": "balanced"
+  },
+  "Aston Villa": {
+    "gf": 1.25,
+    "ga": 0.83,
+    "style": "balanced"
+  },
+  "Newcastle": {
+    "gf": 1.12,
+    "ga": 0.96,
+    "style": "defensive"
+  },
+  "Brighton": {
+    "gf": 1.87,
+    "ga": 1.76,
+    "style": "balanced"
+  },
+  "Fulham": {
+    "gf": 1.0,
+    "ga": 1.73,
+    "style": "balanced"
+  },
+  "Sunderland": {
+    "gf": 1.05,
+    "ga": 0.86,
+    "style": "defensive"
+  },
+  "West Ham": {
+    "gf": 0.9,
+    "ga": 1.93,
+    "style": "balanced"
+  },
+  "Tottenham": {
+    "gf": 1.67,
+    "ga": 1.19,
+    "style": "balanced"
+  },
+  "Burnley": {
+    "gf": 1.72,
+    "ga": 1.64,
+    "style": "balanced"
+  },
+  "Wolves": {
+    "gf": 0.93,
+    "ga": 1.97,
+    "style": "balanced"
+  },
+  "Man City": {
+    "gf": 1.74,
+    "ga": 0.63,
+    "style": "balanced"
+  },
+  "Chelsea": {
+    "gf": 1.73,
+    "ga": 1.19,
+    "style": "balanced"
+  },
+  "Crystal Palace": {
+    "gf": 1.44,
+    "ga": 1.2,
+    "style": "balanced"
+  },
+  "Nott'm Forest": {
+    "gf": 0.49,
+    "ga": 1.86,
+    "style": "balanced"
+  },
+  "Brentford": {
+    "gf": 1.79,
+    "ga": 1.46,
+    "style": "balanced"
+  },
+  "Man United": {
+    "gf": 1.8,
+    "ga": 1.52,
+    "style": "balanced"
+  },
+  "Arsenal": {
+    "gf": 1.67,
+    "ga": 0.45,
+    "style": "balanced"
+  },
+  "Leeds": {
+    "gf": 1.43,
+    "ga": 1.34,
+    "style": "balanced"
+  },
+  "Everton": {
+    "gf": 0.98,
+    "ga": 1.42,
+    "style": "balanced"
+  },
+  "Ipswich": {
+    "gf": 1.37,
+    "ga": 1.33,
+    "style": "balanced"
+  },
+  "Southampton": {
+    "gf": 0.95,
+    "ga": 1.49,
+    "style": "balanced"
+  },
+  "Leicester": {
+    "gf": 1.13,
+    "ga": 1.09,
+    "style": "balanced"
+  },
+  "Luton": {
+    "gf": 1.35,
+    "ga": 1.37,
+    "style": "balanced"
+  },
+  "Sheffield United": {
+    "gf": 1.09,
+    "ga": 1.51,
+    "style": "balanced"
+  },
+  "Watford": {
+    "gf": 1.19,
+    "ga": 1.46,
+    "style": "balanced"
+  },
+  "Norwich": {
+    "gf": 0.88,
+    "ga": 1.54,
+    "style": "balanced"
+  },
+  "West Brom": {
+    "gf": 0.97,
+    "ga": 1.33,
+    "style": "balanced"
+  },
+  "Cardiff": {
+    "gf": 0.89,
+    "ga": 1.51,
+    "style": "balanced"
+  },
+  "Huddersfield": {
+    "gf": 0.68,
+    "ga": 1.86,
+    "style": "balanced"
+  },
+  "Birmingham": {
+    "gf": 0.89,
+    "ga": 1.22,
+    "style": "balanced"
+  },
+  "Charlton": {
+    "gf": 1.34,
+    "ga": 0.96,
+    "style": "balanced"
+  },
+  "Coventry": {
+    "gf": 2.69,
+    "ga": 0.67,
+    "style": "attacking"
+  },
+  "Hull": {
+    "gf": 1.67,
+    "ga": 1.46,
+    "style": "balanced"
+  },
+  "Wrexham": {
+    "gf": 1.11,
+    "ga": 1.09,
+    "style": "balanced"
+  },
+  "Middlesbrough": {
+    "gf": 1.11,
+    "ga": 0.75,
+    "style": "defensive"
+  },
+  "Swansea": {
+    "gf": 1.05,
+    "ga": 1.11,
+    "style": "balanced"
+  },
+  "Millwall": {
+    "gf": 1.34,
+    "ga": 0.92,
+    "style": "balanced"
+  },
+  "Oxford": {
+    "gf": 1.13,
+    "ga": 1.11,
+    "style": "balanced"
+  },
+  "Portsmouth": {
+    "gf": 0.81,
+    "ga": 1.14,
+    "style": "balanced"
+  },
+  "QPR": {
+    "gf": 1.05,
+    "ga": 1.21,
+    "style": "balanced"
+  },
+  "Preston": {
+    "gf": 1.35,
+    "ga": 1.2,
+    "style": "balanced"
+  },
+  "Stoke": {
+    "gf": 0.78,
+    "ga": 0.79,
+    "style": "defensive"
+  },
+  "Derby": {
+    "gf": 0.96,
+    "ga": 0.87,
+    "style": "defensive"
+  },
+  "Blackburn": {
+    "gf": 1.06,
+    "ga": 1.57,
+    "style": "balanced"
+  },
+  "Bristol City": {
+    "gf": 1.5,
+    "ga": 0.98,
+    "style": "balanced"
+  },
+  "Sheffield Weds": {
+    "gf": 0.84,
+    "ga": 1.98,
+    "style": "balanced"
+  },
+  "Plymouth": {
+    "gf": 1.38,
+    "ga": 1.56,
+    "style": "balanced"
+  },
+  "Rotherham": {
+    "gf": 0.98,
+    "ga": 1.73,
+    "style": "balanced"
+  },
+  "Blackpool": {
+    "gf": 1.15,
+    "ga": 1.58,
+    "style": "balanced"
+  },
+  "Reading": {
+    "gf": 0.7,
+    "ga": 1.4,
+    "style": "balanced"
+  },
+  "Wigan": {
+    "gf": 0.65,
+    "ga": 0.84,
+    "style": "defensive"
+  },
+  "Barnsley": {
+    "gf": 0.68,
+    "ga": 2.24,
+    "style": "balanced"
+  },
+  "Peterboro": {
+    "gf": 1.61,
+    "ga": 1.42,
+    "style": "balanced"
+  },
+  "Wycombe": {
+    "gf": 1.46,
+    "ga": 1.02,
+    "style": "balanced"
+  },
+  "Bolton": {
+    "gf": 0.39,
+    "ga": 1.95,
+    "style": "balanced"
+  },
+  "Rennes": {
+    "gf": 1.51,
+    "ga": 1.7,
+    "style": "balanced"
+  },
+  "Marseille": {
+    "gf": 2.66,
+    "ga": 1.15,
+    "style": "attacking"
+  },
+  "Lens": {
+    "gf": 1.68,
+    "ga": 0.95,
+    "style": "balanced"
+  },
+  "Lyon": {
+    "gf": 1.52,
+    "ga": 1.22,
+    "style": "balanced"
+  },
+  "Monaco": {
+    "gf": 1.77,
+    "ga": 1.35,
+    "style": "balanced"
+  },
+  "Le Havre": {
+    "gf": 1.31,
+    "ga": 1.89,
+    "style": "balanced"
+  },
+  "Nice": {
+    "gf": 1.86,
+    "ga": 1.54,
+    "style": "balanced"
+  },
+  "Toulouse": {
+    "gf": 1.62,
+    "ga": 1.29,
+    "style": "balanced"
+  },
+  "Brest": {
+    "gf": 1.43,
+    "ga": 2.02,
+    "style": "balanced"
+  },
+  "Lille": {
+    "gf": 2.36,
+    "ga": 1.09,
+    "style": "attacking"
+  },
+  "Angers": {
+    "gf": 0.79,
+    "ga": 1.39,
+    "style": "balanced"
+  },
+  "Paris FC": {
+    "gf": 1.49,
+    "ga": 1.54,
+    "style": "balanced"
+  },
+  "Auxerre": {
+    "gf": 0.9,
+    "ga": 1.57,
+    "style": "balanced"
+  },
+  "Lorient": {
+    "gf": 1.58,
+    "ga": 2.03,
+    "style": "balanced"
+  },
+  "Metz": {
+    "gf": 0.98,
+    "ga": 3.05,
+    "style": "balanced"
+  },
+  "Strasbourg": {
+    "gf": 2.07,
+    "ga": 1.55,
+    "style": "attacking"
+  },
+  "Nantes": {
+    "gf": 0.94,
+    "ga": 1.09,
+    "style": "balanced"
+  },
+  "Paris SG": {
+    "gf": 2.18,
+    "ga": 1.05,
+    "style": "attacking"
+  },
+  "Reims": {
+    "gf": 1.34,
+    "ga": 1.39,
+    "style": "balanced"
+  },
+  "St Etienne": {
+    "gf": 1.66,
+    "ga": 1.89,
+    "style": "balanced"
+  },
+  "Montpellier": {
+    "gf": 1.27,
+    "ga": 1.1,
+    "style": "balanced"
+  },
+  "Clermont": {
+    "gf": 0.89,
+    "ga": 1.31,
+    "style": "balanced"
+  },
+  "Ajaccio": {
+    "gf": 0.95,
+    "ga": 1.3,
+    "style": "balanced"
+  },
+  "Troyes": {
+    "gf": 1.71,
+    "ga": 0.79,
+    "style": "balanced"
+  },
+  "Bordeaux": {
+    "gf": 1.91,
+    "ga": 1.62,
+    "style": "balanced"
+  },
+  "Dijon": {
+    "gf": 1.22,
+    "ga": 0.88,
+    "style": "balanced"
+  },
+  "Nimes": {
+    "gf": 1.54,
+    "ga": 1.96,
+    "style": "balanced"
+  },
+  "Amiens": {
+    "gf": 1.27,
+    "ga": 1.31,
+    "style": "balanced"
+  },
+  "Guingamp": {
+    "gf": 1.68,
+    "ga": 1.86,
+    "style": "balanced"
+  },
+  "Caen": {
+    "gf": 0.9,
+    "ga": 2.16,
+    "style": "balanced"
+  },
+  "Le Mans": {
+    "gf": 1.42,
+    "ga": 1.18,
+    "style": "balanced"
+  },
+  "Dunkerque": {
+    "gf": 1.66,
+    "ga": 1.06,
+    "style": "balanced"
+  },
+  "Laval": {
+    "gf": 0.56,
+    "ga": 1.15,
+    "style": "balanced"
+  },
+  "Red Star": {
+    "gf": 1.39,
+    "ga": 0.75,
+    "style": "balanced"
+  },
+  "Pau FC": {
+    "gf": 1.45,
+    "ga": 1.39,
+    "style": "balanced"
+  },
+  "Annecy": {
+    "gf": 1.53,
+    "ga": 0.93,
+    "style": "balanced"
+  },
+  "Rodez": {
+    "gf": 1.2,
+    "ga": 1.51,
+    "style": "balanced"
+  },
+  "Nancy": {
+    "gf": 1.01,
+    "ga": 1.85,
+    "style": "balanced"
+  },
+  "Grenoble": {
+    "gf": 1.09,
+    "ga": 1.29,
+    "style": "balanced"
+  },
+  "Bastia": {
+    "gf": 0.58,
+    "ga": 1.19,
+    "style": "balanced"
+  },
+  "Boulogne": {
+    "gf": 0.97,
+    "ga": 1.28,
+    "style": "balanced"
+  },
+  "Martigues": {
+    "gf": 1.24,
+    "ga": 1.77,
+    "style": "balanced"
+  },
+  "Quevilly Rouen": {
+    "gf": 1.46,
+    "ga": 1.51,
+    "style": "balanced"
+  },
+  "Concarneau": {
+    "gf": 1.25,
+    "ga": 2.09,
+    "style": "balanced"
+  },
+  "Valenciennes": {
+    "gf": 0.86,
+    "ga": 1.59,
+    "style": "balanced"
+  },
+  "Niort": {
+    "gf": 1.09,
+    "ga": 2.17,
+    "style": "balanced"
+  },
+  "Sochaux": {
+    "gf": 0.85,
+    "ga": 1.62,
+    "style": "balanced"
+  },
+  "Chateauroux": {
+    "gf": 0.62,
+    "ga": 1.41,
+    "style": "balanced"
+  },
+  "Chambly": {
+    "gf": 1.15,
+    "ga": 1.59,
+    "style": "balanced"
+  },
+  "Orleans": {
+    "gf": 0.64,
+    "ga": 1.71,
+    "style": "balanced"
+  },
+  "Ajaccio GFCO": {
+    "gf": 0.68,
+    "ga": 1.42,
+    "style": "balanced"
+  },
+  "Beziers": {
+    "gf": 1.51,
+    "ga": 1.29,
+    "style": "balanced"
+  },
+  "Empoli": {
+    "gf": 1.32,
+    "ga": 1.65,
+    "style": "balanced"
+  },
+  "Monza": {
+    "gf": 1.25,
+    "ga": 1.03,
+    "style": "balanced"
+  },
+  "Venezia": {
+    "gf": 1.45,
+    "ga": 1.29,
+    "style": "balanced"
+  },
+  "Frosinone": {
+    "gf": 1.32,
+    "ga": 1.15,
+    "style": "balanced"
+  },
+  "Salernitana": {
+    "gf": 1.13,
+    "ga": 0.85,
+    "style": "defensive"
+  },
+  "Sampdoria": {
+    "gf": 1.06,
+    "ga": 1.29,
+    "style": "balanced"
+  },
+  "Spezia": {
+    "gf": 1.45,
+    "ga": 1.44,
+    "style": "balanced"
+  },
+  "Crotone": {
+    "gf": 1.35,
+    "ga": 1.52,
+    "style": "balanced"
+  },
+  "Benevento": {
+    "gf": 1.19,
+    "ga": 1.83,
+    "style": "balanced"
+  },
+  "Brescia": {
+    "gf": 1.07,
+    "ga": 1.03,
+    "style": "balanced"
+  },
+  "Spal": {
+    "gf": 1.02,
+    "ga": 1.26,
+    "style": "balanced"
+  },
+  "Chievo": {
+    "gf": 1.64,
+    "ga": 1.14,
+    "style": "balanced"
+  },
+  "Pescara": {
+    "gf": 1.31,
+    "ga": 1.88,
+    "style": "balanced"
+  },
+  "Cesena": {
+    "gf": 1.35,
+    "ga": 1.16,
+    "style": "balanced"
+  },
+  "Padova": {
+    "gf": 1.34,
+    "ga": 1.25,
+    "style": "balanced"
+  },
+  "Virtus Entella": {
+    "gf": 1.15,
+    "ga": 1.53,
+    "style": "balanced"
+  },
+  "Juve Stabia": {
+    "gf": 1.31,
+    "ga": 1.17,
+    "style": "balanced"
+  },
+  "Mantova": {
+    "gf": 0.74,
+    "ga": 1.53,
+    "style": "balanced"
+  },
+  "Palermo": {
+    "gf": 1.08,
+    "ga": 0.75,
+    "style": "defensive"
+  },
+  "Reggiana": {
+    "gf": 1.62,
+    "ga": 1.62,
+    "style": "balanced"
+  },
+  "Carrarese": {
+    "gf": 1.81,
+    "ga": 1.33,
+    "style": "balanced"
+  },
+  "Bari": {
+    "gf": 1.03,
+    "ga": 1.48,
+    "style": "balanced"
+  },
+  "Catanzaro": {
+    "gf": 0.89,
+    "ga": 1.02,
+    "style": "balanced"
+  },
+  "Sudtirol": {
+    "gf": 1.25,
+    "ga": 1.28,
+    "style": "balanced"
+  },
+  "Avellino": {
+    "gf": 0.85,
+    "ga": 1.99,
+    "style": "balanced"
+  },
+  "Modena": {
+    "gf": 1.62,
+    "ga": 0.84,
+    "style": "balanced"
+  },
+  "Cittadella": {
+    "gf": 0.85,
+    "ga": 1.43,
+    "style": "balanced"
+  },
+  "Cosenza": {
+    "gf": 0.75,
+    "ga": 1.86,
+    "style": "balanced"
+  },
+  "Ascoli": {
+    "gf": 1.05,
+    "ga": 0.86,
+    "style": "defensive"
+  },
+  "Ternana": {
+    "gf": 1.07,
+    "ga": 1.08,
+    "style": "balanced"
+  },
+  "FeralpiSalo": {
+    "gf": 1.18,
+    "ga": 1.89,
+    "style": "balanced"
+  },
+  "Lecco": {
+    "gf": 0.8,
+    "ga": 2.27,
+    "style": "balanced"
+  },
+  "Perugia": {
+    "gf": 1.13,
+    "ga": 1.93,
+    "style": "balanced"
+  },
+  "Reggina": {
+    "gf": 1.0,
+    "ga": 1.29,
+    "style": "balanced"
+  },
+  "Pordenone": {
+    "gf": 0.92,
+    "ga": 1.93,
+    "style": "balanced"
+  },
+  "Vicenza": {
+    "gf": 1.11,
+    "ga": 0.98,
+    "style": "defensive"
+  },
+  "Alessandria": {
+    "gf": 0.91,
+    "ga": 1.42,
+    "style": "balanced"
+  },
+  "Trapani": {
+    "gf": 1.74,
+    "ga": 0.92,
+    "style": "balanced"
+  },
+  "Livorno": {
+    "gf": 0.58,
+    "ga": 2.13,
+    "style": "balanced"
+  },
+  "For Sittard": {
+    "gf": 1.14,
+    "ga": 1.35,
+    "style": "balanced"
+  },
+  "Go Ahead Eagles": {
+    "gf": 1.61,
+    "ga": 1.52,
+    "style": "balanced"
+  },
+  "Nijmegen": {
+    "gf": 2.36,
+    "ga": 1.85,
+    "style": "attacking"
+  },
+  "Excelsior": {
+    "gf": 0.93,
+    "ga": 1.68,
+    "style": "balanced"
+  },
+  "Feyenoord": {
+    "gf": 2.82,
+    "ga": 1.16,
+    "style": "attacking"
+  },
+  "NAC Breda": {
+    "gf": 1.42,
+    "ga": 1.98,
+    "style": "balanced"
+  },
+  "Heerenveen": {
+    "gf": 1.96,
+    "ga": 1.78,
+    "style": "balanced"
+  },
+  "Volendam": {
+    "gf": 1.3,
+    "ga": 1.81,
+    "style": "balanced"
+  },
+  "PSV Eindhoven": {
+    "gf": 2.94,
+    "ga": 1.37,
+    "style": "attacking"
+  },
+  "Sparta Rotterdam": {
+    "gf": 1.38,
+    "ga": 1.82,
+    "style": "balanced"
+  },
+  "Zwolle": {
+    "gf": 1.27,
+    "ga": 2.0,
+    "style": "balanced"
+  },
+  "Twente": {
+    "gf": 2.08,
+    "ga": 1.87,
+    "style": "attacking"
+  },
+  "Ajax": {
+    "gf": 1.89,
+    "ga": 1.66,
+    "style": "balanced"
+  },
+  "Telstar": {
+    "gf": 1.25,
+    "ga": 1.91,
+    "style": "balanced"
+  },
+  "AZ Alkmaar": {
+    "gf": 2.33,
+    "ga": 1.17,
+    "style": "attacking"
+  },
+  "Groningen": {
+    "gf": 1.56,
+    "ga": 1.32,
+    "style": "balanced"
+  },
+  "Utrecht": {
+    "gf": 1.74,
+    "ga": 1.67,
+    "style": "balanced"
+  },
+  "Heracles": {
+    "gf": 0.78,
+    "ga": 3.04,
+    "style": "balanced"
+  },
+  "Willem II": {
+    "gf": 0.77,
+    "ga": 1.8,
+    "style": "balanced"
+  },
+  "Almere City": {
+    "gf": 0.78,
+    "ga": 1.61,
+    "style": "balanced"
+  },
+  "Waalwijk": {
+    "gf": 1.68,
+    "ga": 2.4,
+    "style": "balanced"
+  },
+  "Vitesse": {
+    "gf": 1.32,
+    "ga": 2.26,
+    "style": "balanced"
+  },
+  "Cambuur": {
+    "gf": 1.12,
+    "ga": 2.46,
+    "style": "balanced"
+  },
+  "FC Emmen": {
+    "gf": 1.24,
+    "ga": 2.51,
+    "style": "balanced"
+  },
+  "VVV Venlo": {
+    "gf": 0.7,
+    "ga": 2.99,
+    "style": "balanced"
+  },
+  "Den Haag": {
+    "gf": 1.05,
+    "ga": 2.34,
+    "style": "balanced"
+  },
+  "Graafschap": {
+    "gf": 1.13,
+    "ga": 2.48,
+    "style": "balanced"
+  },
+  "Casa Pia": {
+    "gf": 0.92,
+    "ga": 1.93,
+    "style": "balanced"
+  },
+  "Sp Lisbon": {
+    "gf": 2.33,
+    "ga": 0.52,
+    "style": "attacking"
+  },
+  "Nacional": {
+    "gf": 1.21,
+    "ga": 1.5,
+    "style": "balanced"
+  },
+  "Gil Vicente": {
+    "gf": 1.71,
+    "ga": 0.5,
+    "style": "balanced"
+  },
+  "Arouca": {
+    "gf": 1.0,
+    "ga": 2.43,
+    "style": "balanced"
+  },
+  "AVS": {
+    "gf": 0.5,
+    "ga": 2.5,
+    "style": "balanced"
+  },
+  "Famalicao": {
+    "gf": 1.15,
+    "ga": 0.65,
+    "style": "defensive"
+  },
+  "Santa Clara": {
+    "gf": 1.17,
+    "ga": 1.02,
+    "style": "balanced"
+  },
+  "Moreirense": {
+    "gf": 1.52,
+    "ga": 1.6,
+    "style": "balanced"
+  },
+  "Alverca": {
+    "gf": 1.3,
+    "ga": 1.86,
+    "style": "balanced"
+  },
+  "Sp Braga": {
+    "gf": 1.68,
+    "ga": 0.9,
+    "style": "balanced"
+  },
+  "Tondela": {
+    "gf": 0.54,
+    "ga": 1.94,
+    "style": "balanced"
+  },
+  "Estoril": {
+    "gf": 1.31,
+    "ga": 1.49,
+    "style": "balanced"
+  },
+  "Estrela": {
+    "gf": 0.72,
+    "ga": 1.27,
+    "style": "balanced"
+  },
+  "Porto": {
+    "gf": 2.16,
+    "ga": 0.33,
+    "style": "attacking"
+  },
+  "Guimaraes": {
+    "gf": 0.97,
+    "ga": 1.47,
+    "style": "balanced"
+  },
+  "Benfica": {
+    "gf": 2.17,
+    "ga": 0.5,
+    "style": "attacking"
+  },
+  "Rio Ave": {
+    "gf": 1.49,
+    "ga": 1.32,
+    "style": "balanced"
+  },
+  "Boavista": {
+    "gf": 0.88,
+    "ga": 2.05,
+    "style": "balanced"
+  },
+  "Farense": {
+    "gf": 0.99,
+    "ga": 1.26,
+    "style": "balanced"
+  },
+  "Portimonense": {
+    "gf": 1.44,
+    "ga": 2.11,
+    "style": "balanced"
+  },
+  "Vizela": {
+    "gf": 1.41,
+    "ga": 1.68,
+    "style": "balanced"
+  },
+  "Chaves": {
+    "gf": 0.66,
+    "ga": 2.02,
+    "style": "balanced"
+  },
+  "Maritimo": {
+    "gf": 1.33,
+    "ga": 1.85,
+    "style": "balanced"
+  },
+  "Pacos Ferreira": {
+    "gf": 0.89,
+    "ga": 2.02,
+    "style": "balanced"
+  },
+  "Belenenses": {
+    "gf": 0.86,
+    "ga": 1.28,
+    "style": "balanced"
+  },
+  "Aves": {
+    "gf": 0.15,
+    "ga": 2.28,
+    "style": "balanced"
+  },
+  "Setubal": {
+    "gf": 0.95,
+    "ga": 1.35,
+    "style": "balanced"
+  },
+  "Feirense": {
+    "gf": 1.49,
+    "ga": 2.44,
+    "style": "balanced"
+  },
+  "Kilmarnock": {
+    "gf": 1.23,
+    "ga": 1.68,
+    "style": "balanced"
+  },
+  "Livingston": {
+    "gf": 1.01,
+    "ga": 2.13,
+    "style": "balanced"
+  },
+  "Motherwell": {
+    "gf": 1.6,
+    "ga": 1.44,
+    "style": "balanced"
+  },
+  "Rangers": {
+    "gf": 1.62,
+    "ga": 1.2,
+    "style": "balanced"
+  },
+  "Falkirk": {
+    "gf": 1.45,
+    "ga": 1.46,
+    "style": "balanced"
+  },
+  "Dundee United": {
+    "gf": 1.72,
+    "ga": 1.62,
+    "style": "balanced"
+  },
+  "Dundee": {
+    "gf": 1.03,
+    "ga": 1.52,
+    "style": "balanced"
+  },
+  "Hibernian": {
+    "gf": 1.84,
+    "ga": 1.18,
+    "style": "balanced"
+  },
+  "Celtic": {
+    "gf": 1.58,
+    "ga": 1.18,
+    "style": "balanced"
+  },
+  "St Mirren": {
+    "gf": 0.87,
+    "ga": 1.28,
+    "style": "balanced"
+  },
+  "Hearts": {
+    "gf": 2.31,
+    "ga": 0.61,
+    "style": "attacking"
+  },
+  "Aberdeen": {
+    "gf": 0.88,
+    "ga": 1.4,
+    "style": "balanced"
+  },
+  "Ross County": {
+    "gf": 0.88,
+    "ga": 1.59,
+    "style": "balanced"
+  },
+  "St Johnstone": {
+    "gf": 0.79,
+    "ga": 1.57,
+    "style": "balanced"
+  },
+  "Hamilton": {
+    "gf": 0.76,
+    "ga": 1.38,
+    "style": "balanced"
+  },
+  "Girona": {
+    "gf": 1.11,
+    "ga": 2.01,
+    "style": "balanced"
+  },
+  "Vallecano": {
+    "gf": 1.24,
+    "ga": 0.79,
+    "style": "balanced"
+  },
+  "Villarreal": {
+    "gf": 1.9,
+    "ga": 1.12,
+    "style": "balanced"
+  },
+  "Oviedo": {
+    "gf": 0.98,
+    "ga": 1.8,
+    "style": "balanced"
+  },
+  "Mallorca": {
+    "gf": 1.17,
+    "ga": 1.3,
+    "style": "balanced"
+  },
+  "Barcelona": {
+    "gf": 2.27,
+    "ga": 1.41,
+    "style": "attacking"
+  },
+  "Alaves": {
+    "gf": 0.8,
+    "ga": 0.8,
+    "style": "defensive"
+  },
+  "Levante": {
+    "gf": 1.37,
+    "ga": 1.56,
+    "style": "balanced"
+  },
+  "Valencia": {
+    "gf": 0.91,
+    "ga": 1.5,
+    "style": "balanced"
+  },
+  "Sociedad": {
+    "gf": 0.99,
+    "ga": 1.39,
+    "style": "balanced"
+  },
+  "Celta": {
+    "gf": 1.36,
+    "ga": 1.36,
+    "style": "balanced"
+  },
+  "Getafe": {
+    "gf": 0.85,
+    "ga": 1.23,
+    "style": "balanced"
+  },
+  "Ath Bilbao": {
+    "gf": 0.71,
+    "ga": 0.91,
+    "style": "defensive"
+  },
+  "Sevilla": {
+    "gf": 1.62,
+    "ga": 1.72,
+    "style": "balanced"
+  },
+  "Espanol": {
+    "gf": 1.26,
+    "ga": 1.04,
+    "style": "balanced"
+  },
+  "Ath Madrid": {
+    "gf": 2.02,
+    "ga": 0.95,
+    "style": "attacking"
+  },
+  "Elche": {
+    "gf": 1.08,
+    "ga": 1.02,
+    "style": "balanced"
+  },
+  "Betis": {
+    "gf": 1.81,
+    "ga": 1.28,
+    "style": "balanced"
+  },
+  "Real Madrid": {
+    "gf": 2.2,
+    "ga": 1.12,
+    "style": "attacking"
+  },
+  "Osasuna": {
+    "gf": 1.08,
+    "ga": 1.36,
+    "style": "balanced"
+  },
+  "Las Palmas": {
+    "gf": 1.0,
+    "ga": 0.69,
+    "style": "defensive"
+  },
+  "Leganes": {
+    "gf": 0.94,
+    "ga": 0.54,
+    "style": "defensive"
+  },
+  "Valladolid": {
+    "gf": 1.04,
+    "ga": 1.18,
+    "style": "balanced"
+  },
+  "Almeria": {
+    "gf": 1.65,
+    "ga": 1.17,
+    "style": "balanced"
+  },
+  "Cadiz": {
+    "gf": 0.9,
+    "ga": 0.85,
+    "style": "defensive"
+  },
+  "Granada": {
+    "gf": 1.0,
+    "ga": 1.02,
+    "style": "balanced"
+  },
+  "Eibar": {
+    "gf": 0.86,
+    "ga": 0.9,
+    "style": "defensive"
+  },
+  "Huesca": {
+    "gf": 0.95,
+    "ga": 1.4,
+    "style": "balanced"
+  },
+  "Burgos": {
+    "gf": 1.48,
+    "ga": 1.07,
+    "style": "balanced"
+  },
+  "Cultural Leonesa": {
+    "gf": 1.27,
+    "ga": 0.9,
+    "style": "balanced"
+  },
+  "Ceuta": {
+    "gf": 1.05,
+    "ga": 0.52,
+    "style": "defensive"
+  },
+  "Santander": {
+    "gf": 2.24,
+    "ga": 1.54,
+    "style": "attacking"
+  },
+  "Castellon": {
+    "gf": 1.15,
+    "ga": 1.13,
+    "style": "balanced"
+  },
+  "Malaga": {
+    "gf": 1.38,
+    "ga": 1.32,
+    "style": "balanced"
+  },
+  "La Coruna": {
+    "gf": 1.41,
+    "ga": 1.4,
+    "style": "balanced"
+  },
+  "Sociedad B": {
+    "gf": 1.41,
+    "ga": 1.75,
+    "style": "balanced"
+  },
+  "Zaragoza": {
+    "gf": 0.58,
+    "ga": 1.88,
+    "style": "balanced"
+  },
+  "Mirandes": {
+    "gf": 0.91,
+    "ga": 1.57,
+    "style": "balanced"
+  },
+  "Andorra": {
+    "gf": 1.04,
+    "ga": 1.78,
+    "style": "balanced"
+  },
+  "Sp Gijon": {
+    "gf": 1.7,
+    "ga": 1.56,
+    "style": "balanced"
+  },
+  "Cordoba": {
+    "gf": 1.4,
+    "ga": 1.21,
+    "style": "balanced"
+  },
+  "Albacete": {
+    "gf": 1.25,
+    "ga": 1.39,
+    "style": "balanced"
+  },
+  "Ferrol": {
+    "gf": 0.36,
+    "ga": 1.38,
+    "style": "balanced"
+  },
+  "Cartagena": {
+    "gf": 1.24,
+    "ga": 2.07,
+    "style": "balanced"
+  },
+  "Eldense": {
+    "gf": 1.3,
+    "ga": 1.87,
+    "style": "balanced"
+  },
+  "Tenerife": {
+    "gf": 0.54,
+    "ga": 0.96,
+    "style": "defensive"
+  },
+  "Amorebieta": {
+    "gf": 0.94,
+    "ga": 1.15,
+    "style": "balanced"
+  },
+  "Villarreal B": {
+    "gf": 1.1,
+    "ga": 1.47,
+    "style": "balanced"
+  },
+  "Alcorcon": {
+    "gf": 0.85,
+    "ga": 1.13,
+    "style": "balanced"
+  },
+  "Ibiza": {
+    "gf": 0.78,
+    "ga": 1.59,
+    "style": "balanced"
+  },
+  "Lugo": {
+    "gf": 0.69,
+    "ga": 1.45,
+    "style": "balanced"
+  },
+  "Ponferradina": {
+    "gf": 1.51,
+    "ga": 1.32,
+    "style": "balanced"
+  },
+  "Fuenlabrada": {
+    "gf": 1.25,
+    "ga": 2.31,
+    "style": "balanced"
+  },
+  "Logrones": {
+    "gf": 0.54,
+    "ga": 1.37,
+    "style": "balanced"
+  },
+  "Sabadell": {
+    "gf": 1.22,
+    "ga": 1.02,
+    "style": "balanced"
+  },
+  "Extremadura UD": {
+    "gf": 1.33,
+    "ga": 1.7,
+    "style": "balanced"
+  },
+  "Numancia": {
+    "gf": 0.99,
+    "ga": 1.61,
+    "style": "balanced"
+  },
+  "Reus Deportiu": {
+    "gf": 0.0,
+    "ga": 1.0,
+    "style": "defensive"
+  },
+  "Rayo Majadahonda": {
+    "gf": 1.42,
+    "ga": 1.76,
+    "style": "balanced"
+  },
+  "Gimnastic": {
+    "gf": 1.19,
+    "ga": 1.53,
+    "style": "balanced"
+  },
+  "Gaziantep": {
+    "gf": 1.73,
+    "ga": 1.44,
+    "style": "balanced"
+  },
+  "Galatasaray": {
+    "gf": 2.36,
+    "ga": 0.56,
+    "style": "attacking"
+  },
+  "Samsunspor": {
+    "gf": 1.58,
+    "ga": 0.99,
+    "style": "balanced"
+  },
+  "Genclerbirligi": {
+    "gf": 1.22,
+    "ga": 1.68,
+    "style": "balanced"
+  },
+  "Antalyaspor": {
+    "gf": 0.99,
+    "ga": 2.35,
+    "style": "balanced"
+  },
+  "Kasimpasa": {
+    "gf": 1.01,
+    "ga": 1.24,
+    "style": "balanced"
+  },
+  "Rizespor": {
+    "gf": 1.56,
+    "ga": 1.39,
+    "style": "balanced"
+  },
+  "Goztep": {
+    "gf": 1.11,
+    "ga": 1.03,
+    "style": "balanced"
+  },
+  "Eyupspor": {
+    "gf": 0.59,
+    "ga": 1.32,
+    "style": "balanced"
+  },
+  "Konyaspor": {
+    "gf": 1.48,
+    "ga": 1.59,
+    "style": "balanced"
+  },
+  "Trabzonspor": {
+    "gf": 1.89,
+    "ga": 0.81,
+    "style": "balanced"
+  },
+  "Kocaelispor": {
+    "gf": 1.44,
+    "ga": 1.21,
+    "style": "balanced"
+  },
+  "Karagumruk": {
+    "gf": 1.33,
+    "ga": 2.21,
+    "style": "balanced"
+  },
+  "Alanyaspor": {
+    "gf": 1.08,
+    "ga": 1.1,
+    "style": "balanced"
+  },
+  "Fenerbahce": {
+    "gf": 1.62,
+    "ga": 0.83,
+    "style": "balanced"
+  },
+  "Besiktas": {
+    "gf": 1.69,
+    "ga": 1.06,
+    "style": "balanced"
+  },
+  "Buyuksehyr": {
+    "gf": 1.35,
+    "ga": 1.08,
+    "style": "balanced"
+  },
+  "Kayserispor": {
+    "gf": 0.92,
+    "ga": 2.24,
+    "style": "balanced"
+  },
+  "Hatayspor": {
+    "gf": 2.11,
+    "ga": 2.55,
+    "style": "attacking"
+  },
+  "Ad. Demirspor": {
+    "gf": 1.14,
+    "ga": 2.89,
+    "style": "balanced"
+  },
+  "Sivasspor": {
+    "gf": 0.94,
+    "ga": 1.65,
+    "style": "balanced"
+  },
+  "Bodrumspor": {
+    "gf": 0.65,
+    "ga": 1.36,
+    "style": "balanced"
+  },
+  "Ankaragucu": {
+    "gf": 1.17,
+    "ga": 1.73,
+    "style": "balanced"
+  },
+  "Istanbulspor": {
+    "gf": 0.55,
+    "ga": 3.01,
+    "style": "balanced"
+  },
+  "Pendikspor": {
+    "gf": 0.87,
+    "ga": 1.51,
+    "style": "balanced"
+  },
+  "Giresunspor": {
+    "gf": 1.66,
+    "ga": 1.22,
+    "style": "balanced"
+  },
+  "Umraniyespor": {
+    "gf": 1.2,
+    "ga": 1.74,
+    "style": "balanced"
+  },
+  "Altay": {
+    "gf": 1.06,
+    "ga": 1.63,
+    "style": "balanced"
+  },
+  "Yeni Malatyaspor": {
+    "gf": 0.52,
+    "ga": 2.59,
+    "style": "balanced"
+  },
+  "Denizlispor": {
+    "gf": 0.99,
+    "ga": 2.69,
+    "style": "balanced"
+  },
+  "Erzurum BB": {
+    "gf": 1.5,
+    "ga": 1.9,
+    "style": "balanced"
+  },
+  "Bursaspor": {
+    "gf": 0.69,
+    "ga": 0.95,
+    "style": "defensive"
+  },
+  "Akhisar Belediyespor": {
+    "gf": 0.84,
+    "ga": 1.36,
+    "style": "balanced"
+  }
+}

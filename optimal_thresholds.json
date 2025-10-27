@@ -1,0 +1,18 @@
+{
+  "1X2 Casa": 60,
+  "1X2 Ospite": 60,
+  "Doppia Chance 12": 70,
+  "Doppia Chance 1X": 75,
+  "Doppia Chance X2": 70,
+  "Multigol Casa 1-3": 80,
+  "Multigol Casa 1-4": 80,
+  "Multigol Casa 1-5": 80,
+  "Multigol Ospite 1-3": 70,
+  "Multigol Ospite 1-4": 75,
+  "Multigol Ospite 1-5": 75,
+  "Over 0.5 Goal": 90,
+  "Over 1.5 Goal": 75,
+  "Over 2.5 Goal": 65,
+  "Under 2.5 Goal": 65,
+  "Under 3.5 Goal": 100
+}

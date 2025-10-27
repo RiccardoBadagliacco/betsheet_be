@@ -151,6 +151,7 @@ async def generate_all_models(
                 # Genera il modello
                 print(f"🧠 Training model for {league.code}...")
                 predictor = ExactSimpleFooballPredictor()
+                print('[INFO] USE_CUSTOM_THRESHOLDS =', predictor.use_context_scoring, '(CONTEXT SCORING V4)')
                 
                 # Carica i dati e "allena" il modello
                 df = predictor.load_data(db, league.code)
@@ -158,9 +159,10 @@ async def generate_all_models(
                 
                 # Salva il modello su disco
                 print(f"💾 Saving model for {league.code}...")
+                model_version = 'CONTEXT_SCORING_V4' if getattr(predictor, 'use_context_scoring', False) else 'EXACT_REPLICA'
                 metadata = {
                     'training_matches': training_data_size,
-                    'model_version': 'EXACT_REPLICA',
+                    'model_version': model_version,
                     'league_name': league.name
                 }
                 
