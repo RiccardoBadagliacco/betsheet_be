@@ -203,7 +203,7 @@ class ExactSimpleFooballPredictor:
         """Predice un singolo match (probabilità mercati + metadati)."""
         match = df.iloc[match_idx]
         current_date = match['Date']
-
+        
         # Features squadra (rolling)
         home_features = get_team_features(df, match['HomeTeam'], current_date, is_home=True)
         away_features = get_team_features(df, match['AwayTeam'], current_date, is_home=False)
@@ -230,26 +230,20 @@ class ExactSimpleFooballPredictor:
         matchday_away = df[df['Date'] < current_date].groupby('AwayTeam').size().get(match['AwayTeam'], 0)
         matchday = max(matchday_home, matchday_away)
 
-        source_df = getattr(self, "df_full", df)
+        source_df = df
 
-        # Controllo di sicurezza
+        # Se mancano le colonne ELO, calcolale ora sul DF corrente
         if 'elo_home_pre' not in source_df.columns or 'elo_away_pre' not in source_df.columns:
-            raise ValueError(
-                "⚠️ Il DataFrame non contiene le colonne 'elo_home_pre' e 'elo_away_pre'. "
-                "Assicurati di chiamare annotate_pre_match_elo(df) prima del backtest."
-            )
+            source_df = annotate_pre_match_elo(source_df)
 
-        # Usa df_full se esiste, altrimenti df passato
-        source_df = getattr(self, "df_full", df)
+        # Leggi l'ultima riga con il match_idx sullo STESSO DF
+        row_elo = source_df.iloc[match_idx]
+        elo_home_raw = row_elo.get('elo_home_pre')
+        elo_away_raw = row_elo.get('elo_away_pre')
 
-        if 'elo_home_pre' not in source_df.columns or 'elo_away_pre' not in source_df.columns:
-            raise ValueError(
-                "Il DataFrame non contiene le colonne ELO pre-match. "
-                "Assicurati di aver chiamato annotate_pre_match_elo(df) prima del backtest."
-            )
-
-        elo_home_pre = float(source_df.loc[match_idx, 'elo_home_pre'])
-        elo_away_pre = float(source_df.loc[match_idx, 'elo_away_pre'])
+        # 👇 fallback automatico se il valore è None o NaN
+        elo_home_pre = float(elo_home_raw) if pd.notna(elo_home_raw) and elo_home_raw is not None else 1500.0
+        elo_away_pre = float(elo_away_raw) if pd.notna(elo_away_raw) and elo_away_raw is not None else 1500.0
 
         lambda_home, lambda_away = estimate_lambdas_from_stats(
             home_features, away_features,
@@ -549,8 +543,26 @@ async def get_all_fixtures_recommendations(
 
                 row = _build_fixture_row(fixture)
                 extended_df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
+                
+                from addons.compute_team_profiles import annotate_pre_match_elo
+                
+                try:
+                    extended_df = annotate_pre_match_elo(extended_df)
+                except Exception as e:
+                    print(f"  - DEBUG: annotate_pre_match_elo failed for fixture {fixture.id}: {e}")
+                    import traceback; traceback.print_exc()
+                    raise  # opzionale: per non silenziarlo
+
                 match_idx = len(extended_df) - 1
-                prediction = predictor.predict_match(extended_df, match_idx)
+
+                try:
+                    prediction = predictor.predict_match(extended_df, match_idx)
+                    print(f"[{i}/{len(fixtures)}] Predicted fixture {fixture.id} ({fixture.home_team.name} vs {fixture.away_team.name})")
+                except Exception as e:
+                    print(f"  - DEBUG: Prediction failed for fixture {fixture.id}: {e}")
+                    import traceback; traceback.print_exc()
+                    raise  # opzionale: per non silenziarlo
+
                 clean_prediction = _convert_numpy_types(prediction)
 
                 real_quotes: Optional[Dict[str, float]] = None
@@ -560,6 +572,7 @@ async def get_all_fixtures_recommendations(
                         '2': fixture.avg_away_odds,
                         'X': fixture.avg_draw_odds or 3.2,
                     }
+                print(f"  - Generating recommendations with real quotes: {real_quotes}")
                 recs = get_recommended_bets(clean_prediction, quotes=real_quotes)
                 clean_recs = [_convert_numpy_types(r) for r in recs]
 

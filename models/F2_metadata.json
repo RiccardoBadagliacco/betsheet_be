@@ -1,0 +1,10 @@
+{
+  "training_matches": 2582,
+  "model_version": "CONTEXT_SCORING_V4",
+  "league_name": "Ligue 2",
+  "league_code": "F2",
+  "saved_at": "2025-10-28T16:15:13.867316",
+  "model_class": "ExactSimpleFooballPredictor",
+  "training_data_size": 0,
+  "is_trained": false
+}

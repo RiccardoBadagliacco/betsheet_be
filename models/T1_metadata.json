@@ -1,0 +1,10 @@
+{
+  "training_matches": 2564,
+  "model_version": "CONTEXT_SCORING_V4",
+  "league_name": "S\u00fcper Lig",
+  "league_code": "T1",
+  "saved_at": "2025-10-28T16:15:17.137461",
+  "model_class": "ExactSimpleFooballPredictor",
+  "training_data_size": 0,
+  "is_trained": false
+}

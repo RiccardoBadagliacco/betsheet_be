@@ -123,11 +123,10 @@ def update_elo(home_team, away_team, home_goals, away_goals, k=20):
 
 
 def build_team_profiles(df):
-    print(df.head())
-    teams = pd.concat([df['home_team'], df['away_team']]).unique()
+    teams = pd.concat([df['HomeTeam'], df['AwayTeam']]).unique()
     for team in teams:
-        matches = df[(df['home_team'] == team) | (df['away_team'] == team)]
-        over_rate = ((matches['home_goals_ft'] + matches['away_goals_ft']) > 2.5).mean()
+        matches = df[(df['HomeTeam'] == team) | (df['AwayTeam'] == team)]
+        over_rate = ((matches['FTHG'] + matches['FTAG']) > 2.5).mean()
         style = 'attacking' if over_rate > 0.65 else 'defensive' if over_rate < 0.4 else 'neutral'
         TEAM_PROFILE[team] = {
             'over_rate': over_rate,
@@ -165,8 +164,22 @@ def annotate_pre_match_elo(
         print(f"Totale match nel dataset: {len(dff)}\n")
 
     for i, row in dff.iterrows():
+        
         home = row["HomeTeam"]
         away = row["AwayTeam"]
+        
+        
+        fthg = row["FTHG"]
+        ftag = row["FTAG"]
+
+        # 👇 Gestione match futuri (senza risultato)
+        if fthg is None or ftag is None or pd.isna(fthg) or pd.isna(ftag):
+            # assegna solo i pre-match ELO e continua
+            eh, ea = team_elo[home], team_elo[away]
+            elo_home_pre.append(eh)
+            elo_away_pre.append(ea)
+            continue
+    
         hg, ag = float(row["FTHG"]), float(row["FTAG"])
         eh, ea = team_elo[home], team_elo[away]
 
@@ -214,6 +227,7 @@ def annotate_pre_match_elo(
     out = df.copy()
     out.loc[dff[orig_index_col], "elo_home_pre"] = dff["elo_home_pre"].values
     out.loc[dff[orig_index_col], "elo_away_pre"] = dff["elo_away_pre"].values
+    print(f"✅ Annotated ELO pre-match for {len(out)} matches")
 
     return out
 

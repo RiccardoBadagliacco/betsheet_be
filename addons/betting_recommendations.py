@@ -211,7 +211,7 @@ def adjust_threshold_for_context(label: str, thr: int, prediction: Dict[str, Any
 
 def get_recommended_bets(prediction: Dict[str, Any], quotes: Optional[Dict[str, float]] = None) -> List[Dict[str, Any]]:
     recommendations: List[Dict[str, Any]] = []
-
+    print('------> get_recommended_bets called')
     # Context directives (compat legacy)
     ctx_delta = prediction.get("ctx_delta_thresholds", {}) or {}
     ctx_skip  = set(prediction.get("skip_recommendations", []) or [])

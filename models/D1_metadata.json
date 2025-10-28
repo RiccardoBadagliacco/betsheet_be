@@ -1,0 +1,10 @@
+{
+  "training_matches": 2214,
+  "model_version": "CONTEXT_SCORING_V4",
+  "league_name": "Bundesliga",
+  "league_code": "D1",
+  "saved_at": "2025-10-28T16:15:11.244939",
+  "model_class": "ExactSimpleFooballPredictor",
+  "training_data_size": 0,
+  "is_trained": false
+}

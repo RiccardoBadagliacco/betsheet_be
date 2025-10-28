@@ -1,0 +1,10 @@
+{
+  "training_matches": 4007,
+  "model_version": "CONTEXT_SCORING_V4",
+  "league_name": "Championship",
+  "league_code": "E1",
+  "saved_at": "2025-10-28T16:15:12.749512",
+  "model_class": "ExactSimpleFooballPredictor",
+  "training_data_size": 0,
+  "is_trained": false
+}
