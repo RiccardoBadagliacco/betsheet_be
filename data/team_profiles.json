@@ -1,2012 +1,2816 @@
 {
   "Genoa": {
-    "gf": 0.75,
-    "ga": 1.51,
-    "style": "balanced"
+    "gf": 0.7544422769768199,
+    "ga": 1.513588322032019,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1559.262006085028
   },
   "Lecce": {
-    "gf": 0.94,
-    "ga": 1.45,
-    "style": "balanced"
+    "gf": 0.943963328045878,
+    "ga": 1.4486965432556707,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1523.609883153252
   },
   "Sassuolo": {
-    "gf": 0.98,
-    "ga": 1.02,
-    "style": "balanced"
+    "gf": 0.9800744106412898,
+    "ga": 1.015594352580267,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1582.5496418423952
   },
   "Napoli": {
-    "gf": 1.77,
-    "ga": 0.91,
-    "style": "balanced"
+    "gf": 1.7682347806273606,
+    "ga": 0.9078369214699259,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1678.5769408169374
   },
   "Milan": {
-    "gf": 1.72,
-    "ga": 0.86,
-    "style": "balanced"
+    "gf": 1.7173676514252096,
+    "ga": 0.8576815064392315,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1652.8369412192724
   },
   "Cremonese": {
-    "gf": 1.18,
-    "ga": 1.33,
-    "style": "balanced"
+    "gf": 1.178435368137528,
+    "ga": 1.3306254495575447,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1482.841478595065
   },
   "Roma": {
-    "gf": 1.14,
-    "ga": 0.45,
-    "style": "defensive"
+    "gf": 1.1384954525880917,
+    "ga": 0.4522942684266538,
+    "over_rate": 0.2,
+    "style": "defensive",
+    "elo": 1646.3011117067801
   },
   "Bologna": {
-    "gf": 1.67,
-    "ga": 1.16,
-    "style": "balanced"
+    "gf": 1.6697831393953266,
+    "ga": 1.1625577582843083,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1512.2064136462166
   },
   "Cagliari": {
-    "gf": 1.08,
-    "ga": 1.45,
-    "style": "balanced"
+    "gf": 1.079278039923491,
+    "ga": 1.4531973696864458,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1525.6234645737395
   },
   "Fiorentina": {
-    "gf": 1.17,
-    "ga": 1.57,
-    "style": "balanced"
+    "gf": 1.167108917620934,
+    "ga": 1.5709911514208506,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1478.2986725232067
   },
   "Como": {
-    "gf": 1.13,
-    "ga": 0.61,
-    "style": "defensive"
+    "gf": 1.1278516038228132,
+    "ga": 0.6086115299473935,
+    "over_rate": 0.2,
+    "style": "defensive",
+    "elo": 1457.194748490058
   },
   "Lazio": {
-    "gf": 1.31,
-    "ga": 0.85,
-    "style": "balanced"
+    "gf": 1.3142532459617677,
+    "ga": 0.8523248188180996,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1606.9614495490787
   },
   "Atalanta": {
-    "gf": 1.54,
-    "ga": 0.85,
-    "style": "balanced"
+    "gf": 1.5431214363666368,
+    "ga": 0.8466911407063367,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1677.2112470134587
   },
   "Pisa": {
-    "gf": 0.9,
-    "ga": 1.48,
-    "style": "balanced"
+    "gf": 0.9018765113988993,
+    "ga": 1.4810908696746496,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1489.0751511421952
   },
   "Juventus": {
-    "gf": 1.04,
-    "ga": 1.02,
-    "style": "balanced"
+    "gf": 1.043996691667454,
+    "ga": 1.024823178855459,
+    "over_rate": 0.2,
+    "style": "balanced",
+    "elo": 1713.8380481315116
   },
   "Parma": {
-    "gf": 0.52,
-    "ga": 0.79,
-    "style": "defensive"
+    "gf": 0.5187944895671216,
+    "ga": 0.7883405563409563,
+    "over_rate": 0.26666666666666666,
+    "style": "defensive",
+    "elo": 1491.140857485897
   },
   "Udinese": {
-    "gf": 1.25,
-    "ga": 1.68,
-    "style": "balanced"
+    "gf": 1.2470829360119429,
+    "ga": 1.6754613751259055,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1507.2021437328433
   },
   "Verona": {
-    "gf": 0.62,
-    "ga": 1.24,
-    "style": "balanced"
+    "gf": 0.6163104564823688,
+    "ga": 1.2432498477102818,
+    "over_rate": 0.2,
+    "style": "balanced",
+    "elo": 1496.84621632376
   },
   "Inter": {
-    "gf": 2.01,
-    "ga": 1.23,
-    "style": "attacking"
+    "gf": 2.009056511819022,
+    "ga": 1.228779631370824,
+    "over_rate": 0.5333333333333333,
+    "style": "attacking",
+    "elo": 1670.4486109953098
   },
   "Torino": {
-    "gf": 1.02,
-    "ga": 1.54,
-    "style": "balanced"
+    "gf": 1.0228733055976775,
+    "ga": 1.5364644709603112,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1583.0597019548811
   },
   "Antwerp": {
-    "gf": 0.63,
-    "ga": 1.2,
-    "style": "balanced"
+    "gf": 0.6271731294767767,
+    "ga": 1.2011359641379407,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1567.4045566253985
   },
   "St. Gilloise": {
-    "gf": 1.94,
-    "ga": 0.47,
-    "style": "balanced"
+    "gf": 1.9400025736088886,
+    "ga": 0.4711209883566392,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1723.740725047814
   },
   "Dender": {
-    "gf": 0.65,
-    "ga": 1.62,
-    "style": "balanced"
+    "gf": 0.6514090864578522,
+    "ga": 1.6165685940772017,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1435.1888988535497
   },
   "Cercle Brugge": {
-    "gf": 1.41,
-    "ga": 1.58,
-    "style": "balanced"
+    "gf": 1.408169277186046,
+    "ga": 1.5840233773866839,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1397.891239373211
   },
   "Waregem": {
-    "gf": 1.72,
-    "ga": 1.11,
-    "style": "balanced"
+    "gf": 1.721690371531921,
+    "ga": 1.1071963738298247,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1461.094799470256
   },
   "Mechelen": {
-    "gf": 1.45,
-    "ga": 1.13,
-    "style": "balanced"
+    "gf": 1.445453757822361,
+    "ga": 1.1277942112666437,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1526.6806616966705
   },
   "RAAL La Louviere": {
-    "gf": 0.65,
-    "ga": 0.64,
-    "style": "defensive"
+    "gf": 0.6501282424223437,
+    "ga": 0.6354379609289542,
+    "over_rate": 0.25,
+    "style": "defensive",
+    "elo": 1497.1059927247657
   },
   "Standard": {
-    "gf": 0.66,
-    "ga": 1.44,
-    "style": "balanced"
+    "gf": 0.6553466195535671,
+    "ga": 1.4394951383105237,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1573.317335050702
   },
   "Anderlecht": {
-    "gf": 1.08,
-    "ga": 1.02,
-    "style": "balanced"
+    "gf": 1.0814592987139464,
+    "ga": 1.0186174938725647,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1570.4324626867833
   },
   "Westerlo": {
-    "gf": 1.43,
-    "ga": 1.43,
-    "style": "balanced"
+    "gf": 1.4338076690412698,
+    "ga": 1.4293350536899065,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1505.649211811421
   },
   "Oud-Heverlee Leuven": {
-    "gf": 0.63,
-    "ga": 1.59,
-    "style": "balanced"
+    "gf": 0.6333289483682898,
+    "ga": 1.5925851158982234,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1475.2425734823964
   },
   "Charleroi": {
-    "gf": 1.22,
-    "ga": 1.47,
-    "style": "balanced"
+    "gf": 1.2187519166981338,
+    "ga": 1.4697365464360537,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1548.1033197203435
   },
   "Club Brugge": {
-    "gf": 1.59,
-    "ga": 0.8,
-    "style": "balanced"
+    "gf": 1.589274969168608,
+    "ga": 0.7978967159819931,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1684.39670588412
   },
   "Genk": {
-    "gf": 1.5,
-    "ga": 1.36,
-    "style": "balanced"
+    "gf": 1.504935262055383,
+    "ga": 1.364824909445533,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1616.997636376158
   },
   "St Truiden": {
-    "gf": 1.31,
-    "ga": 1.58,
-    "style": "balanced"
+    "gf": 1.3062340026337251,
+    "ga": 1.5834377727014932,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1514.9263969285785
   },
   "Gent": {
-    "gf": 2.01,
-    "ga": 1.54,
-    "style": "attacking"
+    "gf": 2.008300816712581,
+    "ga": 1.5415024302257132,
+    "over_rate": 0.7333333333333333,
+    "style": "attacking",
+    "elo": 1603.1022247129615
   },
   "Beerschot VA": {
-    "gf": 1.5,
-    "ga": 1.68,
-    "style": "balanced"
+    "gf": 1.4988708086958806,
+    "ga": 1.6837306140881043,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1413.462567207903
   },
   "Kortrijk": {
-    "gf": 1.76,
-    "ga": 1.42,
-    "style": "balanced"
+    "gf": 1.7560510407377596,
+    "ga": 1.4241734477442365,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1494.9124993975531
   },
   "Eupen": {
-    "gf": 0.65,
-    "ga": 1.42,
-    "style": "balanced"
+    "gf": 0.6498574471435274,
+    "ga": 1.4208007503143347,
+    "over_rate": 0.26666666666666666,
+    "style": "balanced",
+    "elo": 1423.1712650183936
   },
   "RWD Molenbeek": {
-    "gf": 1.08,
-    "ga": 2.12,
-    "style": "balanced"
+    "gf": 1.0750837171362484,
+    "ga": 2.1172257840224025,
+    "over_rate": 0.7333333333333333,
+    "style": "balanced",
+    "elo": 1398.9937423793908
   },
   "Seraing": {
-    "gf": 0.62,
-    "ga": 2.2,
-    "style": "balanced"
+    "gf": 0.6186079990620559,
+    "ga": 2.2040192583770626,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1362.8748327532805
   },
   "Oostende": {
-    "gf": 1.12,
-    "ga": 2.51,
-    "style": "balanced"
+    "gf": 1.1243035687910607,
+    "ga": 2.509711065509803,
+    "over_rate": 0.8,
+    "style": "balanced",
+    "elo": 1396.4627629351048
   },
   "Mouscron": {
-    "gf": 1.19,
-    "ga": 1.97,
-    "style": "balanced"
+    "gf": 1.1880257328549964,
+    "ga": 1.9743502666582258,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1506.7835577612404
   },
   "Waasland-Beveren": {
-    "gf": 1.55,
-    "ga": 2.04,
-    "style": "balanced"
+    "gf": 1.5484532188615916,
+    "ga": 2.044928795846888,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1398.2047525359387
   },
   "Lokeren": {
-    "gf": 1.1,
-    "ga": 1.69,
-    "style": "balanced"
+    "gf": 1.0974271358663685,
+    "ga": 1.6925141331478746,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1403.859279566064
   },
   "Bayern Munich": {
-    "gf": 3.38,
-    "ga": 0.52,
-    "style": "attacking"
+    "gf": 3.376802195182118,
+    "ga": 0.519841430454483,
+    "over_rate": 0.9333333333333333,
+    "style": "attacking",
+    "elo": 1782.8025687406396
   },
   "RB Leipzig": {
-    "gf": 2.2,
-    "ga": 1.13,
-    "style": "attacking"
+    "gf": 2.198942579676989,
+    "ga": 1.1348395222492391,
+    "over_rate": 0.6,
+    "style": "attacking",
+    "elo": 1673.3434373504806
   },
   "Ein Frankfurt": {
-    "gf": 2.36,
-    "ga": 1.88,
-    "style": "attacking"
+    "gf": 2.355642136133318,
+    "ga": 1.8845666436010833,
+    "over_rate": 0.7333333333333333,
+    "style": "attacking",
+    "elo": 1567.5166295818235
   },
   "Werder Bremen": {
-    "gf": 1.45,
-    "ga": 1.47,
-    "style": "balanced"
+    "gf": 1.4481810633873307,
+    "ga": 1.4678330074744368,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1596.4563176872448
   },
   "Freiburg": {
-    "gf": 1.34,
-    "ga": 1.58,
-    "style": "balanced"
+    "gf": 1.340289453711898,
+    "ga": 1.5754181858057466,
+    "over_rate": 0.7333333333333333,
+    "style": "balanced",
+    "elo": 1482.067558955875
   },
   "Augsburg": {
-    "gf": 1.17,
-    "ga": 2.6,
-    "style": "balanced"
+    "gf": 1.1741786466833493,
+    "ga": 2.6001203097031897,
+    "over_rate": 0.8,
+    "style": "balanced",
+    "elo": 1425.6942603853317
   },
   "Heidenheim": {
-    "gf": 0.95,
-    "ga": 1.93,
-    "style": "balanced"
+    "gf": 0.9539461092318344,
+    "ga": 1.9300274192310327,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1528.3178665109044
   },
   "Wolfsburg": {
-    "gf": 0.95,
-    "ga": 1.66,
-    "style": "balanced"
+    "gf": 0.9489844915609515,
+    "ga": 1.6612696547905,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1587.015895547489
   },
   "Leverkusen": {
-    "gf": 2.16,
-    "ga": 1.31,
-    "style": "attacking"
+    "gf": 2.1639983239054006,
+    "ga": 1.3148456339797248,
+    "over_rate": 0.5333333333333333,
+    "style": "attacking",
+    "elo": 1623.1294568732762
   },
   "Hoffenheim": {
-    "gf": 1.91,
-    "ga": 1.76,
-    "style": "balanced"
+    "gf": 1.9108121805819331,
+    "ga": 1.7552732811074978,
+    "over_rate": 0.8,
+    "style": "balanced",
+    "elo": 1568.3662844460544
   },
   "Union Berlin": {
-    "gf": 1.32,
-    "ga": 1.69,
-    "style": "balanced"
+    "gf": 1.32037855583302,
+    "ga": 1.691976355506509,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1534.7939279151074
   },
   "Stuttgart": {
-    "gf": 1.93,
-    "ga": 0.86,
-    "style": "balanced"
+    "gf": 1.9283639215630346,
+    "ga": 0.8647754699754546,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1506.1339344171124
   },
   "St Pauli": {
-    "gf": 0.72,
-    "ga": 1.7,
-    "style": "balanced"
+    "gf": 0.7184068442264163,
+    "ga": 1.7011285357939199,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1455.9374496393216
   },
   "Dortmund": {
-    "gf": 1.94,
-    "ga": 0.81,
-    "style": "balanced"
+    "gf": 1.9425097851467534,
+    "ga": 0.8091305694359439,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1712.8204680621222
   },
   "Mainz": {
-    "gf": 1.32,
-    "ga": 2.14,
-    "style": "balanced"
+    "gf": 1.3215487320213641,
+    "ga": 2.142748106996102,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1489.1694692917795
   },
   "FC Koln": {
-    "gf": 1.38,
-    "ga": 1.2,
-    "style": "balanced"
+    "gf": 1.377412550524736,
+    "ga": 1.1993323649277217,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1544.2020291820593
   },
   "M'gladbach": {
-    "gf": 0.95,
-    "ga": 2.43,
-    "style": "balanced"
+    "gf": 0.9457407640657486,
+    "ga": 2.4290045099829163,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1568.5471817642185
   },
   "Hamburg": {
-    "gf": 1.44,
-    "ga": 1.39,
-    "style": "balanced"
+    "gf": 1.4393144032429992,
+    "ga": 1.391765269524728,
+    "over_rate": 0.7333333333333333,
+    "style": "balanced",
+    "elo": 1507.8454926131242
   },
   "Holstein Kiel": {
-    "gf": 1.17,
-    "ga": 1.09,
-    "style": "balanced"
+    "gf": 1.168288839441489,
+    "ga": 1.0900187926461995,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1480.1682908046796
   },
   "Bochum": {
-    "gf": 1.24,
-    "ga": 1.67,
-    "style": "balanced"
+    "gf": 1.2394021342617298,
+    "ga": 1.6697356899402367,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1482.1544282000634
   },
   "Darmstadt": {
-    "gf": 1.22,
-    "ga": 0.82,
-    "style": "balanced"
+    "gf": 1.2164052654230173,
+    "ga": 0.8230856401432378,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1501.2662331207696
   },
   "Hertha": {
-    "gf": 1.34,
-    "ga": 1.05,
-    "style": "balanced"
+    "gf": 1.344970035736748,
+    "ga": 1.05045149944842,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1487.5072213695976
   },
   "Schalke 04": {
-    "gf": 1.4,
-    "ga": 0.61,
-    "style": "balanced"
+    "gf": 1.3971474656011877,
+    "ga": 0.6096192124937508,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1570.3602102880054
   },
   "Bielefeld": {
-    "gf": 1.72,
-    "ga": 1.82,
-    "style": "balanced"
+    "gf": 1.7233429648964185,
+    "ga": 1.8152933913706617,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1543.0845238658992
   },
   "Greuther Furth": {
-    "gf": 1.31,
-    "ga": 2.79,
-    "style": "balanced"
+    "gf": 1.3140338064533477,
+    "ga": 2.78865351440895,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1455.431390871638
   },
   "Paderborn": {
-    "gf": 1.88,
-    "ga": 1.06,
-    "style": "balanced"
+    "gf": 1.8806441200832722,
+    "ga": 1.0612475400708126,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1544.5121654876446
   },
   "Fortuna Dusseldorf": {
-    "gf": 1.04,
-    "ga": 1.73,
-    "style": "balanced"
+    "gf": 1.0362905474155895,
+    "ga": 1.731713721610346,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1521.3792408324016
   },
   "Nurnberg": {
-    "gf": 1.24,
-    "ga": 1.55,
-    "style": "balanced"
+    "gf": 1.235728763819618,
+    "ga": 1.5487040709525113,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1441.1348035069364
   },
   "Hannover": {
-    "gf": 1.74,
-    "ga": 1.38,
-    "style": "balanced"
+    "gf": 1.7422822310687742,
+    "ga": 1.384312627110252,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1485.4176815375972
   },
   "Elversberg": {
-    "gf": 2.4,
-    "ga": 0.79,
-    "style": "attacking"
+    "gf": 2.3967333426131963,
+    "ga": 0.7933945820482013,
+    "over_rate": 0.5333333333333333,
+    "style": "attacking",
+    "elo": 1466.9155051976413
   },
   "Karlsruhe": {
-    "gf": 1.98,
-    "ga": 1.44,
-    "style": "balanced"
+    "gf": 1.979611529166624,
+    "ga": 1.436288005303154,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1466.3754005468575
   },
   "Preußen Münster": {
-    "gf": 1.51,
-    "ga": 1.83,
-    "style": "balanced"
+    "gf": 1.5137128282572454,
+    "ga": 1.8260835375859885,
+    "over_rate": 0.7333333333333333,
+    "style": "balanced",
+    "elo": 1432.2118940918465
   },
   "Dresden": {
-    "gf": 1.45,
-    "ga": 1.93,
-    "style": "balanced"
+    "gf": 1.4496558251739182,
+    "ga": 1.9314187068410904,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1424.3371641607298
   },
   "Kaiserslautern": {
-    "gf": 1.9,
-    "ga": 1.43,
-    "style": "balanced"
+    "gf": 1.904859910442263,
+    "ga": 1.431876680948822,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1444.3468397120087
   },
   "Magdeburg": {
-    "gf": 0.97,
-    "ga": 1.74,
-    "style": "balanced"
+    "gf": 0.9699951291161336,
+    "ga": 1.740127474326586,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1430.8389932533648
   },
   "Braunschweig": {
-    "gf": 1.04,
-    "ga": 2.18,
-    "style": "balanced"
+    "gf": 1.0368730708710365,
+    "ga": 2.1805233559242287,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1379.4082029121116
   },
   "Regensburg": {
-    "gf": 0.97,
-    "ga": 1.91,
-    "style": "balanced"
+    "gf": 0.9740272024643881,
+    "ga": 1.9139454693892513,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1482.7557392877109
   },
   "Ulm": {
-    "gf": 1.14,
-    "ga": 1.99,
-    "style": "balanced"
+    "gf": 1.1400496466591177,
+    "ga": 1.9922044220707216,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1417.5886509931413
   },
   "Osnabruck": {
-    "gf": 0.97,
-    "ga": 2.12,
-    "style": "balanced"
+    "gf": 0.9690904093335442,
+    "ga": 2.1213561304843354,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1417.5831422346491
   },
   "Wehen": {
-    "gf": 0.84,
-    "ga": 1.86,
-    "style": "balanced"
+    "gf": 0.8405486725423651,
+    "ga": 1.8574306820663142,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1390.8001453218103
   },
   "Hansa Rostock": {
-    "gf": 0.75,
-    "ga": 1.79,
-    "style": "balanced"
+    "gf": 0.7514169359938861,
+    "ga": 1.794885736792761,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1450.669749933198
   },
   "Sandhausen": {
-    "gf": 0.81,
-    "ga": 1.71,
-    "style": "balanced"
+    "gf": 0.8092977547338949,
+    "ga": 1.707504227514364,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1454.5287560976024
   },
   "Ingolstadt": {
-    "gf": 0.95,
-    "ga": 1.89,
-    "style": "balanced"
+    "gf": 0.9491625981343446,
+    "ga": 1.8947157780502175,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1414.5922232913313
   },
   "Erzgebirge Aue": {
-    "gf": 0.94,
-    "ga": 2.49,
-    "style": "balanced"
+    "gf": 0.9382173178616026,
+    "ga": 2.490002440799526,
+    "over_rate": 0.7333333333333333,
+    "style": "balanced",
+    "elo": 1441.9473941707424
   },
   "Wurzburger Kickers": {
-    "gf": 1.16,
-    "ga": 1.9,
-    "style": "balanced"
+    "gf": 1.1619860685402372,
+    "ga": 1.9039439399305174,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1399.9528264282576
   },
   "Duisburg": {
-    "gf": 1.55,
-    "ga": 2.3,
-    "style": "balanced"
+    "gf": 1.5460789052332113,
+    "ga": 2.303033736873968,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1418.5709535177984
   },
   "Liverpool": {
-    "gf": 1.65,
-    "ga": 1.75,
-    "style": "balanced"
+    "gf": 1.652891297684593,
+    "ga": 1.7472260857795539,
+    "over_rate": 0.7333333333333333,
+    "style": "balanced",
+    "elo": 1790.2124895148559
   },
   "Bournemouth": {
-    "gf": 1.79,
-    "ga": 1.16,
-    "style": "balanced"
+    "gf": 1.7910796750020845,
+    "ga": 1.158727136454241,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1536.0897458605368
   },
   "Aston Villa": {
-    "gf": 1.25,
-    "ga": 0.83,
-    "style": "balanced"
+    "gf": 1.2548387619117838,
+    "ga": 0.8258647647397739,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1559.6546336848494
   },
   "Newcastle": {
-    "gf": 1.12,
-    "ga": 0.96,
-    "style": "defensive"
+    "gf": 1.1229508758890654,
+    "ga": 0.961873644994843,
+    "over_rate": 0.4,
+    "style": "defensive",
+    "elo": 1507.3070887505908
   },
   "Brighton": {
-    "gf": 1.87,
-    "ga": 1.76,
-    "style": "balanced"
+    "gf": 1.8679363787096739,
+    "ga": 1.7565164248349467,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1425.1819304102587
   },
   "Fulham": {
-    "gf": 1.0,
-    "ga": 1.73,
-    "style": "balanced"
+    "gf": 1.002572954220721,
+    "ga": 1.7250613529219736,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1544.4315738209461
   },
   "Sunderland": {
-    "gf": 1.05,
-    "ga": 0.86,
-    "style": "defensive"
+    "gf": 1.0459776447897013,
+    "ga": 0.8607970812627561,
+    "over_rate": 0.26666666666666666,
+    "style": "defensive",
+    "elo": 1510.3401108624066
   },
   "West Ham": {
-    "gf": 0.9,
-    "ga": 1.93,
-    "style": "balanced"
+    "gf": 0.9002678012816852,
+    "ga": 1.9337380531615775,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1504.023790349001
   },
   "Tottenham": {
-    "gf": 1.67,
-    "ga": 1.19,
-    "style": "balanced"
+    "gf": 1.6679926424624179,
+    "ga": 1.1948288375199385,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1593.7808534511687
   },
   "Burnley": {
-    "gf": 1.72,
-    "ga": 1.64,
-    "style": "balanced"
+    "gf": 1.7195137255623485,
+    "ga": 1.6385608814344572,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1681.9292761481488
   },
   "Wolves": {
-    "gf": 0.93,
-    "ga": 1.97,
-    "style": "balanced"
+    "gf": 0.931411132555923,
+    "ga": 1.9708046033435571,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1548.1053512129492
   },
   "Man City": {
-    "gf": 1.74,
-    "ga": 0.63,
-    "style": "balanced"
+    "gf": 1.735983169193399,
+    "ga": 0.6328875227023038,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1774.749579069587
   },
   "Chelsea": {
-    "gf": 1.73,
-    "ga": 1.19,
-    "style": "balanced"
+    "gf": 1.72987703260189,
+    "ga": 1.1934220984806923,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1610.2095317255903
   },
   "Crystal Palace": {
-    "gf": 1.44,
-    "ga": 1.2,
-    "style": "balanced"
+    "gf": 1.4430503623913618,
+    "ga": 1.196829173558536,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1497.1945014664916
   },
   "Nott'm Forest": {
-    "gf": 0.49,
-    "ga": 1.86,
-    "style": "balanced"
+    "gf": 0.4878703734625671,
+    "ga": 1.856169743310143,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1468.5887948301674
   },
   "Brentford": {
-    "gf": 1.79,
-    "ga": 1.46,
-    "style": "balanced"
+    "gf": 1.7917629940655142,
+    "ga": 1.461098135472275,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1527.578865779182
   },
   "Man United": {
-    "gf": 1.8,
-    "ga": 1.52,
-    "style": "balanced"
+    "gf": 1.7958956004097093,
+    "ga": 1.5167591906387796,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1617.855610195606
   },
   "Arsenal": {
-    "gf": 1.67,
-    "ga": 0.45,
-    "style": "balanced"
+    "gf": 1.674970958376344,
+    "ga": 0.4531860272884186,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1608.0730135150134
   },
   "Leeds": {
-    "gf": 1.43,
-    "ga": 1.34,
-    "style": "balanced"
+    "gf": 1.4256724882585166,
+    "ga": 1.3371040564544556,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1568.6358322679932
   },
   "Everton": {
-    "gf": 0.98,
-    "ga": 1.42,
-    "style": "balanced"
+    "gf": 0.9753510948001437,
+    "ga": 1.421962827994882,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1526.2172520756844
   },
   "Ipswich": {
-    "gf": 1.37,
-    "ga": 1.33,
-    "style": "balanced"
+    "gf": 1.3726852844444393,
+    "ga": 1.3257111187966568,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1404.1173831963388
   },
   "Southampton": {
-    "gf": 0.95,
-    "ga": 1.49,
-    "style": "balanced"
+    "gf": 0.9518238656158442,
+    "ga": 1.4915654891362755,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1531.0349752657116
   },
   "Leicester": {
-    "gf": 1.13,
-    "ga": 1.09,
-    "style": "balanced"
+    "gf": 1.1333814485328493,
+    "ga": 1.0925986304315207,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1560.6082012724535
   },
   "Luton": {
-    "gf": 1.35,
-    "ga": 1.37,
-    "style": "balanced"
+    "gf": 1.3530148875889465,
+    "ga": 1.3749570527385002,
+    "over_rate": 0.26666666666666666,
+    "style": "balanced",
+    "elo": 1437.3917759077776
   },
   "Sheffield United": {
-    "gf": 1.09,
-    "ga": 1.51,
-    "style": "balanced"
+    "gf": 1.0921742927874767,
+    "ga": 1.5124231903446335,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1586.9424810551118
   },
   "Watford": {
-    "gf": 1.19,
-    "ga": 1.46,
-    "style": "balanced"
+    "gf": 1.1876631463191476,
+    "ga": 1.4584408318164703,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1555.7951470546607
   },
   "Norwich": {
-    "gf": 0.88,
-    "ga": 1.54,
-    "style": "balanced"
+    "gf": 0.8769368297319835,
+    "ga": 1.5446803367264914,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1618.1615341190122
   },
   "West Brom": {
-    "gf": 0.97,
-    "ga": 1.33,
-    "style": "balanced"
+    "gf": 0.9661738659269136,
+    "ga": 1.3343800815835478,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1528.900699925954
   },
   "Cardiff": {
-    "gf": 0.89,
-    "ga": 1.51,
-    "style": "balanced"
+    "gf": 0.8945859242025712,
+    "ga": 1.5117914531156778,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1519.4069254034548
   },
   "Huddersfield": {
-    "gf": 0.68,
-    "ga": 1.86,
-    "style": "balanced"
+    "gf": 0.6787712862190407,
+    "ga": 1.8635763727676193,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1412.8842249504087
   },
   "Birmingham": {
-    "gf": 0.89,
-    "ga": 1.22,
-    "style": "balanced"
+    "gf": 0.8860110306512065,
+    "ga": 1.2235889339274102,
+    "over_rate": 0.26666666666666666,
+    "style": "balanced",
+    "elo": 1437.8961116021526
   },
   "Charlton": {
-    "gf": 1.34,
-    "ga": 0.96,
-    "style": "balanced"
+    "gf": 1.3427737017392312,
+    "ga": 0.9634204928592944,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1406.5183329114946
   },
   "Coventry": {
-    "gf": 2.69,
-    "ga": 0.67,
-    "style": "attacking"
+    "gf": 2.692970932174155,
+    "ga": 0.6681285704825073,
+    "over_rate": 0.6,
+    "style": "attacking",
+    "elo": 1456.7588305699908
   },
   "Hull": {
-    "gf": 1.67,
-    "ga": 1.46,
-    "style": "balanced"
+    "gf": 1.670285214673809,
+    "ga": 1.4620548801947657,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1439.7387681283078
   },
   "Wrexham": {
-    "gf": 1.11,
-    "ga": 1.09,
-    "style": "balanced"
+    "gf": 1.1062870077963354,
+    "ga": 1.090594173538153,
+    "over_rate": 0.4166666666666667,
+    "style": "balanced",
+    "elo": 1486.8686376431745
   },
   "Middlesbrough": {
-    "gf": 1.11,
-    "ga": 0.75,
-    "style": "defensive"
+    "gf": 1.1126769744799128,
+    "ga": 0.7480303300714664,
+    "over_rate": 0.4,
+    "style": "defensive",
+    "elo": 1486.7172481815915
   },
   "Swansea": {
-    "gf": 1.05,
-    "ga": 1.11,
-    "style": "balanced"
+    "gf": 1.0513421414721975,
+    "ga": 1.1087241155974425,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1496.9117112899105
   },
   "Millwall": {
-    "gf": 1.34,
-    "ga": 0.92,
-    "style": "balanced"
+    "gf": 1.3433132208862049,
+    "ga": 0.9211666479653525,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1421.0781296868165
   },
   "Oxford": {
-    "gf": 1.13,
-    "ga": 1.11,
-    "style": "balanced"
+    "gf": 1.133644774106041,
+    "ga": 1.1063851152580013,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1457.2840082481046
   },
   "Portsmouth": {
-    "gf": 0.81,
-    "ga": 1.14,
-    "style": "balanced"
+    "gf": 0.8148686140278869,
+    "ga": 1.1363152002222476,
+    "over_rate": 0.26666666666666666,
+    "style": "balanced",
+    "elo": 1446.5309126961815
   },
   "QPR": {
-    "gf": 1.05,
-    "ga": 1.21,
-    "style": "balanced"
+    "gf": 1.0458743390268206,
+    "ga": 1.2071593309176425,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1391.2007430866702
   },
   "Preston": {
-    "gf": 1.35,
-    "ga": 1.2,
-    "style": "balanced"
+    "gf": 1.3511673249213885,
+    "ga": 1.1981437200528453,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1480.625847414357
   },
   "Stoke": {
-    "gf": 0.78,
-    "ga": 0.79,
-    "style": "defensive"
+    "gf": 0.777521314544765,
+    "ga": 0.7882328055891845,
+    "over_rate": 0.26666666666666666,
+    "style": "defensive",
+    "elo": 1460.7756232272407
   },
   "Derby": {
-    "gf": 0.96,
-    "ga": 0.87,
-    "style": "defensive"
+    "gf": 0.9567063633441032,
+    "ga": 0.8675897818150623,
+    "over_rate": 0.26666666666666666,
+    "style": "defensive",
+    "elo": 1518.9186400383549
   },
   "Blackburn": {
-    "gf": 1.06,
-    "ga": 1.57,
-    "style": "balanced"
+    "gf": 1.0566104478633698,
+    "ga": 1.5691737449852314,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1462.0274448511316
   },
   "Bristol City": {
-    "gf": 1.5,
-    "ga": 0.98,
-    "style": "balanced"
+    "gf": 1.5043668816500895,
+    "ga": 0.9833588317861118,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1495.6588136474477
   },
   "Sheffield Weds": {
-    "gf": 0.84,
-    "ga": 1.98,
-    "style": "balanced"
+    "gf": 0.8425673398425474,
+    "ga": 1.982676823471492,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1460.9653852237436
   },
   "Plymouth": {
-    "gf": 1.38,
-    "ga": 1.56,
-    "style": "balanced"
+    "gf": 1.3791698126685974,
+    "ga": 1.5614628445209218,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1416.3069126762425
   },
   "Rotherham": {
-    "gf": 0.98,
-    "ga": 1.73,
-    "style": "balanced"
+    "gf": 0.9798783774459046,
+    "ga": 1.725398306217338,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1352.783704386339
   },
   "Blackpool": {
-    "gf": 1.15,
-    "ga": 1.58,
-    "style": "balanced"
+    "gf": 1.1499389480699795,
+    "ga": 1.580045989824011,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1424.8611178472825
   },
   "Reading": {
-    "gf": 0.7,
-    "ga": 1.4,
-    "style": "balanced"
+    "gf": 0.6960598480166831,
+    "ga": 1.403148851849837,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1428.1946096046893
   },
   "Wigan": {
-    "gf": 0.65,
-    "ga": 0.84,
-    "style": "defensive"
+    "gf": 0.6516324189147126,
+    "ga": 0.8447063117925661,
+    "over_rate": 0.2,
+    "style": "defensive",
+    "elo": 1439.8098125927331
   },
   "Barnsley": {
-    "gf": 0.68,
-    "ga": 2.24,
-    "style": "balanced"
+    "gf": 0.6846188185025214,
+    "ga": 2.239378642185981,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1445.5956494749314
   },
   "Peterboro": {
-    "gf": 1.61,
-    "ga": 1.42,
-    "style": "balanced"
+    "gf": 1.610445932632257,
+    "ga": 1.4202129008700004,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1382.4504185197866
   },
   "Wycombe": {
-    "gf": 1.46,
-    "ga": 1.02,
-    "style": "balanced"
+    "gf": 1.4625067862123649,
+    "ga": 1.0153896361994617,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1419.3459548628084
   },
   "Bolton": {
-    "gf": 0.39,
-    "ga": 1.95,
-    "style": "balanced"
+    "gf": 0.3910159401929533,
+    "ga": 1.947714177720023,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1328.773458446605
   },
   "Rennes": {
-    "gf": 1.51,
-    "ga": 1.7,
-    "style": "balanced"
+    "gf": 1.5061979211861407,
+    "ga": 1.7019110908523505,
+    "over_rate": 0.7333333333333333,
+    "style": "balanced",
+    "elo": 1538.4516891037265
   },
   "Marseille": {
-    "gf": 2.66,
-    "ga": 1.15,
-    "style": "attacking"
+    "gf": 2.6625499345595243,
+    "ga": 1.1472177919561966,
+    "over_rate": 0.7333333333333333,
+    "style": "attacking",
+    "elo": 1579.6350024054998
   },
   "Lens": {
-    "gf": 1.68,
-    "ga": 0.95,
-    "style": "balanced"
+    "gf": 1.6844686353971943,
+    "ga": 0.9506144520543235,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1578.444860388329
   },
   "Lyon": {
-    "gf": 1.52,
-    "ga": 1.22,
-    "style": "balanced"
+    "gf": 1.5203723165229441,
+    "ga": 1.2208038832740127,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1634.077773895919
   },
   "Monaco": {
-    "gf": 1.77,
-    "ga": 1.35,
-    "style": "balanced"
+    "gf": 1.770942203509455,
+    "ga": 1.3531652250354342,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1500.4371237403304
   },
   "Le Havre": {
-    "gf": 1.31,
-    "ga": 1.89,
-    "style": "balanced"
+    "gf": 1.314718283809173,
+    "ga": 1.8888071969834943,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1516.1795267227512
   },
   "Nice": {
-    "gf": 1.86,
-    "ga": 1.54,
-    "style": "balanced"
+    "gf": 1.8590969595605826,
+    "ga": 1.537280620290771,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1555.859993273406
   },
   "Toulouse": {
-    "gf": 1.62,
-    "ga": 1.29,
-    "style": "balanced"
+    "gf": 1.6153129951929552,
+    "ga": 1.292714672492619,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1554.8511658476268
   },
   "Brest": {
-    "gf": 1.43,
-    "ga": 2.02,
-    "style": "balanced"
+    "gf": 1.4270608320562654,
+    "ga": 2.0154221345531242,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1569.9795576484623
   },
   "Lille": {
-    "gf": 2.36,
-    "ga": 1.09,
-    "style": "attacking"
+    "gf": 2.3556486051471133,
+    "ga": 1.0892905285883503,
+    "over_rate": 0.5333333333333333,
+    "style": "attacking",
+    "elo": 1669.311619316606
   },
   "Angers": {
-    "gf": 0.79,
-    "ga": 1.39,
-    "style": "balanced"
+    "gf": 0.7862831949567829,
+    "ga": 1.3933305226316752,
+    "over_rate": 0.2,
+    "style": "balanced",
+    "elo": 1552.205443102233
   },
   "Paris FC": {
-    "gf": 1.49,
-    "ga": 1.54,
-    "style": "balanced"
+    "gf": 1.4933726514958299,
+    "ga": 1.5352217062705635,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1542.5081868387501
   },
   "Auxerre": {
-    "gf": 0.9,
-    "ga": 1.57,
-    "style": "balanced"
+    "gf": 0.8991560372803025,
+    "ga": 1.5693199102683821,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1448.025157906142
   },
   "Lorient": {
-    "gf": 1.58,
-    "ga": 2.03,
-    "style": "balanced"
+    "gf": 1.577136928272379,
+    "ga": 2.032889906834612,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1555.6778978352777
   },
   "Metz": {
-    "gf": 0.98,
-    "ga": 3.05,
-    "style": "balanced"
+    "gf": 0.9771515191347244,
+    "ga": 3.0472408391448207,
+    "over_rate": 0.8,
+    "style": "balanced",
+    "elo": 1640.2638041424525
   },
   "Strasbourg": {
-    "gf": 2.07,
-    "ga": 1.55,
-    "style": "attacking"
+    "gf": 2.0733667509828373,
+    "ga": 1.5493653908963765,
+    "over_rate": 0.7333333333333333,
+    "style": "attacking",
+    "elo": 1503.2091928956925
   },
   "Nantes": {
-    "gf": 0.94,
-    "ga": 1.09,
-    "style": "balanced"
+    "gf": 0.9376437419337735,
+    "ga": 1.0883741911294083,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1511.4201302518534
   },
   "Paris SG": {
-    "gf": 2.18,
-    "ga": 1.05,
-    "style": "attacking"
+    "gf": 2.182255656469088,
+    "ga": 1.0486633278705677,
+    "over_rate": 0.5333333333333333,
+    "style": "attacking",
+    "elo": 1753.837983460582
   },
   "Reims": {
-    "gf": 1.34,
-    "ga": 1.39,
-    "style": "balanced"
+    "gf": 1.339523782821591,
+    "ga": 1.394486186356061,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1538.5544606158976
   },
   "St Etienne": {
-    "gf": 1.66,
-    "ga": 1.89,
-    "style": "balanced"
+    "gf": 1.6590270892950834,
+    "ga": 1.891657426008818,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1530.5465838828702
   },
   "Montpellier": {
-    "gf": 1.27,
-    "ga": 1.1,
-    "style": "balanced"
+    "gf": 1.2672508689374382,
+    "ga": 1.1045896026812152,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1546.002246979829
   },
   "Clermont": {
-    "gf": 0.89,
-    "ga": 1.31,
-    "style": "balanced"
+    "gf": 0.8902358355655428,
+    "ga": 1.3080690976947829,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1515.8021498125202
   },
   "Ajaccio": {
-    "gf": 0.95,
-    "ga": 1.3,
-    "style": "balanced"
+    "gf": 0.9507400799001025,
+    "ga": 1.296075133823095,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1468.6556052901858
   },
   "Troyes": {
-    "gf": 1.71,
-    "ga": 0.79,
-    "style": "balanced"
+    "gf": 1.712054736022548,
+    "ga": 0.7863350915193257,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1615.8150378316705
   },
   "Bordeaux": {
-    "gf": 1.91,
-    "ga": 1.62,
-    "style": "balanced"
+    "gf": 1.9146777196396396,
+    "ga": 1.6180780457149804,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1553.2317189819705
   },
   "Dijon": {
-    "gf": 1.22,
-    "ga": 0.88,
-    "style": "balanced"
+    "gf": 1.2239854057290698,
+    "ga": 0.8843068649061822,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1435.9229705870127
   },
   "Nimes": {
-    "gf": 1.54,
-    "ga": 1.96,
-    "style": "balanced"
+    "gf": 1.5434420070652084,
+    "ga": 1.9633991794668038,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1423.7192709860285
   },
   "Amiens": {
-    "gf": 1.27,
-    "ga": 1.31,
-    "style": "balanced"
+    "gf": 1.2730798137430974,
+    "ga": 1.3063792431426806,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1454.8547035352694
   },
   "Guingamp": {
-    "gf": 1.68,
-    "ga": 1.86,
-    "style": "balanced"
+    "gf": 1.6759914885208893,
+    "ga": 1.8581973590627283,
+    "over_rate": 0.8,
+    "style": "balanced",
+    "elo": 1488.0140628989209
   },
   "Caen": {
-    "gf": 0.9,
-    "ga": 2.16,
-    "style": "balanced"
+    "gf": 0.897018073594541,
+    "ga": 2.162501373440445,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1451.7496243647927
   },
   "Le Mans": {
-    "gf": 1.42,
-    "ga": 1.18,
-    "style": "balanced"
+    "gf": 1.4159815434063352,
+    "ga": 1.1822695194467778,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1448.3998023651939
   },
   "Dunkerque": {
-    "gf": 1.66,
-    "ga": 1.06,
-    "style": "balanced"
+    "gf": 1.6616460382987155,
+    "ga": 1.0640712780210382,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1407.171862288419
   },
   "Laval": {
-    "gf": 0.56,
-    "ga": 1.15,
-    "style": "balanced"
+    "gf": 0.5636780109243303,
+    "ga": 1.1544193033305488,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1445.9302012446474
   },
   "Red Star": {
-    "gf": 1.39,
-    "ga": 0.75,
-    "style": "balanced"
+    "gf": 1.390950364508242,
+    "ga": 0.7511691100613566,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1412.930193831804
   },
   "Pau FC": {
-    "gf": 1.45,
-    "ga": 1.39,
-    "style": "balanced"
+    "gf": 1.4481866912384687,
+    "ga": 1.3860249304544858,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1440.1379083431589
   },
   "Annecy": {
-    "gf": 1.53,
-    "ga": 0.93,
-    "style": "balanced"
+    "gf": 1.5298003692890667,
+    "ga": 0.9268800190753463,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1467.5080035403628
   },
   "Rodez": {
-    "gf": 1.2,
-    "ga": 1.51,
-    "style": "balanced"
+    "gf": 1.2037298024007002,
+    "ga": 1.5091553269925653,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1427.2972041092012
   },
   "Nancy": {
-    "gf": 1.01,
-    "ga": 1.85,
-    "style": "balanced"
+    "gf": 1.0124578267073439,
+    "ga": 1.8491666706031165,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1452.2284894434563
   },
   "Grenoble": {
-    "gf": 1.09,
-    "ga": 1.29,
-    "style": "balanced"
+    "gf": 1.086773322980372,
+    "ga": 1.289604693635306,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1464.0696913872507
   },
   "Bastia": {
-    "gf": 0.58,
-    "ga": 1.19,
-    "style": "balanced"
+    "gf": 0.5849943866577807,
+    "ga": 1.1906151961238205,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1476.792617868718
   },
   "Boulogne": {
-    "gf": 0.97,
-    "ga": 1.28,
-    "style": "balanced"
+    "gf": 0.9688054640088548,
+    "ga": 1.2809936044219372,
+    "over_rate": 0.45454545454545453,
+    "style": "balanced",
+    "elo": 1465.4000386257744
   },
   "Martigues": {
-    "gf": 1.24,
-    "ga": 1.77,
-    "style": "balanced"
+    "gf": 1.239684646234206,
+    "ga": 1.7707033728473667,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1422.1329993713464
   },
   "Quevilly Rouen": {
-    "gf": 1.46,
-    "ga": 1.51,
-    "style": "balanced"
+    "gf": 1.458790800409888,
+    "ga": 1.5094630699593894,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1407.154123900822
   },
   "Concarneau": {
-    "gf": 1.25,
-    "ga": 2.09,
-    "style": "balanced"
+    "gf": 1.2519772356688221,
+    "ga": 2.08915882173079,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1416.3013502156393
   },
   "Valenciennes": {
-    "gf": 0.86,
-    "ga": 1.59,
-    "style": "balanced"
+    "gf": 0.8601006168332302,
+    "ga": 1.5930416810911268,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1459.799974308031
   },
   "Niort": {
-    "gf": 1.09,
-    "ga": 2.17,
-    "style": "balanced"
+    "gf": 1.0892846190185652,
+    "ga": 2.172079574676292,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1436.791115855721
   },
   "Sochaux": {
-    "gf": 0.85,
-    "ga": 1.62,
-    "style": "balanced"
+    "gf": 0.8519915310908536,
+    "ga": 1.6153387245643656,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1444.3654113551486
   },
   "Chateauroux": {
-    "gf": 0.62,
-    "ga": 1.41,
-    "style": "balanced"
+    "gf": 0.619650725648371,
+    "ga": 1.4113866274091091,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1474.5805775827569
   },
   "Chambly": {
-    "gf": 1.15,
-    "ga": 1.59,
-    "style": "balanced"
+    "gf": 1.1528859116148589,
+    "ga": 1.588479283197185,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1451.5347420391429
   },
   "Orleans": {
-    "gf": 0.64,
-    "ga": 1.71,
-    "style": "balanced"
+    "gf": 0.6437668948838783,
+    "ga": 1.710502862816543,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1455.7123323384553
   },
   "Ajaccio GFCO": {
-    "gf": 0.68,
-    "ga": 1.42,
-    "style": "balanced"
+    "gf": 0.6831543812175517,
+    "ga": 1.4240075296414065,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1441.6921498958588
   },
   "Beziers": {
-    "gf": 1.51,
-    "ga": 1.29,
-    "style": "balanced"
+    "gf": 1.5149090320962026,
+    "ga": 1.2926110700329199,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1454.8246655464827
   },
   "Empoli": {
-    "gf": 1.32,
-    "ga": 1.65,
-    "style": "balanced"
+    "gf": 1.3177324335515943,
+    "ga": 1.654088815875133,
+    "over_rate": 0.7333333333333333,
+    "style": "balanced",
+    "elo": 1491.2380375089904
   },
   "Monza": {
-    "gf": 1.25,
-    "ga": 1.03,
-    "style": "balanced"
+    "gf": 1.2483193062857683,
+    "ga": 1.0303436345129744,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1549.443675177303
   },
   "Venezia": {
-    "gf": 1.45,
-    "ga": 1.29,
-    "style": "balanced"
+    "gf": 1.454769725530665,
+    "ga": 1.2868607655074868,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1475.2384880912432
   },
   "Frosinone": {
-    "gf": 1.32,
-    "ga": 1.15,
-    "style": "balanced"
+    "gf": 1.3197803265511598,
+    "ga": 1.1509142172277491,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1475.4878925385528
   },
   "Salernitana": {
-    "gf": 1.13,
-    "ga": 0.85,
-    "style": "defensive"
+    "gf": 1.134705850704698,
+    "ga": 0.8462983126474632,
+    "over_rate": 0.26666666666666666,
+    "style": "defensive",
+    "elo": 1474.172738854484
   },
   "Sampdoria": {
-    "gf": 1.06,
-    "ga": 1.29,
-    "style": "balanced"
+    "gf": 1.0587622166916155,
+    "ga": 1.2922161469343014,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1504.9050055997811
   },
   "Spezia": {
-    "gf": 1.45,
-    "ga": 1.44,
-    "style": "balanced"
+    "gf": 1.4543470800307956,
+    "ga": 1.4391141510275258,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1522.9356977001241
   },
   "Crotone": {
-    "gf": 1.35,
-    "ga": 1.52,
-    "style": "balanced"
+    "gf": 1.3518130583793269,
+    "ga": 1.523529110069762,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1495.7651497694253
   },
   "Benevento": {
-    "gf": 1.19,
-    "ga": 1.83,
-    "style": "balanced"
+    "gf": 1.191770141079784,
+    "ga": 1.833205466357177,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1591.3543341615252
   },
   "Brescia": {
-    "gf": 1.07,
-    "ga": 1.03,
-    "style": "balanced"
+    "gf": 1.0704499666572826,
+    "ga": 1.0332255533835717,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1521.506172859936
   },
   "Spal": {
-    "gf": 1.02,
-    "ga": 1.26,
-    "style": "balanced"
+    "gf": 1.0246044093960747,
+    "ga": 1.2561567157511766,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1468.4650832086454
   },
   "Chievo": {
-    "gf": 1.64,
-    "ga": 1.14,
-    "style": "balanced"
+    "gf": 1.6432641773424925,
+    "ga": 1.1377519143294996,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1490.8547874399326
   },
   "Pescara": {
-    "gf": 1.31,
-    "ga": 1.88,
-    "style": "balanced"
+    "gf": 1.3112351780505545,
+    "ga": 1.876419448055021,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1398.479981870501
   },
   "Cesena": {
-    "gf": 1.35,
-    "ga": 1.16,
-    "style": "balanced"
+    "gf": 1.345389500737795,
+    "ga": 1.1590432659301995,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1507.492510674887
   },
   "Padova": {
-    "gf": 1.34,
-    "ga": 1.25,
-    "style": "balanced"
+    "gf": 1.3367603701780424,
+    "ga": 1.254458895169121,
+    "over_rate": 0.5555555555555556,
+    "style": "balanced",
+    "elo": 1495.618153880505
   },
   "Virtus Entella": {
-    "gf": 1.15,
-    "ga": 1.53,
-    "style": "balanced"
+    "gf": 1.1511729538041353,
+    "ga": 1.5302338569089573,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1403.6401276361885
   },
   "Juve Stabia": {
-    "gf": 1.31,
-    "ga": 1.17,
-    "style": "balanced"
+    "gf": 1.3104030560156632,
+    "ga": 1.171932585702353,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1421.562350458312
   },
   "Mantova": {
-    "gf": 0.74,
-    "ga": 1.53,
-    "style": "balanced"
+    "gf": 0.7406287965571534,
+    "ga": 1.5267704486582978,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1442.3599804435648
   },
   "Palermo": {
-    "gf": 1.08,
-    "ga": 0.75,
-    "style": "defensive"
+    "gf": 1.0779516398424476,
+    "ga": 0.7511981458658111,
+    "over_rate": 0.4,
+    "style": "defensive",
+    "elo": 1467.023134729465
   },
   "Reggiana": {
-    "gf": 1.62,
-    "ga": 1.62,
-    "style": "balanced"
+    "gf": 1.6205352011945116,
+    "ga": 1.6191574787162968,
+    "over_rate": 0.8,
+    "style": "balanced",
+    "elo": 1373.40235311856
   },
   "Carrarese": {
-    "gf": 1.81,
-    "ga": 1.33,
-    "style": "balanced"
+    "gf": 1.8108171805845426,
+    "ga": 1.3332240888224514,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1475.1497049466989
   },
   "Bari": {
-    "gf": 1.03,
-    "ga": 1.48,
-    "style": "balanced"
+    "gf": 1.025305627976276,
+    "ga": 1.4816460733828063,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1531.041004138827
   },
   "Catanzaro": {
-    "gf": 0.89,
-    "ga": 1.02,
-    "style": "balanced"
+    "gf": 0.8935622235245327,
+    "ga": 1.0159451925957426,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1517.9081596241679
   },
   "Sudtirol": {
-    "gf": 1.25,
-    "ga": 1.28,
-    "style": "balanced"
+    "gf": 1.2529437430388601,
+    "ga": 1.2786256231633173,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1492.9561595334956
   },
   "Avellino": {
-    "gf": 0.85,
-    "ga": 1.99,
-    "style": "balanced"
+    "gf": 0.8521937082438986,
+    "ga": 1.985357369154757,
+    "over_rate": 0.4444444444444444,
+    "style": "balanced",
+    "elo": 1495.578858060358
   },
   "Modena": {
-    "gf": 1.62,
-    "ga": 0.84,
-    "style": "balanced"
+    "gf": 1.619988173740211,
+    "ga": 0.8389377127450908,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1463.521783334281
   },
   "Cittadella": {
-    "gf": 0.85,
-    "ga": 1.43,
-    "style": "balanced"
+    "gf": 0.8511609056355899,
+    "ga": 1.4343880137875153,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1482.5087921309184
   },
   "Cosenza": {
-    "gf": 0.75,
-    "ga": 1.86,
-    "style": "balanced"
+    "gf": 0.750782109193563,
+    "ga": 1.8580560628495955,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1430.1528092600577
   },
   "Ascoli": {
-    "gf": 1.05,
-    "ga": 0.86,
-    "style": "defensive"
+    "gf": 1.0502297395492644,
+    "ga": 0.8606384608693306,
+    "over_rate": 0.4,
+    "style": "defensive",
+    "elo": 1435.2901283857314
   },
   "Ternana": {
-    "gf": 1.07,
-    "ga": 1.08,
-    "style": "balanced"
+    "gf": 1.070436238277241,
+    "ga": 1.0805407974768857,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1464.9022751453358
   },
   "FeralpiSalo": {
-    "gf": 1.18,
-    "ga": 1.89,
-    "style": "balanced"
+    "gf": 1.1757020915752336,
+    "ga": 1.8920827005854415,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1412.5933777339098
   },
   "Lecco": {
-    "gf": 0.8,
-    "ga": 2.27,
-    "style": "balanced"
+    "gf": 0.8029048944435583,
+    "ga": 2.2676294832413513,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1364.784692381724
   },
   "Perugia": {
-    "gf": 1.13,
-    "ga": 1.93,
-    "style": "balanced"
+    "gf": 1.1330757715478192,
+    "ga": 1.9319912840158866,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1426.392892247095
   },
   "Reggina": {
-    "gf": 1.0,
-    "ga": 1.29,
-    "style": "balanced"
+    "gf": 0.9979221687198102,
+    "ga": 1.2907578433152769,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1471.859830025848
   },
   "Pordenone": {
-    "gf": 0.92,
-    "ga": 1.93,
-    "style": "balanced"
+    "gf": 0.9202757717836453,
+    "ga": 1.933368010278739,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1461.0627401955117
   },
   "Vicenza": {
-    "gf": 1.11,
-    "ga": 0.98,
-    "style": "defensive"
+    "gf": 1.109336547297668,
+    "ga": 0.9796550154035505,
+    "over_rate": 0.3333333333333333,
+    "style": "defensive",
+    "elo": 1445.7650788780431
   },
   "Alessandria": {
-    "gf": 0.91,
-    "ga": 1.42,
-    "style": "balanced"
+    "gf": 0.9121808304517651,
+    "ga": 1.4159956082855194,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1402.711842372797
   },
   "Trapani": {
-    "gf": 1.74,
-    "ga": 0.92,
-    "style": "balanced"
+    "gf": 1.73969792256654,
+    "ga": 0.9216717683495796,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1487.6529767825346
   },
   "Livorno": {
-    "gf": 0.58,
-    "ga": 2.13,
-    "style": "balanced"
+    "gf": 0.5835268180463651,
+    "ga": 2.1287447747429917,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1332.1365101198523
   },
   "For Sittard": {
-    "gf": 1.14,
-    "ga": 1.35,
-    "style": "balanced"
+    "gf": 1.1381963308574514,
+    "ga": 1.3548298918995723,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1420.0872098441116
   },
   "Go Ahead Eagles": {
-    "gf": 1.61,
-    "ga": 1.52,
-    "style": "balanced"
+    "gf": 1.6085325139801796,
+    "ga": 1.5203417150544496,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1456.104472871847
   },
   "Nijmegen": {
-    "gf": 2.36,
-    "ga": 1.85,
-    "style": "attacking"
+    "gf": 2.3621153354599693,
+    "ga": 1.850288392292768,
+    "over_rate": 0.8,
+    "style": "attacking",
+    "elo": 1465.0835220071087
   },
   "Excelsior": {
-    "gf": 0.93,
-    "ga": 1.68,
-    "style": "balanced"
+    "gf": 0.9342969312622876,
+    "ga": 1.6835260169353314,
+    "over_rate": 0.7333333333333333,
+    "style": "balanced",
+    "elo": 1405.2993529040566
   },
   "Feyenoord": {
-    "gf": 2.82,
-    "ga": 1.16,
-    "style": "attacking"
+    "gf": 2.8165366134592027,
+    "ga": 1.1600307741197948,
+    "over_rate": 0.6,
+    "style": "attacking",
+    "elo": 1653.0303720751133
   },
   "NAC Breda": {
-    "gf": 1.42,
-    "ga": 1.98,
-    "style": "balanced"
+    "gf": 1.4197951735189887,
+    "ga": 1.9801933053495893,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1378.5340365045747
   },
   "Heerenveen": {
-    "gf": 1.96,
-    "ga": 1.78,
-    "style": "balanced"
+    "gf": 1.9604209804100947,
+    "ga": 1.77799913638521,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1482.2525521834366
   },
   "Volendam": {
-    "gf": 1.3,
-    "ga": 1.81,
-    "style": "balanced"
+    "gf": 1.3036674940912183,
+    "ga": 1.8139169011621148,
+    "over_rate": 0.7333333333333333,
+    "style": "balanced",
+    "elo": 1431.2065457403173
   },
   "PSV Eindhoven": {
-    "gf": 2.94,
-    "ga": 1.37,
-    "style": "attacking"
+    "gf": 2.942178064698643,
+    "ga": 1.368859260222388,
+    "over_rate": 0.8666666666666667,
+    "style": "attacking",
+    "elo": 1753.7442839756711
   },
   "Sparta Rotterdam": {
-    "gf": 1.38,
-    "ga": 1.82,
-    "style": "balanced"
+    "gf": 1.3849950906997859,
+    "ga": 1.8221139711103844,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1521.862436610568
   },
   "Zwolle": {
-    "gf": 1.27,
-    "ga": 2.0,
-    "style": "balanced"
+    "gf": 1.2663260253065611,
+    "ga": 1.9975896900586125,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1457.7794991665312
   },
   "Twente": {
-    "gf": 2.08,
-    "ga": 1.87,
-    "style": "attacking"
+    "gf": 2.084210804382811,
+    "ga": 1.8722048208562274,
+    "over_rate": 0.6,
+    "style": "attacking",
+    "elo": 1480.7442914656822
   },
   "Ajax": {
-    "gf": 1.89,
-    "ga": 1.66,
-    "style": "balanced"
+    "gf": 1.8938132622699493,
+    "ga": 1.6550546309623253,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1800.9726343211325
   },
   "Telstar": {
-    "gf": 1.25,
-    "ga": 1.91,
-    "style": "balanced"
+    "gf": 1.2458728898421307,
+    "ga": 1.9112191625972466,
+    "over_rate": 0.5,
+    "style": "balanced",
+    "elo": 1457.3476019341895
   },
   "AZ Alkmaar": {
-    "gf": 2.33,
-    "ga": 1.17,
-    "style": "attacking"
+    "gf": 2.3306032505086205,
+    "ga": 1.1735779073309025,
+    "over_rate": 0.7333333333333333,
+    "style": "attacking",
+    "elo": 1652.588102115553
   },
   "Groningen": {
-    "gf": 1.56,
-    "ga": 1.32,
-    "style": "balanced"
+    "gf": 1.562901975106766,
+    "ga": 1.3210604048670285,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1517.2783656311346
   },
   "Utrecht": {
-    "gf": 1.74,
-    "ga": 1.67,
-    "style": "balanced"
+    "gf": 1.7381521057274636,
+    "ga": 1.6668257869268028,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1562.917632226643
   },
   "Heracles": {
-    "gf": 0.78,
-    "ga": 3.04,
-    "style": "balanced"
+    "gf": 0.7809232282395334,
+    "ga": 3.039012426380374,
+    "over_rate": 0.9333333333333333,
+    "style": "balanced",
+    "elo": 1483.831140750037
   },
   "Willem II": {
-    "gf": 0.77,
-    "ga": 1.8,
-    "style": "balanced"
+    "gf": 0.7728481602601558,
+    "ga": 1.7998253947769753,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1501.633148885006
   },
   "Almere City": {
-    "gf": 0.78,
-    "ga": 1.61,
-    "style": "balanced"
+    "gf": 0.7833958981498088,
+    "ga": 1.6136119473363453,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1422.3691423559264
   },
   "Waalwijk": {
-    "gf": 1.68,
-    "ga": 2.4,
-    "style": "balanced"
+    "gf": 1.6840721288381233,
+    "ga": 2.395808076293202,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1372.312748763538
   },
   "Vitesse": {
-    "gf": 1.32,
-    "ga": 2.26,
-    "style": "balanced"
+    "gf": 1.31543826280255,
+    "ga": 2.257084714546388,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1571.1837684529153
   },
   "Cambuur": {
-    "gf": 1.12,
-    "ga": 2.46,
-    "style": "balanced"
+    "gf": 1.1240313865452012,
+    "ga": 2.4591995040759222,
+    "over_rate": 0.8,
+    "style": "balanced",
+    "elo": 1413.1391168071516
   },
   "FC Emmen": {
-    "gf": 1.24,
-    "ga": 2.51,
-    "style": "balanced"
+    "gf": 1.2361797045027865,
+    "ga": 2.5122001665233284,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1470.4636474472507
   },
   "VVV Venlo": {
-    "gf": 0.7,
-    "ga": 2.99,
-    "style": "balanced"
+    "gf": 0.6971793454698331,
+    "ga": 2.990112774930224,
+    "over_rate": 0.7333333333333333,
+    "style": "balanced",
+    "elo": 1451.4896568346144
   },
   "Den Haag": {
-    "gf": 1.05,
-    "ga": 2.34,
-    "style": "balanced"
+    "gf": 1.0513769475189327,
+    "ga": 2.3352462700469205,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1484.6609332009139
   },
   "Graafschap": {
-    "gf": 1.13,
-    "ga": 2.48,
-    "style": "balanced"
+    "gf": 1.1266625241437065,
+    "ga": 2.4823818587283633,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1432.083784924977
   },
   "Casa Pia": {
-    "gf": 0.92,
-    "ga": 1.93,
-    "style": "balanced"
+    "gf": 0.9190454619024536,
+    "ga": 1.93448613806133,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1443.4440588632058
   },
   "Sp Lisbon": {
-    "gf": 2.33,
-    "ga": 0.52,
-    "style": "attacking"
+    "gf": 2.3295645595049996,
+    "ga": 0.5185901519339832,
+    "over_rate": 0.6,
+    "style": "attacking",
+    "elo": 1718.414046130617
   },
   "Nacional": {
-    "gf": 1.21,
-    "ga": 1.5,
-    "style": "balanced"
+    "gf": 1.2090914103086692,
+    "ga": 1.495607473465918,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1366.6447915132783
   },
   "Gil Vicente": {
-    "gf": 1.71,
-    "ga": 0.5,
-    "style": "balanced"
+    "gf": 1.7105550070801718,
+    "ga": 0.4985436960898315,
+    "over_rate": 0.26666666666666666,
+    "style": "balanced",
+    "elo": 1508.9746296850522
   },
   "Arouca": {
-    "gf": 1.0,
-    "ga": 2.43,
-    "style": "balanced"
+    "gf": 1.0046416434474574,
+    "ga": 2.426543430946337,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1460.8772080999647
   },
   "AVS": {
-    "gf": 0.5,
-    "ga": 2.5,
-    "style": "balanced"
+    "gf": 0.5034379078793005,
+    "ga": 2.4970809054399514,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1386.3708632971434
   },
   "Famalicao": {
-    "gf": 1.15,
-    "ga": 0.65,
-    "style": "defensive"
+    "gf": 1.1521860687367642,
+    "ga": 0.650216584318881,
+    "over_rate": 0.4666666666666667,
+    "style": "defensive",
+    "elo": 1558.3390033495407
   },
   "Santa Clara": {
-    "gf": 1.17,
-    "ga": 1.02,
-    "style": "balanced"
+    "gf": 1.1660693653590355,
+    "ga": 1.024456493572095,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1505.4379867718962
   },
   "Moreirense": {
-    "gf": 1.52,
-    "ga": 1.6,
-    "style": "balanced"
+    "gf": 1.523199133210475,
+    "ga": 1.5989756116088254,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1522.1552839495914
   },
   "Alverca": {
-    "gf": 1.3,
-    "ga": 1.86,
-    "style": "balanced"
+    "gf": 1.3000474631974885,
+    "ga": 1.8630556386523467,
+    "over_rate": 0.7777777777777778,
+    "style": "balanced",
+    "elo": 1482.1852909141353
   },
   "Sp Braga": {
-    "gf": 1.68,
-    "ga": 0.9,
-    "style": "balanced"
+    "gf": 1.6837100122132818,
+    "ga": 0.8960369528119067,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1636.8203513154297
   },
   "Tondela": {
-    "gf": 0.54,
-    "ga": 1.94,
-    "style": "balanced"
+    "gf": 0.5366202142377239,
+    "ga": 1.9412346975723447,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1437.2139338012803
   },
   "Estoril": {
-    "gf": 1.31,
-    "ga": 1.49,
-    "style": "balanced"
+    "gf": 1.3067364316586607,
+    "ga": 1.494099801554465,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1437.388627526799
   },
   "Estrela": {
-    "gf": 0.72,
-    "ga": 1.27,
-    "style": "balanced"
+    "gf": 0.7212410599592456,
+    "ga": 1.2745638268683745,
+    "over_rate": 0.26666666666666666,
+    "style": "balanced",
+    "elo": 1409.1080595133444
   },
   "Porto": {
-    "gf": 2.16,
-    "ga": 0.33,
-    "style": "attacking"
+    "gf": 2.155696770541644,
+    "ga": 0.33447175466938905,
+    "over_rate": 0.6666666666666666,
+    "style": "attacking",
+    "elo": 1821.0634041439002
   },
   "Guimaraes": {
-    "gf": 0.97,
-    "ga": 1.47,
-    "style": "balanced"
+    "gf": 0.9710373480437634,
+    "ga": 1.4720134013919906,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1532.0604479650988
   },
   "Benfica": {
-    "gf": 2.17,
-    "ga": 0.5,
-    "style": "attacking"
+    "gf": 2.165797350412598,
+    "ga": 0.49940402157462344,
+    "over_rate": 0.6,
+    "style": "attacking",
+    "elo": 1802.3741025825623
   },
   "Rio Ave": {
-    "gf": 1.49,
-    "ga": 1.32,
-    "style": "balanced"
+    "gf": 1.4856242429221866,
+    "ga": 1.3237558943029688,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1538.5522507420753
   },
   "Boavista": {
-    "gf": 0.88,
-    "ga": 2.05,
-    "style": "balanced"
+    "gf": 0.8782596439276109,
+    "ga": 2.0501376089217014,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1497.4875962531855
   },
   "Farense": {
-    "gf": 0.99,
-    "ga": 1.26,
-    "style": "balanced"
+    "gf": 0.9902177777042139,
+    "ga": 1.261338552108408,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1422.7392221839154
   },
   "Portimonense": {
-    "gf": 1.44,
-    "ga": 2.11,
-    "style": "balanced"
+    "gf": 1.437945933614408,
+    "ga": 2.1093235847724747,
+    "over_rate": 0.7333333333333333,
+    "style": "balanced",
+    "elo": 1448.9796196674456
   },
   "Vizela": {
-    "gf": 1.41,
-    "ga": 1.68,
-    "style": "balanced"
+    "gf": 1.4121899686401316,
+    "ga": 1.682762555032886,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1428.3897653263896
   },
   "Chaves": {
-    "gf": 0.66,
-    "ga": 2.02,
-    "style": "balanced"
+    "gf": 0.6607216863765669,
+    "ga": 2.015111990084856,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1439.9960886836554
   },
   "Maritimo": {
-    "gf": 1.33,
-    "ga": 1.85,
-    "style": "balanced"
+    "gf": 1.3340414728704706,
+    "ga": 1.8526670115501318,
+    "over_rate": 0.7333333333333333,
+    "style": "balanced",
+    "elo": 1460.3001709556993
   },
   "Pacos Ferreira": {
-    "gf": 0.89,
-    "ga": 2.02,
-    "style": "balanced"
+    "gf": 0.8890012003078523,
+    "ga": 2.0239201386843,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1497.9052558651908
   },
   "Belenenses": {
-    "gf": 0.86,
-    "ga": 1.28,
-    "style": "balanced"
+    "gf": 0.8577849398059386,
+    "ga": 1.2760029454067658,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1475.3755469881346
   },
   "Aves": {
-    "gf": 0.15,
-    "ga": 2.28,
-    "style": "balanced"
+    "gf": 0.15312394628558942,
+    "ga": 2.276469889802403,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1414.1033756624859
   },
   "Setubal": {
-    "gf": 0.95,
-    "ga": 1.35,
-    "style": "balanced"
+    "gf": 0.9499318938610463,
+    "ga": 1.3455443455071436,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1454.8305454697615
   },
   "Feirense": {
-    "gf": 1.49,
-    "ga": 2.44,
-    "style": "balanced"
+    "gf": 1.486592980650311,
+    "ga": 2.444994291687016,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1392.468472779221
   },
   "Kilmarnock": {
-    "gf": 1.23,
-    "ga": 1.68,
-    "style": "balanced"
+    "gf": 1.2297821363450323,
+    "ga": 1.684656898830678,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1416.8266762911778
   },
   "Livingston": {
-    "gf": 1.01,
-    "ga": 2.13,
-    "style": "balanced"
+    "gf": 1.010574120611727,
+    "ga": 2.129996007585751,
+    "over_rate": 0.7333333333333333,
+    "style": "balanced",
+    "elo": 1479.0182638105207
   },
   "Motherwell": {
-    "gf": 1.6,
-    "ga": 1.44,
-    "style": "balanced"
+    "gf": 1.603544891138776,
+    "ga": 1.4351679703002818,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1498.6064315783944
   },
   "Rangers": {
-    "gf": 1.62,
-    "ga": 1.2,
-    "style": "balanced"
+    "gf": 1.6235489184968452,
+    "ga": 1.196394056606501,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1780.0356492958736
   },
   "Falkirk": {
-    "gf": 1.45,
-    "ga": 1.46,
-    "style": "balanced"
+    "gf": 1.4474542641747083,
+    "ga": 1.4596247598435266,
+    "over_rate": 0.7777777777777778,
+    "style": "balanced",
+    "elo": 1499.2917864712722
   },
   "Dundee United": {
-    "gf": 1.72,
-    "ga": 1.62,
-    "style": "balanced"
+    "gf": 1.721349223370815,
+    "ga": 1.6182456884302725,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1460.9170797794795
   },
   "Dundee": {
-    "gf": 1.03,
-    "ga": 1.52,
-    "style": "balanced"
+    "gf": 1.0333135003691465,
+    "ga": 1.516775152790657,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1371.4535461220792
   },
   "Hibernian": {
-    "gf": 1.84,
-    "ga": 1.18,
-    "style": "balanced"
+    "gf": 1.8377028117688534,
+    "ga": 1.1794147081388886,
+    "over_rate": 0.7333333333333333,
+    "style": "balanced",
+    "elo": 1514.6965842489258
   },
   "Celtic": {
-    "gf": 1.58,
-    "ga": 1.18,
-    "style": "balanced"
+    "gf": 1.5755658386083007,
+    "ga": 1.1825016767112904,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1760.542110146886
   },
   "St Mirren": {
-    "gf": 0.87,
-    "ga": 1.28,
-    "style": "balanced"
+    "gf": 0.8693581539070719,
+    "ga": 1.2828431226501769,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1430.5241739129515
   },
   "Hearts": {
-    "gf": 2.31,
-    "ga": 0.61,
-    "style": "attacking"
+    "gf": 2.3148386798243696,
+    "ga": 0.6144653341467214,
+    "over_rate": 0.6,
+    "style": "attacking",
+    "elo": 1468.0330166271333
   },
   "Aberdeen": {
-    "gf": 0.88,
-    "ga": 1.4,
-    "style": "balanced"
+    "gf": 0.8770956332267527,
+    "ga": 1.397032098846419,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1505.8206569416611
   },
   "Ross County": {
-    "gf": 0.88,
-    "ga": 1.59,
-    "style": "balanced"
+    "gf": 0.8783787171797531,
+    "ga": 1.5925354857882792,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1415.1226910463035
   },
   "St Johnstone": {
-    "gf": 0.79,
-    "ga": 1.57,
-    "style": "balanced"
+    "gf": 0.7924420447117582,
+    "ga": 1.5749691141259352,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1490.6482523406905
   },
   "Hamilton": {
-    "gf": 0.76,
-    "ga": 1.38,
-    "style": "balanced"
+    "gf": 0.7555122524690384,
+    "ga": 1.375723709242418,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1408.4630813866504
   },
   "Girona": {
-    "gf": 1.11,
-    "ga": 2.01,
-    "style": "balanced"
+    "gf": 1.1109535315086065,
+    "ga": 2.010389191591564,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1524.0531553351593
   },
   "Vallecano": {
-    "gf": 1.24,
-    "ga": 0.79,
-    "style": "balanced"
+    "gf": 1.242036679370373,
+    "ga": 0.7865116500650562,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1521.0731893216466
   },
   "Villarreal": {
-    "gf": 1.9,
-    "ga": 1.12,
-    "style": "balanced"
+    "gf": 1.8972754185539134,
+    "ga": 1.1197372074691332,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1530.8710724422929
   },
   "Oviedo": {
-    "gf": 0.98,
-    "ga": 1.8,
-    "style": "balanced"
+    "gf": 0.9847368624016141,
+    "ga": 1.8039546694214894,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1510.141469021706
   },
   "Mallorca": {
-    "gf": 1.17,
-    "ga": 1.3,
-    "style": "balanced"
+    "gf": 1.165609057363009,
+    "ga": 1.3043096615068617,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1552.662229058499
   },
   "Barcelona": {
-    "gf": 2.27,
-    "ga": 1.41,
-    "style": "attacking"
+    "gf": 2.268397771822133,
+    "ga": 1.4058389321068276,
+    "over_rate": 0.8666666666666667,
+    "style": "attacking",
+    "elo": 1721.1703371832866
   },
   "Alaves": {
-    "gf": 0.8,
-    "ga": 0.8,
-    "style": "defensive"
+    "gf": 0.7965090617260794,
+    "ga": 0.8001866025684835,
+    "over_rate": 0.2,
+    "style": "defensive",
+    "elo": 1522.3723002784436
   },
   "Levante": {
-    "gf": 1.37,
-    "ga": 1.56,
-    "style": "balanced"
+    "gf": 1.3704570932676616,
+    "ga": 1.5552149896633845,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1568.2184307600344
   },
   "Valencia": {
-    "gf": 0.91,
-    "ga": 1.5,
-    "style": "balanced"
+    "gf": 0.9057292757622638,
+    "ga": 1.5043904771176455,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1559.6367797335527
   },
   "Sociedad": {
-    "gf": 0.99,
-    "ga": 1.39,
-    "style": "balanced"
+    "gf": 0.9854990010925916,
+    "ga": 1.3905374357077696,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1535.0988200559232
   },
   "Celta": {
-    "gf": 1.36,
-    "ga": 1.36,
-    "style": "balanced"
+    "gf": 1.3635817937623527,
+    "ga": 1.3592936861281348,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1472.9528593945554
   },
   "Getafe": {
-    "gf": 0.85,
-    "ga": 1.23,
-    "style": "balanced"
+    "gf": 0.8539555350915362,
+    "ga": 1.2258423981665663,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1555.5785365116697
   },
   "Ath Bilbao": {
-    "gf": 0.71,
-    "ga": 0.91,
-    "style": "defensive"
+    "gf": 0.7051760832697715,
+    "ga": 0.9065272377225764,
+    "over_rate": 0.26666666666666666,
+    "style": "defensive",
+    "elo": 1521.6001363101946
   },
   "Sevilla": {
-    "gf": 1.62,
-    "ga": 1.72,
-    "style": "balanced"
+    "gf": 1.6237788920162513,
+    "ga": 1.7193185410007503,
+    "over_rate": 0.7333333333333333,
+    "style": "balanced",
+    "elo": 1568.763296887947
   },
   "Espanol": {
-    "gf": 1.26,
-    "ga": 1.04,
-    "style": "balanced"
+    "gf": 1.2628188018301147,
+    "ga": 1.0389980537559513,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1590.635148680383
   },
   "Ath Madrid": {
-    "gf": 2.02,
-    "ga": 0.95,
-    "style": "attacking"
+    "gf": 2.0245997970356275,
+    "ga": 0.9535534113363243,
+    "over_rate": 0.4666666666666667,
+    "style": "attacking",
+    "elo": 1674.8098257060824
   },
   "Elche": {
-    "gf": 1.08,
-    "ga": 1.02,
-    "style": "balanced"
+    "gf": 1.075937912399367,
+    "ga": 1.0169852116078812,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1491.1474938864576
   },
   "Betis": {
-    "gf": 1.81,
-    "ga": 1.28,
-    "style": "balanced"
+    "gf": 1.8130712189989957,
+    "ga": 1.2807591040382331,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1488.4453648554256
   },
   "Real Madrid": {
-    "gf": 2.2,
-    "ga": 1.12,
-    "style": "attacking"
+    "gf": 2.203290846030135,
+    "ga": 1.1222009990467554,
+    "over_rate": 0.6666666666666666,
+    "style": "attacking",
+    "elo": 1664.2483541145677
   },
   "Osasuna": {
-    "gf": 1.08,
-    "ga": 1.36,
-    "style": "balanced"
+    "gf": 1.0808939769544375,
+    "ga": 1.3643505465949868,
+    "over_rate": 0.26666666666666666,
+    "style": "balanced",
+    "elo": 1614.7811992103393
   },
   "Las Palmas": {
-    "gf": 1.0,
-    "ga": 0.69,
-    "style": "defensive"
+    "gf": 1.0043373827747806,
+    "ga": 0.6904373774716742,
+    "over_rate": 0.2,
+    "style": "defensive",
+    "elo": 1483.4785199765588
   },
   "Leganes": {
-    "gf": 0.94,
-    "ga": 0.54,
-    "style": "defensive"
+    "gf": 0.9423927489706982,
+    "ga": 0.5427314096443075,
+    "over_rate": 0.3333333333333333,
+    "style": "defensive",
+    "elo": 1541.766954321622
   },
   "Valladolid": {
-    "gf": 1.04,
-    "ga": 1.18,
-    "style": "balanced"
+    "gf": 1.0418967104864159,
+    "ga": 1.17911489925444,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1590.220462735742
   },
   "Almeria": {
-    "gf": 1.65,
-    "ga": 1.17,
-    "style": "balanced"
+    "gf": 1.653557674566797,
+    "ga": 1.1695239155969472,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1521.9222768327713
   },
   "Cadiz": {
-    "gf": 0.9,
-    "ga": 0.85,
-    "style": "defensive"
+    "gf": 0.9031767078282915,
+    "ga": 0.8533181284256103,
+    "over_rate": 0.4,
+    "style": "defensive",
+    "elo": 1527.2098989359943
   },
   "Granada": {
-    "gf": 1.0,
-    "ga": 1.02,
-    "style": "balanced"
+    "gf": 1.001726493391739,
+    "ga": 1.0167306259215823,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1598.889217408362
   },
   "Eibar": {
-    "gf": 0.86,
-    "ga": 0.9,
-    "style": "defensive"
+    "gf": 0.8568611549906677,
+    "ga": 0.9042922631127926,
+    "over_rate": 0.3333333333333333,
+    "style": "defensive",
+    "elo": 1582.2504230849913
   },
   "Huesca": {
-    "gf": 0.95,
-    "ga": 1.4,
-    "style": "balanced"
+    "gf": 0.9463225767171083,
+    "ga": 1.3952193924117373,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1514.3709268409827
   },
   "Burgos": {
-    "gf": 1.48,
-    "ga": 1.07,
-    "style": "balanced"
+    "gf": 1.4844813097000809,
+    "ga": 1.0684181415527965,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1467.4472254177324
   },
   "Cultural Leonesa": {
-    "gf": 1.27,
-    "ga": 0.9,
-    "style": "balanced"
+    "gf": 1.2743066001972123,
+    "ga": 0.9010937310981548,
+    "over_rate": 0.36363636363636365,
+    "style": "balanced",
+    "elo": 1471.9911132421307
   },
   "Ceuta": {
-    "gf": 1.05,
-    "ga": 0.52,
-    "style": "defensive"
+    "gf": 1.050441009328412,
+    "ga": 0.515569407235515,
+    "over_rate": 0.36363636363636365,
+    "style": "defensive",
+    "elo": 1518.3482196101015
   },
   "Santander": {
-    "gf": 2.24,
-    "ga": 1.54,
-    "style": "attacking"
+    "gf": 2.2397307383404943,
+    "ga": 1.541134418352908,
+    "over_rate": 0.8666666666666667,
+    "style": "attacking",
+    "elo": 1403.3525785866484
   },
   "Castellon": {
-    "gf": 1.15,
-    "ga": 1.13,
-    "style": "balanced"
+    "gf": 1.1499829748249917,
+    "ga": 1.1252516088825721,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1389.5369676464154
   },
   "Malaga": {
-    "gf": 1.38,
-    "ga": 1.32,
-    "style": "balanced"
+    "gf": 1.3750847820467127,
+    "ga": 1.323251846489552,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1557.9548939424428
   },
   "La Coruna": {
-    "gf": 1.41,
-    "ga": 1.4,
-    "style": "balanced"
+    "gf": 1.4079069462506888,
+    "ga": 1.3959938104511347,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1529.8228848046053
   },
   "Sociedad B": {
-    "gf": 1.41,
-    "ga": 1.75,
-    "style": "balanced"
+    "gf": 1.407513117286152,
+    "ga": 1.7493582450387883,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1397.2338830735064
   },
   "Zaragoza": {
-    "gf": 0.58,
-    "ga": 1.88,
-    "style": "balanced"
+    "gf": 0.5768334509662819,
+    "ga": 1.8844202027074037,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1458.4439530867025
   },
   "Mirandes": {
-    "gf": 0.91,
-    "ga": 1.57,
-    "style": "balanced"
+    "gf": 0.9073328441564303,
+    "ga": 1.5682937939675206,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1457.209003233174
   },
   "Andorra": {
-    "gf": 1.04,
-    "ga": 1.78,
-    "style": "balanced"
+    "gf": 1.0383501323188373,
+    "ga": 1.7831940188768258,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1477.3429275309702
   },
   "Sp Gijon": {
-    "gf": 1.7,
-    "ga": 1.56,
-    "style": "balanced"
+    "gf": 1.6958758431809386,
+    "ga": 1.563341812406112,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1513.2132712892185
   },
   "Cordoba": {
-    "gf": 1.4,
-    "ga": 1.21,
-    "style": "balanced"
+    "gf": 1.4032584497162368,
+    "ga": 1.2075354993857546,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1408.10241284686
   },
   "Albacete": {
-    "gf": 1.25,
-    "ga": 1.39,
-    "style": "balanced"
+    "gf": 1.248311636958519,
+    "ga": 1.3914231473247465,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1510.694561860949
   },
   "Ferrol": {
-    "gf": 0.36,
-    "ga": 1.38,
-    "style": "balanced"
+    "gf": 0.35674620024267206,
+    "ga": 1.3758877556687417,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1444.8905941177807
   },
   "Cartagena": {
-    "gf": 1.24,
-    "ga": 2.07,
-    "style": "balanced"
+    "gf": 1.2406910668357778,
+    "ga": 2.068361454862877,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1459.7638116931473
   },
   "Eldense": {
-    "gf": 1.3,
-    "ga": 1.87,
-    "style": "balanced"
+    "gf": 1.2981001201585178,
+    "ga": 1.8689973744681287,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1439.774266088422
   },
   "Tenerife": {
-    "gf": 0.54,
-    "ga": 0.96,
-    "style": "defensive"
+    "gf": 0.5446135427212593,
+    "ga": 0.9608003798719316,
+    "over_rate": 0.26666666666666666,
+    "style": "defensive",
+    "elo": 1478.4163447985038
   },
   "Amorebieta": {
-    "gf": 0.94,
-    "ga": 1.15,
-    "style": "balanced"
+    "gf": 0.9381526307357153,
+    "ga": 1.1453107997250445,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1433.6067589618756
   },
   "Villarreal B": {
-    "gf": 1.1,
-    "ga": 1.47,
-    "style": "balanced"
+    "gf": 1.0984848367194708,
+    "ga": 1.4670503247227291,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1429.055743027765
   },
   "Alcorcon": {
-    "gf": 0.85,
-    "ga": 1.13,
-    "style": "balanced"
+    "gf": 0.8528610724878432,
+    "ga": 1.1265263828695362,
+    "over_rate": 0.2,
+    "style": "balanced",
+    "elo": 1431.9929972334294
   },
   "Ibiza": {
-    "gf": 0.78,
-    "ga": 1.59,
-    "style": "balanced"
+    "gf": 0.7778045516751968,
+    "ga": 1.5945467447468928,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1434.1867937889085
   },
   "Lugo": {
-    "gf": 0.69,
-    "ga": 1.45,
-    "style": "balanced"
+    "gf": 0.6869074675862912,
+    "ga": 1.4467978920013547,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1461.2993965157402
   },
   "Ponferradina": {
-    "gf": 1.51,
-    "ga": 1.32,
-    "style": "balanced"
+    "gf": 1.5148083089451858,
+    "ga": 1.3204380429203617,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1436.7354641914496
   },
   "Fuenlabrada": {
-    "gf": 1.25,
-    "ga": 2.31,
-    "style": "balanced"
+    "gf": 1.2520562033793698,
+    "ga": 2.311997868170575,
+    "over_rate": 0.8666666666666667,
+    "style": "balanced",
+    "elo": 1480.3334710812724
   },
   "Logrones": {
-    "gf": 0.54,
-    "ga": 1.37,
-    "style": "balanced"
+    "gf": 0.5430598443668834,
+    "ga": 1.3679269428306207,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1419.4890097745913
   },
   "Sabadell": {
-    "gf": 1.22,
-    "ga": 1.02,
-    "style": "balanced"
+    "gf": 1.21501765808222,
+    "ga": 1.0233056558808342,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1455.1495288976548
   },
   "Extremadura UD": {
-    "gf": 1.33,
-    "ga": 1.7,
-    "style": "balanced"
+    "gf": 1.3338001233198507,
+    "ga": 1.7029672296554716,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1478.2668064698478
   },
   "Numancia": {
-    "gf": 0.99,
-    "ga": 1.61,
-    "style": "balanced"
+    "gf": 0.9875852835422386,
+    "ga": 1.6065802575790906,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1449.1065772634245
   },
   "Reus Deportiu": {
     "gf": 0.0,
     "ga": 1.0,
-    "style": "defensive"
+    "over_rate": 0.0,
+    "style": "defensive",
+    "elo": 1307.4088069378893
   },
   "Rayo Majadahonda": {
-    "gf": 1.42,
-    "ga": 1.76,
-    "style": "balanced"
+    "gf": 1.4238818156439847,
+    "ga": 1.755117754545429,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1435.7811687849571
   },
   "Gimnastic": {
-    "gf": 1.19,
-    "ga": 1.53,
-    "style": "balanced"
+    "gf": 1.1935683737711436,
+    "ga": 1.5295927907747011,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1415.6798853166922
   },
   "Gaziantep": {
-    "gf": 1.73,
-    "ga": 1.44,
-    "style": "balanced"
+    "gf": 1.7347572005187908,
+    "ga": 1.4401011504550048,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1520.5963927519401
   },
   "Galatasaray": {
-    "gf": 2.36,
-    "ga": 0.56,
-    "style": "attacking"
+    "gf": 2.357139946539396,
+    "ga": 0.5644700863877847,
+    "over_rate": 0.6,
+    "style": "attacking",
+    "elo": 1667.468907289057
   },
   "Samsunspor": {
-    "gf": 1.58,
-    "ga": 0.99,
-    "style": "balanced"
+    "gf": 1.5789417500829663,
+    "ga": 0.9916739321022991,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1487.8477263920577
   },
   "Genclerbirligi": {
-    "gf": 1.22,
-    "ga": 1.68,
-    "style": "balanced"
+    "gf": 1.223928341882472,
+    "ga": 1.675977336826041,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1434.3072364009836
   },
   "Antalyaspor": {
-    "gf": 0.99,
-    "ga": 2.35,
-    "style": "balanced"
+    "gf": 0.9917485809320259,
+    "ga": 2.3484094186368742,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1496.5678670651355
   },
   "Kasimpasa": {
-    "gf": 1.01,
-    "ga": 1.24,
-    "style": "balanced"
+    "gf": 1.0066462914821104,
+    "ga": 1.2438148125390525,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1462.806470009209
   },
   "Rizespor": {
-    "gf": 1.56,
-    "ga": 1.39,
-    "style": "balanced"
+    "gf": 1.5616541543743652,
+    "ga": 1.3943612025157368,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1488.5268241548326
   },
   "Goztep": {
-    "gf": 1.11,
-    "ga": 1.03,
-    "style": "balanced"
+    "gf": 1.1116670913820237,
+    "ga": 1.0267450821411093,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1454.866448874789
   },
   "Eyupspor": {
-    "gf": 0.59,
-    "ga": 1.32,
-    "style": "balanced"
+    "gf": 0.5862596906874105,
+    "ga": 1.3192206052836488,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1486.881748954996
   },
   "Konyaspor": {
-    "gf": 1.48,
-    "ga": 1.59,
-    "style": "balanced"
+    "gf": 1.4842894125931914,
+    "ga": 1.5884497585950181,
+    "over_rate": 0.7333333333333333,
+    "style": "balanced",
+    "elo": 1520.5539014256628
   },
   "Trabzonspor": {
-    "gf": 1.89,
-    "ga": 0.81,
-    "style": "balanced"
+    "gf": 1.8863989546478583,
+    "ga": 0.8058062720793214,
+    "over_rate": 0.26666666666666666,
+    "style": "balanced",
+    "elo": 1659.4780501951655
   },
   "Kocaelispor": {
-    "gf": 1.44,
-    "ga": 1.21,
-    "style": "balanced"
+    "gf": 1.4397952231340159,
+    "ga": 1.2095642646134446,
+    "over_rate": 0.3,
+    "style": "balanced",
+    "elo": 1488.0033315026778
   },
   "Karagumruk": {
-    "gf": 1.33,
-    "ga": 2.21,
-    "style": "balanced"
+    "gf": 1.3312277898046525,
+    "ga": 2.2058107797758058,
+    "over_rate": 0.7333333333333333,
+    "style": "balanced",
+    "elo": 1546.9530013856531
   },
   "Alanyaspor": {
-    "gf": 1.08,
-    "ga": 1.1,
-    "style": "balanced"
+    "gf": 1.08336763786353,
+    "ga": 1.0984744937716067,
+    "over_rate": 0.3333333333333333,
+    "style": "balanced",
+    "elo": 1519.3941907781732
   },
   "Fenerbahce": {
-    "gf": 1.62,
-    "ga": 0.83,
-    "style": "balanced"
+    "gf": 1.6173786082485866,
+    "ga": 0.8275977560599743,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1575.2761827008283
   },
   "Besiktas": {
-    "gf": 1.69,
-    "ga": 1.06,
-    "style": "balanced"
+    "gf": 1.6867089019055181,
+    "ga": 1.0596433515123609,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1650.5405700793547
   },
   "Buyuksehyr": {
-    "gf": 1.35,
-    "ga": 1.08,
-    "style": "balanced"
+    "gf": 1.350109066924506,
+    "ga": 1.0773453173529093,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1647.077199915521
   },
   "Kayserispor": {
-    "gf": 0.92,
-    "ga": 2.24,
-    "style": "balanced"
+    "gf": 0.9241460236350413,
+    "ga": 2.242554817664917,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1477.5743696281543
   },
   "Hatayspor": {
-    "gf": 2.11,
-    "ga": 2.55,
-    "style": "attacking"
+    "gf": 2.1117975608474455,
+    "ga": 2.554762831884177,
+    "over_rate": 0.6666666666666666,
+    "style": "attacking",
+    "elo": 1508.4208498225978
   },
   "Ad. Demirspor": {
-    "gf": 1.14,
-    "ga": 2.89,
-    "style": "balanced"
+    "gf": 1.142940005213268,
+    "ga": 2.8908409971127322,
+    "over_rate": 0.7333333333333333,
+    "style": "balanced",
+    "elo": 1529.7685323846783
   },
   "Sivasspor": {
-    "gf": 0.94,
-    "ga": 1.65,
-    "style": "balanced"
+    "gf": 0.9449011253827914,
+    "ga": 1.6500623137516306,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1527.187367240544
   },
   "Bodrumspor": {
-    "gf": 0.65,
-    "ga": 1.36,
-    "style": "balanced"
+    "gf": 0.6511516806681672,
+    "ga": 1.3577182064265918,
+    "over_rate": 0.2,
+    "style": "balanced",
+    "elo": 1460.8094720141842
   },
   "Ankaragucu": {
-    "gf": 1.17,
-    "ga": 1.73,
-    "style": "balanced"
+    "gf": 1.1677301524017258,
+    "ga": 1.732309298922996,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1456.6839511801404
   },
   "Istanbulspor": {
-    "gf": 0.55,
-    "ga": 3.01,
-    "style": "balanced"
+    "gf": 0.5522786612955493,
+    "ga": 3.0120277726166393,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1415.5548378294077
   },
   "Pendikspor": {
-    "gf": 0.87,
-    "ga": 1.51,
-    "style": "balanced"
+    "gf": 0.8721091792978047,
+    "ga": 1.5062716085807741,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1441.4344200398523
   },
   "Giresunspor": {
-    "gf": 1.66,
-    "ga": 1.22,
-    "style": "balanced"
+    "gf": 1.6574086221684636,
+    "ga": 1.2236226871392266,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1472.5379896588809
   },
   "Umraniyespor": {
-    "gf": 1.2,
-    "ga": 1.74,
-    "style": "balanced"
+    "gf": 1.199343603940596,
+    "ga": 1.7362493261748937,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1421.9384417682747
   },
   "Altay": {
-    "gf": 1.06,
-    "ga": 1.63,
-    "style": "balanced"
+    "gf": 1.061872451089142,
+    "ga": 1.6260601686531224,
+    "over_rate": 0.4,
+    "style": "balanced",
+    "elo": 1426.5929583681589
   },
   "Yeni Malatyaspor": {
-    "gf": 0.52,
-    "ga": 2.59,
-    "style": "balanced"
+    "gf": 0.5246806735692447,
+    "ga": 2.587898456239349,
+    "over_rate": 0.5333333333333333,
+    "style": "balanced",
+    "elo": 1468.8667514185686
   },
   "Denizlispor": {
-    "gf": 0.99,
-    "ga": 2.69,
-    "style": "balanced"
+    "gf": 0.9943768624594193,
+    "ga": 2.688672341469828,
+    "over_rate": 0.4666666666666667,
+    "style": "balanced",
+    "elo": 1409.7456070093974
   },
   "Erzurum BB": {
-    "gf": 1.5,
-    "ga": 1.9,
-    "style": "balanced"
+    "gf": 1.496518067110298,
+    "ga": 1.8984430472398288,
+    "over_rate": 0.6666666666666666,
+    "style": "balanced",
+    "elo": 1461.6042098958176
   },
   "Bursaspor": {
-    "gf": 0.69,
-    "ga": 0.95,
-    "style": "defensive"
+    "gf": 0.6934180461343997,
+    "ga": 0.9526059190590406,
+    "over_rate": 0.26666666666666666,
+    "style": "defensive",
+    "elo": 1487.6811483874787
   },
   "Akhisar Belediyespor": {
-    "gf": 0.84,
-    "ga": 1.36,
-    "style": "balanced"
+    "gf": 0.8379868059494642,
+    "ga": 1.3637785010780292,
+    "over_rate": 0.6,
+    "style": "balanced",
+    "elo": 1426.4530434778264
   }
 }

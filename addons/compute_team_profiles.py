@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 import logging
 from typing import Optional, Dict
+from collections import defaultdict, deque
 
 # Configura logging opzionale
 logging.basicConfig(level=logging.INFO)
@@ -44,6 +45,14 @@ def compute_team_profiles(rolling_n: int = 15, season_filter: Optional[str] = No
         df = df[df["season"] == season_filter]
 
     teams = pd.unique(df[["home_team", "away_team"]].values.ravel())
+    init_team_elo(teams)
+    build_team_profiles(df)
+    
+    
+     # 🧭 Aggiorna ELO cronologicamente
+    for _, row in df.iterrows():
+        update_elo(row["home_team"], row["away_team"], row["home_goals_ft"], row["away_goals_ft"])
+    
     profiles = {}
 
     for team in teams:
@@ -82,10 +91,161 @@ def compute_team_profiles(rolling_n: int = 15, season_filter: Optional[str] = No
             style = "defensive"
         else:
             style = "balanced"
+        
+        # Over rate: % partite con più di 2.5 gol totali
+        over_rate = ((team_matches["home_goals_ft"] + team_matches["away_goals_ft"]) > 2.5).mean()
 
-        profiles[team] = {"gf": round(gf, 2), "ga": round(ga, 2), "style": style}
+        profiles[team] = {
+            "gf": gf,
+            "ga": ga,
+            "over_rate": over_rate,
+            "style": style,
+            "elo": TEAM_ELO.get(team, 1500)
+        }
 
     return profiles
+
+
+TEAM_ELO = {}
+TEAM_PROFILE = {}
+def init_team_elo(teams, base_elo=1500):
+    for t in teams:
+        TEAM_ELO[t] = base_elo
+
+def update_elo(home_team, away_team, home_goals, away_goals, k=20):
+    eh = TEAM_ELO[home_team]
+    ea = TEAM_ELO[away_team]
+    expected_home = 1 / (1 + 10 ** ((ea - eh) / 400))
+    actual_home = 1 if home_goals > away_goals else 0.5 if home_goals == away_goals else 0
+    TEAM_ELO[home_team] = eh + k * (actual_home - expected_home)
+    TEAM_ELO[away_team] = ea + k * ((1 - actual_home) - (1 - expected_home))
+    
+
+
+def build_team_profiles(df):
+    print(df.head())
+    teams = pd.concat([df['home_team'], df['away_team']]).unique()
+    for team in teams:
+        matches = df[(df['home_team'] == team) | (df['away_team'] == team)]
+        over_rate = ((matches['home_goals_ft'] + matches['away_goals_ft']) > 2.5).mean()
+        style = 'attacking' if over_rate > 0.65 else 'defensive' if over_rate < 0.4 else 'neutral'
+        TEAM_PROFILE[team] = {
+            'over_rate': over_rate,
+            'style': style
+        }
+
+def annotate_pre_match_elo(
+    df: pd.DataFrame,
+    base_elo: float = 1500.0,
+    k: float = 20.0,
+    window_size: int = 30,
+    verbose: bool = False,
+    show_history: bool = False  # 👈 nuovo flag per stampare lo storico
+) -> pd.DataFrame:
+    """
+    Calcola l'ELO pre-partita per ogni match, considerando solo
+    le ultime `window_size` partite per squadra.
+    Se `show_history=True`, stampa le ultime partite usate per il calcolo.
+    """
+    required_cols = {"Date", "HomeTeam", "AwayTeam", "FTHG", "FTAG"}
+    missing = required_cols - set(df.columns)
+    if missing:
+        raise ValueError(f"annotate_pre_match_elo: colonne mancanti: {missing}")
+
+    dff = df.sort_values("Date").reset_index(drop=False)
+    orig_index_col = "index"
+
+    team_elo = defaultdict(lambda: base_elo)
+    team_history = defaultdict(lambda: deque(maxlen=window_size))  # 👈 storico per squadra
+
+    elo_home_pre, elo_away_pre = [], []
+
+    if verbose:
+        print(f"📊 Calcolo ELO (ultime {window_size} partite per squadra)")
+        print(f"Totale match nel dataset: {len(dff)}\n")
+
+    for i, row in dff.iterrows():
+        home = row["HomeTeam"]
+        away = row["AwayTeam"]
+        hg, ag = float(row["FTHG"]), float(row["FTAG"])
+        eh, ea = team_elo[home], team_elo[away]
+
+        # Salva pre-match
+        elo_home_pre.append(eh)
+        elo_away_pre.append(ea)
+
+        # Risultato effettivo
+        if hg > ag:
+            actual_home = 1.0
+        elif hg < ag:
+            actual_home = 0.0
+        else:
+            actual_home = 0.5
+
+        expected_home = 1.0 / (1.0 + 10 ** ((ea - eh) / 400))
+        actual_away = 1.0 - actual_home
+
+        new_eh = eh + k * (actual_home - expected_home)
+        new_ea = ea + k * (actual_away - (1.0 - expected_home))
+
+        # Aggiorna storico ELO
+        team_history[home].append(new_eh)
+        team_history[away].append(new_ea)
+
+        # Media delle ultime N partite
+        team_elo[home] = sum(team_history[home]) / len(team_history[home])
+        team_elo[away] = sum(team_history[away]) / len(team_history[away])
+
+        # 🧾 Stampa debug
+        if verbose and i < 10000:  # non esagerare
+            print(f"[{i+1}] 📅 {row['Date']} {home} ({eh:.1f}) vs {away} ({ea:.1f}) → {int(hg)}-{int(ag)}")
+            print(f"   🧮 expected_home={expected_home:.3f}, actual_home={actual_home:.1f}")
+            print(f"   🆕 ELO post: {home}={team_elo[home]:.1f}, {away}={team_elo[away]:.1f}")
+            
+            # 👇 stampa le ultime partite usate nel calcolo
+            if show_history:
+                print(f"   📜 Ultime {len(team_history[home])} partite {home}: {list(map(lambda x: round(x,1), team_history[home]))}")
+                print(f"   📜 Ultime {len(team_history[away])} partite {away}: {list(map(lambda x: round(x,1), team_history[away]))}")
+            print("")
+
+    dff["elo_home_pre"] = elo_home_pre
+    dff["elo_away_pre"] = elo_away_pre
+
+    out = df.copy()
+    out.loc[dff[orig_index_col], "elo_home_pre"] = dff["elo_home_pre"].values
+    out.loc[dff[orig_index_col], "elo_away_pre"] = dff["elo_away_pre"].values
+
+    return out
+
+def standardize_for_elo(df):
+    """Rinomina le colonne dal formato originale al formato usato per ELO."""
+    return df.rename(columns={
+        "Date": "match_date",
+        "HomeTeam": "home_team",
+        "AwayTeam": "away_team",
+        "FTHG": "home_goals_ft",
+        "FTAG": "away_goals_ft"
+    })
+
+def restore_original_names(df):
+    """Ripristina i nomi originali dopo il calcolo ELO."""
+    return df.rename(columns={
+        "match_date": "Date",
+        "home_team": "HomeTeam",
+        "away_team": "AwayTeam",
+        "home_goals_ft": "FTHG",
+        "away_goals_ft": "FTAG"
+    })
+    
+def standardize_dataset_columns(df):
+    """Rinomina le colonne al formato standard usato in tutta la pipeline."""
+    return df.rename(columns={
+        "Date": "match_date",
+        "HomeTeam": "home_team",
+        "AwayTeam": "away_team",
+        "FTHG": "home_goals_ft",
+        "FTAG": "away_goals_ft"
+    })
 
 if __name__ == "__main__":
     import argparse

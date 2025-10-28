@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # ==============================================================
-# A/B backtest: baseline vs context scoring v4 + soglie log
+# A/B backtest: baseline vs context scoring v4 + soglie log (refactor)
 # ==============================================================
 import sys, os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -11,15 +11,10 @@ import sqlite3
 from collections import defaultdict
 import csv
 from pathlib import Path
-import app.api.ml_football_exact  # 👈 importa per controllare lo switch
 
-# Predictor + context
-try:
-    from app.api.ml_football_exact import ExactSimpleFooballPredictor, get_recommended_bets
-except Exception:
-    from app.api.ml_football_exact import ExactSimpleFooballPredictor, get_recommended_bets
-
+from app.api.ml_football_exact import ExactSimpleFooballPredictor, get_recommended_bets
 from addons.context_scoring_v4 import build_signals_map, compute_context_directives
+from addons.betting_config import CANDIDATE_MARKETS
 
 try:
     from tqdm import tqdm
@@ -45,7 +40,9 @@ def log_threshold_row(market, confidence, correct):
         writer = csv.writer(f)
         writer.writerow([market, confidence, int(correct)])
 
-
+# ===============================================
+# CLASS BACKTEST
+# ===============================================
 class FootballBacktest:
     def __init__(self, num_matches=500, use_context=False):
         self.num_matches = num_matches
@@ -103,48 +100,44 @@ class FootballBacktest:
     def run(self, df, use_context=False):
         matches = [row.to_dict() for _, row in df.iterrows()]
         signals_map = build_signals_map(matches)
-        if use_context:
-            print("   ➕ Context attivo")
-        else:
-            print("   🧪 Baseline")
+        print("   ➕ Context attivo" if use_context else "   🧪 Baseline")
 
         n = len(df)
-        iterator = range(n)
-        if HAS_TQDM:
-            iterator = tqdm(iterator, desc="Backtest", unit="match")
+        iterator = tqdm(range(n), desc="Backtest", unit="match") if HAS_TQDM else range(n)
         for idx in iterator:
             row = df.iloc[idx]
-            if idx == 0:
-                print(f"\n🔍 DEBUG - Prima partita: {row['HomeTeam']} vs {row['AwayTeam']}")
             actual = self.calc_results(row)
             pred = self.predictor.predict_match(df, idx)
+
             quotes = {
                 '1': row["AvgH"], 'X': row["AvgD"], '2': row["AvgA"],
                 'over_25': row["Avg>2.5"], 'under_25': row["Avg<2.5"]
             }
 
-            # context integration
             if use_context:
                 mid = row["id"]
-                candidate_markets = [
-                    'Over 0.5', 'Over 1.5', 'Over 2.5',
-                    'Under 2.5', 'Under 3.5',
-                    'Multigol Casa 1-3', 'Multigol Casa 1-4', 'Multigol Casa 1-5',
-                    'Multigol Ospite 1-3', 'Multigol Ospite 1-4', 'Multigol Ospite 1-5',
-                    'Doppia Chance 1X', 'Doppia Chance 12', 'Doppia Chance X2',
-                    '1X2 Casa', '1X2 Ospite'
+                proto = [
+                    {
+                        'match_id': mid,
+                        'market': m,
+                        'threshold': 0,
+                        'HomeTeam': row["HomeTeam"],
+                        'AwayTeam': row["AwayTeam"],
+                        'odds_home': row["AvgH"],
+                        'odds_away': row["AvgA"]
+                    }
+                    for m in CANDIDATE_MARKETS
                 ]
-                proto = [{'match_id': mid, 'market': m, 'threshold': 0, 'HomeTeam': row["HomeTeam"], 'AwayTeam': row["AwayTeam"], 'odds_home': row["AvgH"], 'odds_away': row["AvgA"]} for m in candidate_markets]
                 directives = compute_context_directives(proto, signals_map).get(mid, {})
                 pred.update(directives)
 
             recs = get_recommended_bets(pred, quotes)
+
             for rec in recs:
                 self.market_stats[rec["market"]]["total"] += 1
                 correct = self.evaluate(rec, actual)
                 if correct:
                     self.market_stats[rec["market"]]["correct"] += 1
-                # 👉 LOG PER ANALISI SOGLIE
                 log_threshold_row(rec["market"], rec["confidence"], correct)
 
             if not HAS_TQDM and (idx+1) % 100 == 0:
@@ -161,38 +154,24 @@ class FootballBacktest:
             a = round((c/t)*100, 2) if t else 0
             print(f"{m:<24} {t:>6} {c:>6} {a:>6.2f}%")
 
-
+# ===============================================
+# CONFRONTO BASELINE vs CONTEXT
+# ===============================================
 def compare_backtest(n=2000):
-    print("\n=== CONFRONTO BASELINE vs CONTEXT SCORING v4 (stesso seed/matches) ===")
+    print("\n=== CONFRONTO BASELINE vs CONTEXT SCORING v4 ===")
     init_threshold_log()
     runner_b = FootballBacktest(n)
     df = runner_b.load_random_matches()
-    df_copy = df.copy()
 
-    # ===================================
-    # 🟡 BASELINE — Default thresholds
-    # ===================================
-    app.api.ml_football_exact.USE_CUSTOM_THRESHOLDS = False
-    print(f"[INFO] USE_CUSTOM_THRESHOLDS = {app.api.ml_football_exact.USE_CUSTOM_THRESHOLDS} (BASELINE)")
-
-    runner_b = FootballBacktest(n)
-    df = runner_b.load_random_matches()
-    df_copy = df.copy()
-
+    # 🟡 BASELINE
     runner_b.run(df, use_context=False)
     b_stats = runner_b.market_stats
 
-    # ===================================
-    # 🟢 CONTEXT — Custom thresholds
-    # ===================================
-    app.api.ml_football_exact.USE_CUSTOM_THRESHOLDS = True
-    print(f"[INFO] USE_CUSTOM_THRESHOLDS = {app.api.ml_football_exact.USE_CUSTOM_THRESHOLDS} (CONTEXT)")
-
+    # 🟢 CONTEXT
     runner_c = FootballBacktest(n)
-    runner_c.run(df_copy, use_context=True)
+    runner_c.run(df.copy(), use_context=True)
     c_stats = runner_c.market_stats
 
-    # stampa tabella
     print(f"{'Market':<24} | {'BASELINE':<18} | {'CONTEXT':<18}")
     for m in sorted(set(b_stats) | set(c_stats)):
         bt = b_stats.get(m, {}).get("total", 0)
