@@ -44,23 +44,14 @@ CANDIDATE_MARKETS = list(TARGET_MARKETS) + [
 # (valori ottimizzabili via backtest / tuning dinamico)
 # --------------------------------------------------------------
 MARKET_THRESHOLDS = {
-    "Over 0.5 Goal": 0.80,
-    "Over 1.5 Goal": 0.72,
-    "Over 2.5 Goal": 0.66,
-    "Under 2.5 Goal": 0.64,
-    "Multigol Casa 1-3": 0.66,
-    "Multigol Casa 1-4": 0.64,
-    "Multigol Casa 1-5": 0.60,
-    "Multigol Ospite 1-3": 0.66,
-    "Multigol Ospite 1-4": 0.64,
-    "Multigol Ospite 1-5": 0.60,
-    "Under 0.5 Goal": 0.50,
-    "Over 3.5 Goal": 0.60,
-    "1X2 Casa": 0.58,
-    "1X2 Ospite": 0.58,
-    "Doppia Chance 1X": 0.60,
-    "Doppia Chance X2": 0.60,
-    "Doppia Chance 12": 0.60,
+    "Multigol Casa 1-3": 70,
+  "Multigol Casa 1-4": 80,
+  "Multigol Casa 1-5": 80,
+  "Multigol Ospite 1-3": 70,
+  "Multigol Ospite 1-4": 75,
+  "Multigol Ospite 1-5": 95,
+  "Over 0.5 Goal": 90,
+  "Over 1.5 Goal": 75
 }
 
 # --------------------------------------------------------------

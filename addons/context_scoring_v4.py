@@ -410,16 +410,12 @@ class FootballBacktest:
                 '1': row["AvgH"], 'X': row["AvgD"], '2': row["AvgA"],
                 'over_25': row["Avg>2.5"], 'under_25': row["Avg<2.5"]
             }
-
-            if use_context:
-                mid = row.get("id")
-                if mid is not None:
-                    proto = [{'match_id': mid, 'market': m, 'threshold': 0} for m in CANDIDATE_MARKETS]
-                    directives_all = compute_context_directives(proto, signals_map)
-                    directives = directives_all.get(mid, {})
-                    # Inietta le direttive nella predizione
-                    pred.update(directives)
-            recs = get_recommended_bets(pred, quotes)
+            
+            
+            
+            
+            recs = pred.get("betting_recommendations", [])
+            
             for rec in recs:
                 self.market_stats[rec["market"]]["total"] += 1
                 if self.evaluate(rec, actual):
@@ -480,6 +476,49 @@ def compare_backtest(n: int = 2000) -> None:
 
     print("-" * 72)
     print(f"{'TOTALE':<24} | {total_b:>4} {correct_b:>4} {acc_b:>6.2f}% | {total_c:>4} {correct_c:>4} {acc_c:>6.2f}%")
+    
+def analyze_favorite_anomalies(df: pd.DataFrame) -> None:
+    """
+    Analizza le partite in cui la favorita non segna o segna >=5 gol.
+    Determina la favorita in base alle quote 1X2.
+    """
+    if not {"HomeTeam", "AwayTeam", "FTHG", "FTAG", "AvgH", "AvgA"}.issubset(df.columns):
+        print("⚠️ Impossibile analizzare anomalie: colonne mancanti.")
+        return
+
+    df = df.copy()
+    df["favorite_side"] = df.apply(lambda r: "home" if r["AvgH"] < r["AvgA"] else "away", axis=1)
+    df["fav_goals"] = df.apply(lambda r: r["FTHG"] if r["favorite_side"] == "home" else r["FTAG"], axis=1)
+    df["fav_odds"] = df.apply(lambda r: r["AvgH"] if r["favorite_side"] == "home" else r["AvgA"], axis=1)
+    df["underdog_goals"] = df.apply(lambda r: r["FTAG"] if r["favorite_side"] == "home" else r["FTHG"], axis=1)
+
+    no_goal = df[df["fav_goals"] == 0]
+    over_5 = df[df["fav_goals"] >= 5]
+
+    total = len(df)
+    print("\n⚽️ ANALISI FAVORITA — CASI ANOMALI")
+    print("──────────────────────────────────────────────")
+    print(f"Totale partite analizzate: {total}")
+    print(f"Favorita non segna: {len(no_goal)} ({len(no_goal)/total*100:.2f}%)")
+    print(f"Favorita segna ≥5 gol: {len(over_5)} ({len(over_5)/total*100:.2f}%)")
+
+    # Breakdown per fascia di quota
+    df["fav_bin"] = pd.cut(df["fav_odds"], [1.0, 1.4, 1.7, 2.0, 2.5, 3.0, 10.0])
+    mean_goals = df.groupby("fav_bin")["fav_goals"].mean().round(2)
+    print("\n📊 Media gol favorita per fascia quote:")
+    print(mean_goals)
+
+    # Leghe più colpite
+    if "league_code" in df.columns:
+        print("\n🏆 Leghe con più favorite a zero gol:")
+        print(no_goal["league_code"].value_counts().head())
+
+    # 🔎 Extra debug: salvataggio CSV opzionale
+    out_path = "reports/favorite_anomalies.csv"
+    import os
+    os.makedirs("reports", exist_ok=True)
+    df.to_csv(out_path, index=False)
+    print(f"\n📁 Report completo salvato in: {out_path}")
 
 
 if __name__ == "__main__":
@@ -514,3 +553,7 @@ if __name__ == "__main__":
         # ✅ 6. Esegui il backtest
         runner.run(df, use_context=True)
         runner.print_stats("Context v4 Refactor")
+        try:
+            analyze_favorite_anomalies(runner.df_full)
+        except Exception as e:
+            print(f"⚠️ Errore durante analisi favorita: {e}")

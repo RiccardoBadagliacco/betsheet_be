@@ -227,17 +227,6 @@ class FootballBacktest:
                 
                 # Ottieni raccomandazioni baseline
                 recommendations = get_recommended_bets(prediction, quotes)
-
-                # Addon removed: keep baseline recommendations as returned by get_recommended_bets
-                
-                # Debug prima partita
-                if idx == 0:
-                    print(f"\\n🔍 DEBUG - Prima partita: {match['HomeTeam']} vs {match['AwayTeam']}")
-                    print(f"    Risultato: {match['FTHG']}-{match['FTAG']}")
-                    print(f"    Raccomandazioni generate: {len(recommendations)}")
-                    if recommendations:
-                        for i, rec in enumerate(recommendations[:3]):
-                            print(f"      {i+1}. {rec['market']}: {rec['confidence']:.1f}%")
                 
                 # Valuta ogni raccomandazione
                 match_recommendations = []

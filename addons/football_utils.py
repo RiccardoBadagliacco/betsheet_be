@@ -10,6 +10,8 @@ from datetime import datetime
 from typing import Dict, Tuple
 from addons.compute_team_profiles import TEAM_ELO, TEAM_PROFILE
 from typing import Dict, Tuple, Optional
+import os
+DEBUG = str(os.getenv("DEBUG_CONTEXT", "0")).strip() == "1"
 
 try:
     from scipy.optimize import minimize
@@ -126,50 +128,99 @@ def estimate_lambdas_from_stats(
         elo_home_pre: Optional[float] = None, elo_away_pre: Optional[float] = None,
         team_profile: Optional[Dict[str, Dict]] = None
     ) -> Tuple[float, float]:
-    # Base lambda
-    home_attack = home_features.get('goals_for_avg', 1.0)
-    home_defense = home_features.get('goals_against_avg', 1.0)
-    away_attack = away_features.get('goals_for_avg', 1.0)
-    away_defense = away_features.get('goals_against_avg', 1.0)
+    """
+    Stima i lambda (expected goals) per casa e trasferta in base a statistiche e contesto.
+    Include calibrazione su quote, ELO, venue e stile tattico.
+    """
 
-    # base
-    home_boost = 1.15
+    # ---------------------------
+    # Base lambda da goal medi
+    # ---------------------------
+    home_attack = home_features.get("goals_for_avg", 1.0)
+    home_defense = home_features.get("goals_against_avg", 1.0)
+    away_attack = away_features.get("goals_for_avg", 1.0)
+    away_defense = away_features.get("goals_against_avg", 1.0)
+
+    home_boost = 1.15  # vantaggio casa medio
     lambda_home = ((home_attack + away_defense) / 2.0) * home_boost
     lambda_away = (away_attack + home_defense) / 2.0
 
-    # venue
-    venue_home = home_features.get('venue_goals_for', home_attack) / (home_attack + 0.1)
-    venue_away = away_features.get('venue_goals_for', away_attack) / (away_attack + 0.1)
+    # ---------------------------
+    # Venue effect
+    # ---------------------------
+    venue_home = home_features.get("venue_goals_for", home_attack) / (home_attack + 0.1)
+    venue_away = away_features.get("venue_goals_for", away_attack) / (away_attack + 0.1)
     lambda_home *= venue_home
     lambda_away *= venue_away
 
-    # ELO pre-match (preferito)
+    # ---------------------------
+    # ELO pre-match influence
+    # ---------------------------
     if elo_home_pre is not None and elo_away_pre is not None:
         elo_diff = elo_home_pre - elo_away_pre
         scale = elo_diff / 1000.0
         lambda_home *= (1.0 + scale)
         lambda_away *= (1.0 - scale)
 
-    # stagionalità
-    if matchday is not None:
-        season_factor = 1.05 if matchday > 20 else 1.0
-        lambda_home *= season_factor
-        lambda_away *= season_factor
-
-    # stile squadra (se fornito un profilo)
+    # ---------------------------
+    # Team style adjustment
+    # ---------------------------
+    style_home = None
+    style_away = None
     if team_profile and home_team_name:
-        style_home = team_profile.get(home_team_name, {}).get('style', 'neutral')
-        if style_home == 'attacking':
+        style_home = team_profile.get(home_team_name, {}).get("style", "neutral")
+        if style_home == "attacking":
             lambda_home *= 1.05
-        elif style_home == 'defensive':
+        elif style_home == "defensive":
             lambda_home *= 0.95
     if team_profile and away_team_name:
-        style_away = team_profile.get(away_team_name, {}).get('style', 'neutral')
-        if style_away == 'attacking':
+        style_away = team_profile.get(away_team_name, {}).get("style", "neutral")
+        if style_away == "attacking":
             lambda_away *= 1.05
-        elif style_away == 'defensive':
+        elif style_away == "defensive":
             lambda_away *= 0.95
 
+    # ---------------------------
+    # Tattica (matchup attacco-difesa)
+    # ---------------------------
+    if style_home == "attacking" and style_away == "defensive":
+        lambda_away *= 0.9
+    elif style_home == "defensive" and style_away == "attacking":
+        lambda_home *= 0.9
+
+    # ---------------------------
+    # 🔧 Calibrazione quote
+    # ---------------------------
+    def calibrate_lambda(lambda_base: float, odds: float, is_away: bool = False) -> float:
+        """Adatta il lambda in base alle quote — tuning più realistico"""
+        if odds <= 1.50:
+            lambda_base *= 1.35       # favorita netta
+        elif 1.50 < odds <= 1.80:
+            lambda_base *= 1.20       # favorita
+        elif 1.80 < odds <= 2.50:
+            lambda_base *= 0.95       # match equilibrato
+        elif odds > 3.00:
+            lambda_base *= 0.75       # sfavorita netta
+        if is_away:
+            lambda_base *= 0.93       # penalità trasferta
+        return lambda_base
+
+    # Applica calibrazione se disponibili le quote
+    home_odds = home_features.get("odds_home") or home_features.get("odds_1")
+    away_odds = away_features.get("odds_away") or away_features.get("odds_2")
+
+    if home_odds:
+        lambda_home = calibrate_lambda(lambda_home, home_odds, is_away=False)
+    if away_odds:
+        lambda_away = calibrate_lambda(lambda_away, away_odds, is_away=True)
+    
+    if DEBUG:  
+        print(f"[DEBUG CALIB QUOTES] home_odds={home_odds}, away_odds={away_odds}, λ_pre=({round(lambda_home,2)}, {round(lambda_away,2)})")
+
+
+    # ---------------------------
+    # Valori minimi di sicurezza
+    # ---------------------------
     return max(0.1, lambda_home), max(0.1, lambda_away)
 
 def calculate_probabilities(lambda_home: float, lambda_away: float) -> Dict[str, float]:

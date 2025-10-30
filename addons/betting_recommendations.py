@@ -14,6 +14,7 @@ from __future__ import annotations
 from typing import Dict, List, Any, Optional
 import json
 from pathlib import Path
+import os
 
 from addons.betting_config import (
     MARKET_THRESHOLDS,           # decimali (0.70, 0.65, ...)
@@ -28,7 +29,7 @@ from addons.betting_config import (
 # Opzioni
 # ==============================
 INCLUDE_1X2_AND_DC = True  # riabilita 1X2 / DC come nella versione copy
-DEBUG_BETS = False         # metti True per stampare passaggi di debug
+DEBUG = str(os.getenv("DEBUG_CONTEXT", "0")).strip() == "1"
 
 # ==============================
 # Caricamento soglie dinamiche
@@ -47,13 +48,40 @@ if THRESHOLD_FILE.exists():
                 _optimal_thresholds[k] = int(v["threshold"])
             else:
                 _optimal_thresholds[k] = int(v)
-        if DEBUG_BETS:
+        if DEBUG:
             print(f"[THR LOADER] Caricate soglie custom per {len(_optimal_thresholds)} mercati")
     except Exception as e:
         print(f"[THR LOADER] ⚠️ Errore caricando soglie personalizzate: {e}")
 else:
-    if DEBUG_BETS:
+    if DEBUG:
         print(f"[THR LOADER] File {THRESHOLD_FILE} non trovato — uso sole soglie di config")
+        
+def should_recommend_multigol(odds_home: float, odds_away: float, lambda_home: float, lambda_away: float, side: str) -> bool:
+    """
+    Determina se raccomandare Multigol Casa / Ospite in base al favoritismo.
+    side: "home" o "away"
+    """
+    # Calcolo probabilità implicite da quote 1X2
+    implied_home = 1.0 / odds_home
+    implied_away = 1.0 / odds_away
+    total = implied_home + implied_away
+    implied_home /= total
+    implied_away /= total
+
+    # Differenza minima per considerare "favorito"
+    min_diff = 0.15  # es. 15%
+
+    # Gap λ per ulteriore controllo
+    lambda_gap_threshold = 0.25
+
+    if side == "home":
+        is_favorite = (implied_home - implied_away) >= min_diff and (lambda_home - lambda_away) >= lambda_gap_threshold
+        return is_favorite
+    elif side == "away":
+        is_favorite = (implied_away - implied_home) >= min_diff and (lambda_away - lambda_home) >= lambda_gap_threshold
+        return is_favorite
+    else:
+        return False
 
 def get_threshold(label: str) -> int:
     """
@@ -63,13 +91,17 @@ def get_threshold(label: str) -> int:
     """
     # 1) custom file
     if USE_CUSTOM_THRESHOLDS and label in _optimal_thresholds:
+        if DEBUG:
+            print(f"[THR GETTER] Usando soglia custom per {label}: {_optimal_thresholds[label]}")
         thr = int(_optimal_thresholds[label])
-        if label.startswith("Over") or "Multigol" in label:
-            thr -= 5   # offset soft legacy
+        """  if label.startswith("Over") or "Multigol" in label:
+            thr -= 5   # offset soft legacy """
         return thr
 
     # 2) config decimale
     if label in MARKET_THRESHOLDS:
+        if DEBUG:
+            print(f"[THR GETTER] Usando soglia config per {label}: {MARKET_THRESHOLDS[label]}")
         return int(round(MARKET_THRESHOLDS[label] * 100))
 
     # 3) fallback ragionevole
@@ -141,15 +173,21 @@ def _multigol_baseline(pred: Dict[str, Any], quotes: Optional[Dict[str, float]])
     if quotes:
         qH = quotes.get("1", 999)
         qA = quotes.get("2", 999)
-        if abs(qH - qA) >= 0.2:
-            if qH < qA and qH <= 1.70:
-                favorite_team = "home"
-            elif qA < qH and qA <= 1.90:
-                favorite_team = "away"
+        lambda_home = float(pred.get("lambda_home", 0))
+        lambda_away = float(pred.get("lambda_away", 0))
+
+        can_home = should_recommend_multigol(qH, qA, lambda_home, lambda_away, "home")
+        can_away = should_recommend_multigol(qH, qA, lambda_home, lambda_away, "away")
+
+        if can_home:
+            favorite_team = "home"
+        elif can_away:
+            favorite_team = "away"
     else:
+        # fallback vecchio se non ho quote reali
         if abs(pH - pA) >= 5.0:
             favorite_team = "home" if pH > pA else "away"
-
+            
     def maybe_add(lbl: str, market: str, prob_01: float):
         c = float(prob_01) * 100.0
         thr = get_threshold(lbl)
@@ -211,7 +249,6 @@ def adjust_threshold_for_context(label: str, thr: int, prediction: Dict[str, Any
 
 def get_recommended_bets(prediction: Dict[str, Any], quotes: Optional[Dict[str, float]] = None) -> List[Dict[str, Any]]:
     recommendations: List[Dict[str, Any]] = []
-    print('------> get_recommended_bets called')
     # Context directives (compat legacy)
     ctx_delta = prediction.get("ctx_delta_thresholds", {}) or {}
     ctx_skip  = set(prediction.get("skip_recommendations", []) or [])
@@ -222,11 +259,32 @@ def get_recommended_bets(prediction: Dict[str, Any], quotes: Optional[Dict[str, 
     for label in TARGET_MARKETS:
         if label in ctx_skip:
             continue
+        
+        # --- BLOCCO MG per match equilibrati ---
+        if "Multigol" in label and quotes is not None:
+            
+
+            qH = quotes.get("1", 999)
+            qA = quotes.get("2", 999)
+            lH = prediction.get("lambda_home", 0)
+            lA = prediction.get("lambda_away", 0)
+            if DEBUG:
+                print(f"  - DEBUG: MG check {label}: qH={qH}, qA={qA}, lH={lH:.2f}, lA={lA:.2f}")
+
+            home_ok = should_recommend_multigol(qH, qA, lH, lA, "home")
+            away_ok = should_recommend_multigol(qH, qA, lH, lA, "away")
+
+            # se non c'è favorito → skip MG
+            if not home_ok and not away_ok:
+                if DEBUG:
+                    print(f"  - DEBUG: Skip MG {label} (no favorite)")
+                continue
+            
         conf = _calc_confidence(prediction, label)  # 0..100
         conf = _apply_ctx_delta(conf, label, {"ctx_delta_thresholds": ctx_delta})
         thr = get_threshold(label)
-        thr = adjust_threshold_for_context(label, thr, prediction)
-
+        if DEBUG:
+            print(f"  - DEBUG: Market '{label}': conf={conf}, thr={thr}")
         forced = (label in ctx_force)
         if forced or conf >= thr:
             recommendations.append({
@@ -259,54 +317,55 @@ def get_recommended_bets(prediction: Dict[str, Any], quotes: Optional[Dict[str, 
         already.add(lbl)
 
     # 3) (Opzionale) 1X2 / DC – come in versione copy
-    if INCLUDE_1X2_AND_DC:
-        prob_home = float(prediction.get('1X2_H', prediction.get('prob_home', 0))) * 100
-        prob_draw = float(prediction.get('1X2_D', prediction.get('prob_draw', 0))) * 100
-        prob_away = float(prediction.get('1X2_A', prediction.get('prob_away', 0))) * 100
+    prob_home = float(prediction.get('1X2_H', prediction.get('prob_home', 0))) * 100
+    prob_draw = float(prediction.get('1X2_D', prediction.get('prob_draw', 0))) * 100
+    prob_away = float(prediction.get('1X2_A', prediction.get('prob_away', 0))) * 100
 
-        def maybe_add_1x2(lbl: str, c: float):
-            if lbl in ctx_skip:
-                return
-            thr = get_threshold(lbl)
-            c = _apply_ctx_delta(c, lbl, {"ctx_delta_thresholds": ctx_delta})
-            forced = lbl in ctx_force
-            if forced or c >= thr:
-                recommendations.append({
-                    "market": lbl,
-                    "prediction": lbl,
-                    "confidence": round(c, 1),
-                    "threshold": thr,
-                    "forced": forced,
-                    "high_confidence": c >= HIGH_CONFIDENCE_THRESHOLD * 100,
-                    "medium_confidence": c >= MEDIUM_CONFIDENCE_THRESHOLD * 100,
-                })
+    def maybe_add_1x2(lbl: str, c: float):
+        if lbl in ctx_skip:
+            return
+        thr = get_threshold(lbl)
+        c = _apply_ctx_delta(c, lbl, {"ctx_delta_thresholds": ctx_delta})
+        forced = lbl in ctx_force
+        if forced or c >= thr:
+            recommendations.append({
+                "market": lbl,
+                "prediction": lbl,
+                "confidence": round(c, 1),
+                "threshold": thr,
+                "forced": forced,
+                "high_confidence": c >= HIGH_CONFIDENCE_THRESHOLD * 100,
+                "medium_confidence": c >= MEDIUM_CONFIDENCE_THRESHOLD * 100,
+            })
 
-        if prob_home: maybe_add_1x2("1X2 Casa", prob_home)
-        if prob_draw: maybe_add_1x2("1X2 X", prob_draw)
-        if prob_away: maybe_add_1x2("1X2 Ospite", prob_away)
+    if prob_home: maybe_add_1x2("1X2 Casa", prob_home)
+    if prob_draw: maybe_add_1x2("1X2 X", prob_draw)
+    if prob_away: maybe_add_1x2("1X2 Ospite", prob_away)
 
-        # DC
-        def sumc(a, b): return a + b if a and b else 0.0
-        prob_1x = sumc(prob_home, prob_draw)
-        prob_x2 = sumc(prob_draw, prob_away)
-        prob_12 = sumc(prob_home, prob_away)
-        for lbl, c in [("Doppia Chance 1X", prob_1x), ("Doppia Chance X2", prob_x2), ("Doppia Chance 12", prob_12)]:
-            if c == 0 or lbl in ctx_skip:
-                continue
-            thr = get_threshold(lbl)
-            c = _apply_ctx_delta(c, lbl, {"ctx_delta_thresholds": ctx_delta})
-            forced = lbl in ctx_force
-            if forced or c >= thr:
-                recommendations.append({
-                    "market": lbl,
-                    "prediction": lbl,
-                    "confidence": round(c, 1),
-                    "threshold": thr,
-                    "forced": forced,
-                    "high_confidence": c >= HIGH_CONFIDENCE_THRESHOLD * 100,
-                    "medium_confidence": c >= MEDIUM_CONFIDENCE_THRESHOLD * 100,
-                })
+    # DC
+    def sumc(a, b): return a + b if a and b else 0.0
+    prob_1x = sumc(prob_home, prob_draw)
+    prob_x2 = sumc(prob_draw, prob_away)
+    prob_12 = sumc(prob_home, prob_away)
+    for lbl, c in [("Doppia Chance 1X", prob_1x), ("Doppia Chance X2", prob_x2), ("Doppia Chance 12", prob_12)]:
+        if c == 0 or lbl in ctx_skip:
+            continue
+        thr = get_threshold(lbl)
+        c = _apply_ctx_delta(c, lbl, {"ctx_delta_thresholds": ctx_delta})
+        forced = lbl in ctx_force
+        if forced or c >= thr:
+            recommendations.append({
+                "market": lbl,
+                "prediction": lbl,
+                "confidence": round(c, 1),
+                "threshold": thr,
+                "forced": forced,
+                "high_confidence": c >= HIGH_CONFIDENCE_THRESHOLD * 100,
+                "medium_confidence": c >= MEDIUM_CONFIDENCE_THRESHOLD * 100,
+            })
 
     # Ordina per confidenza discendente
     recommendations.sort(key=lambda x: x["confidence"], reverse=True)
     return recommendations
+
+
