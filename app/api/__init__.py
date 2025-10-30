@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from . import users, auth, backrolls, health, bets, csv_download, football_db, leagues_seasons, fixtures, seasons, ml_football_exact, model_management, team_profiles
+from . import users, auth, backrolls, health, bets, csv_download, football_db, leagues_seasons, fixtures, seasons, ml_football_exact, model_management, team_profiles,recommendations
 
 # Istanza di router principale dell'API
 api_router = APIRouter()
@@ -18,3 +18,4 @@ api_router.include_router(seasons.router, prefix="/api/v1", tags=["Seasons Manag
 api_router.include_router(ml_football_exact.router, prefix="/api/v1/exact", tags=["Machine Learning Football - Production"])
 api_router.include_router(model_management.router, prefix="/api/v1/models", tags=["Model Management"])
 api_router.include_router(team_profiles.router, prefix="/api/v1/team_profiles", tags=["Team Profiles"])
+api_router.include_router(recommendations.router, prefix="/api/v1/recommendations", tags=["Recommendations"])

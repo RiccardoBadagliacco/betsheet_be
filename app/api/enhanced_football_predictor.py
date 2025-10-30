@@ -3,7 +3,7 @@
 Enhanced Football Predictor - V1.0
 ==================================
 
-Estensione del ExactSimpleFooballPredictor con miglioramenti per i mercati Multigol.
+Estensione del ExactSimpleFootballPredictor con miglioramenti per i mercati Multigol.
 Introduce logica avanzata per identificare match con nette favorite e integra
 posizione in classifica per ottimizzare le raccomandazioni.
 
@@ -31,7 +31,7 @@ from app.db.models import Match, Team, Season, League
 from pydantic import BaseModel
 
 # Import baseline predictor
-from .ml_football_exact import ExactSimpleFooballPredictor, BettingRecommendation, MatchPredictionResponse
+from .ml_football_exact import ExactSimpleFootballPredictor, BettingRecommendation, MatchPredictionResponse
 
 class EnhancedBettingRecommendation(BaseModel):
     market: str
@@ -48,7 +48,7 @@ class EnhancedMatchPredictionResponse(BaseModel):
     model_info: dict
     enhancements_applied: List[str] = []      # Track which enhancements were applied
 
-class EnhancedFootballPredictor(ExactSimpleFooballPredictor):
+class EnhancedFootballPredictor(ExactSimpleFootballPredictor):
     """
     Predictor potenziato con logica avanzata per mercati Multigol.
     Estende il baseline senza modificarlo, aggiungendo intelligenza contestuale.
@@ -333,7 +333,7 @@ class EnhancedFootballPredictor(ExactSimpleFooballPredictor):
             model_info={
                 'model_name': 'EnhancedFootballPredictor',
                 'version': '2.0',  # Updated to V2
-                'baseline_model': 'ExactSimpleFooballPredictor',
+                'baseline_model': 'ExactSimpleFootballPredictor',
                 'strategy': 'Selective Multigol Filtering',
                 'enhancements': [
                     'Selective Multigol filtering (favorites only)',
@@ -358,7 +358,7 @@ async def health_check():
         "status": "healthy",
         "model": "EnhancedFootballPredictor",
         "version": "1.0",
-        "baseline": "ExactSimpleFooballPredictor"
+        "baseline": "ExactSimpleFootballPredictor"
     }
 
 @router.post("/predict-enhanced", response_model=EnhancedMatchPredictionResponse)
@@ -410,7 +410,7 @@ def compare_model_recommendations(df: pd.DataFrame, match_idx: int,
     """
     
     # Baseline predictions
-    baseline_predictor = ExactSimpleFooballPredictor()
+    baseline_predictor = ExactSimpleFootballPredictor()
     baseline_prediction = baseline_predictor.predict_match(df, match_idx)
     baseline_recs = baseline_predictor.generate_recommendations(baseline_prediction)
     

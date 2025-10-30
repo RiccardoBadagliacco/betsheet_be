@@ -1,0 +1,1288 @@
+{
+  "success": true,
+  "fixtures_count": 42,
+  "generated_at": "2025-10-30T21:49:25.005298",
+  "model": "OverModelV1_patch7",
+  "fixtures": [
+    {
+      "fixture_id": "79fc8b12-4b32-4697-9dbd-1a85a3339f97",
+      "match_date": "2025-10-29",
+      "home_team": "Le Havre",
+      "away_team": "Brest",
+      "league_code": "F1",
+      "odds": {
+        "over_25": 1.92,
+        "under_25": 1.83
+      },
+      "predictions": {
+        "lambda_market": 2.6256880975172407,
+        "p_over_0_5_raw": 0.9276100714373234,
+        "p_over_1_5_raw": 0.7375366976301804,
+        "p_over_2_5_raw": 0.488,
+        "p_over_0_5": 0.9433249370277078,
+        "p_over_1_5": 0.7617328519855595,
+        "p_over_2_5": 0.4865384615384615,
+        "ev_over_2_5": -0.065846153846154,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9433249370277078,
+          "threshold": 0.9
+        }
+      ]
+    },
+    {
+      "fixture_id": "9ba20f96-043c-4255-83fe-a5fab639613c",
+      "match_date": "2025-10-29",
+      "home_team": "Lorient",
+      "away_team": "Paris SG",
+      "league_code": "F1",
+      "odds": {
+        "over_25": 1.4,
+        "under_25": 2.79
+      },
+      "predictions": {
+        "lambda_market": 3.429264363748821,
+        "p_over_0_5_raw": 0.9675892254539767,
+        "p_over_1_5_raw": 0.8564441113018015,
+        "p_over_2_5_raw": 0.6658711217183771,
+        "p_over_0_5": 0.9866666666666667,
+        "p_over_1_5": 0.8689655172413793,
+        "p_over_2_5": 0.6842105263157895,
+        "ev_over_2_5": -0.04210526315789476,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9866666666666667,
+          "threshold": 0.9
+        },
+        {
+          "market": "Over 1.5",
+          "confidence": 0.8689655172413793,
+          "threshold": 0.8
+        },
+        {
+          "market": "Over 2.5",
+          "confidence": 0.6842105263157895,
+          "threshold": 0.68,
+          "ev": -0.04210526315789476,
+          "ev_flag": false
+        }
+      ]
+    },
+    {
+      "fixture_id": "73a8ebe9-b1ef-4bd0-87ec-888c3e4d82f7",
+      "match_date": "2025-10-29",
+      "home_team": "Metz",
+      "away_team": "Lens",
+      "league_code": "F1",
+      "odds": {
+        "over_25": 1.65,
+        "under_25": 2.17
+      },
+      "predictions": {
+        "lambda_market": 2.9612074679385243,
+        "p_over_0_5_raw": 0.948243614748127,
+        "p_over_1_5_raw": 0.7949822202267773,
+        "p_over_2_5_raw": 0.5680628272251308,
+        "p_over_0_5": 0.9461538461538461,
+        "p_over_1_5": 0.8020833333333334,
+        "p_over_2_5": 0.5927152317880795,
+        "ev_over_2_5": -0.022019867549668892,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9461538461538461,
+          "threshold": 0.9
+        },
+        {
+          "market": "Over 1.5",
+          "confidence": 0.8020833333333334,
+          "threshold": 0.8
+        }
+      ]
+    },
+    {
+      "fixture_id": "98dd53b3-9f80-4546-8e30-bc769b9c130a",
+      "match_date": "2025-10-29",
+      "home_team": "Nice",
+      "away_team": "Lille",
+      "league_code": "F1",
+      "odds": {
+        "over_25": 1.72,
+        "under_25": 2.05
+      },
+      "predictions": {
+        "lambda_market": 2.8559113132769935,
+        "p_over_0_5_raw": 0.9424966063705028,
+        "p_over_1_5_raw": 0.7782720139522016,
+        "p_over_2_5_raw": 0.5437665782493367,
+        "p_over_0_5": 0.9433249370277078,
+        "p_over_1_5": 0.8020833333333334,
+        "p_over_2_5": 0.5757575757575758,
+        "ev_over_2_5": -0.009696969696969648,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9433249370277078,
+          "threshold": 0.9
+        },
+        {
+          "market": "Over 1.5",
+          "confidence": 0.8020833333333334,
+          "threshold": 0.8
+        }
+      ]
+    },
+    {
+      "fixture_id": "7972abc4-d318-405d-9219-22fc1abb65c5",
+      "match_date": "2025-10-29",
+      "home_team": "Marseille",
+      "away_team": "Angers",
+      "league_code": "F1",
+      "odds": {
+        "over_25": 1.59,
+        "under_25": 2.27
+      },
+      "predictions": {
+        "lambda_market": 3.0507479797361077,
+        "p_over_0_5_raw": 0.952676485879894,
+        "p_over_1_5_raw": 0.8083043707839674,
+        "p_over_2_5_raw": 0.588082901554404,
+        "p_over_0_5": 0.9541984732824428,
+        "p_over_1_5": 0.8020833333333334,
+        "p_over_2_5": 0.5927152317880795,
+        "ev_over_2_5": -0.0575827814569535,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9541984732824428,
+          "threshold": 0.9
+        },
+        {
+          "market": "Over 1.5",
+          "confidence": 0.8020833333333334,
+          "threshold": 0.8
+        }
+      ]
+    },
+    {
+      "fixture_id": "658b92ea-3681-4b98-a73a-146c42b004fc",
+      "match_date": "2025-10-29",
+      "home_team": "Nantes",
+      "away_team": "Monaco",
+      "league_code": "F1",
+      "odds": {
+        "over_25": 1.64,
+        "under_25": 2.17
+      },
+      "predictions": {
+        "lambda_market": 2.9677850161113994,
+        "p_over_0_5_raw": 0.948582927718332,
+        "p_over_1_5_raw": 0.795988111028481,
+        "p_over_2_5_raw": 0.5695538057742783,
+        "p_over_0_5": 0.9461538461538461,
+        "p_over_1_5": 0.8020833333333334,
+        "p_over_2_5": 0.5927152317880795,
+        "ev_over_2_5": -0.02794701986754966,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9461538461538461,
+          "threshold": 0.9
+        },
+        {
+          "market": "Over 1.5",
+          "confidence": 0.8020833333333334,
+          "threshold": 0.8
+        }
+      ]
+    },
+    {
+      "fixture_id": "94384abb-1804-4b77-9b1f-272e61382179",
+      "match_date": "2025-10-29",
+      "home_team": "Paris FC",
+      "away_team": "Lyon",
+      "league_code": "F1",
+      "odds": {
+        "over_25": 1.66,
+        "under_25": 2.14
+      },
+      "predictions": {
+        "lambda_market": 2.9396672568401625,
+        "p_over_0_5_raw": 0.9471166776251033,
+        "p_over_1_5_raw": 0.791657306406697,
+        "p_over_2_5_raw": 0.5631578947368423,
+        "p_over_0_5": 0.9461538461538461,
+        "p_over_1_5": 0.8020833333333334,
+        "p_over_2_5": 0.5818181818181818,
+        "ev_over_2_5": -0.03418181818181831,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9461538461538461,
+          "threshold": 0.9
+        },
+        {
+          "market": "Over 1.5",
+          "confidence": 0.8020833333333334,
+          "threshold": 0.8
+        }
+      ]
+    },
+    {
+      "fixture_id": "688f5be6-6ac4-46c7-ab6b-6cadd6fa3a2e",
+      "match_date": "2025-10-29",
+      "home_team": "Strasbourg",
+      "away_team": "Auxerre",
+      "league_code": "F1",
+      "odds": {
+        "over_25": 1.76,
+        "under_25": 1.99
+      },
+      "predictions": {
+        "lambda_market": 2.800504912808943,
+        "p_over_0_5_raw": 0.9392206334042528,
+        "p_over_1_5_raw": 0.7690077186554469,
+        "p_over_2_5_raw": 0.5306666666666666,
+        "p_over_0_5": 0.9433249370277078,
+        "p_over_1_5": 0.8020833333333334,
+        "p_over_2_5": 0.5549132947976878,
+        "ev_over_2_5": -0.023352601156069408,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9433249370277078,
+          "threshold": 0.9
+        },
+        {
+          "market": "Over 1.5",
+          "confidence": 0.8020833333333334,
+          "threshold": 0.8
+        }
+      ]
+    },
+    {
+      "fixture_id": "0e90da11-12fb-4ca0-bfe2-43cde63c4af5",
+      "match_date": "2025-10-29",
+      "home_team": "Toulouse",
+      "away_team": "Rennes",
+      "league_code": "F1",
+      "odds": {
+        "over_25": 1.86,
+        "under_25": 1.89
+      },
+      "predictions": {
+        "lambda_market": 2.690314752265704,
+        "p_over_0_5_raw": 0.9321404229456087,
+        "p_over_1_5_raw": 0.7495768017136684,
+        "p_over_2_5_raw": 0.5039999999999999,
+        "p_over_0_5": 0.9433249370277078,
+        "p_over_1_5": 0.7824267782426778,
+        "p_over_2_5": 0.5303030303030303,
+        "ev_over_2_5": -0.013636363636363669,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9433249370277078,
+          "threshold": 0.9
+        }
+      ]
+    },
+    {
+      "fixture_id": "0f031c46-ed77-4e74-b926-fc4e9d3d0ce7",
+      "match_date": "2025-10-28",
+      "home_team": "Boulogne",
+      "away_team": "Reims",
+      "league_code": "F2",
+      "odds": {
+        "over_25": 2.07,
+        "under_25": 1.68
+      },
+      "predictions": {
+        "lambda_market": 2.468183970939873,
+        "p_over_0_5_raw": 0.9152613928731647,
+        "p_over_1_5_raw": 0.7061109210429382,
+        "p_over_2_5_raw": 0.44800000000000006,
+        "p_over_0_5": 0.9136807817589576,
+        "p_over_1_5": 0.6772908366533864,
+        "p_over_2_5": 0.4607645875251509,
+        "ev_over_2_5": -0.04621730382293765,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9136807817589576,
+          "threshold": 0.9
+        }
+      ]
+    },
+    {
+      "fixture_id": "b1e5b364-6836-4e6c-8dde-1fb5cc08521a",
+      "match_date": "2025-10-28",
+      "home_team": "Clermont",
+      "away_team": "Montpellier",
+      "league_code": "F2",
+      "odds": {
+        "over_25": 2.1,
+        "under_25": 1.67
+      },
+      "predictions": {
+        "lambda_market": 2.448734926007649,
+        "p_over_0_5_raw": 0.9135971766468598,
+        "p_over_1_5_raw": 0.7020195653963559,
+        "p_over_2_5_raw": 0.44297082228116713,
+        "p_over_0_5": 0.9136807817589576,
+        "p_over_1_5": 0.6772908366533864,
+        "p_over_2_5": 0.43859649122807015,
+        "ev_over_2_5": -0.07894736842105265,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9136807817589576,
+          "threshold": 0.9
+        }
+      ]
+    },
+    {
+      "fixture_id": "4540a7c4-5372-412e-ae35-5a9ac577b153",
+      "match_date": "2025-10-28",
+      "home_team": "Dunkerque",
+      "away_team": "Red Star",
+      "league_code": "F2",
+      "odds": {
+        "over_25": 2.0,
+        "under_25": 1.74
+      },
+      "predictions": {
+        "lambda_market": 2.5354226731535876,
+        "p_over_0_5_raw": 0.9207717754569503,
+        "p_over_1_5_raw": 0.7198947385967988,
+        "p_over_2_5_raw": 0.46524064171123003,
+        "p_over_0_5": 0.9136807817589576,
+        "p_over_1_5": 0.6772908366533864,
+        "p_over_2_5": 0.4607645875251509,
+        "ev_over_2_5": -0.07847082494969815,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9136807817589576,
+          "threshold": 0.9
+        }
+      ]
+    },
+    {
+      "fixture_id": "ff5394f2-ddd7-40ea-8c57-0a86261bdead",
+      "match_date": "2025-10-28",
+      "home_team": "Grenoble",
+      "away_team": "Guingamp",
+      "league_code": "F2",
+      "odds": {
+        "over_25": 1.92,
+        "under_25": 1.8
+      },
+      "predictions": {
+        "lambda_market": 2.6091736222166677,
+        "p_over_0_5_raw": 0.926404663808373,
+        "p_over_1_5_raw": 0.7343816538990124,
+        "p_over_2_5_raw": 0.4838709677419355,
+        "p_over_0_5": 0.9366197183098591,
+        "p_over_1_5": 0.6772908366533864,
+        "p_over_2_5": 0.4607645875251509,
+        "ev_over_2_5": -0.11533199195171029,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9366197183098591,
+          "threshold": 0.9
+        }
+      ]
+    },
+    {
+      "fixture_id": "46914f55-276b-4dc9-8ade-e75d1725cec5",
+      "match_date": "2025-10-28",
+      "home_team": "Laval",
+      "away_team": "Le Mans",
+      "league_code": "F2",
+      "odds": {
+        "over_25": 2.47,
+        "under_25": 1.49
+      },
+      "predictions": {
+        "lambda_market": 2.196183212930346,
+        "p_over_0_5_raw": 0.8887731214651053,
+        "p_over_1_5_raw": 0.6444985180001271,
+        "p_over_2_5_raw": 0.3762626262626261,
+        "p_over_0_5": 0.8722222222222222,
+        "p_over_1_5": 0.640661938534279,
+        "p_over_2_5": 0.3619047619047619,
+        "ev_over_2_5": -0.10609523809523802,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": []
+    },
+    {
+      "fixture_id": "007e08dc-fa78-4b03-a468-bb5da65d59c3",
+      "match_date": "2025-10-28",
+      "home_team": "Nancy",
+      "away_team": "Bastia",
+      "league_code": "F2",
+      "odds": {
+        "over_25": 2.39,
+        "under_25": 1.51
+      },
+      "predictions": {
+        "lambda_market": 2.236960754242128,
+        "p_over_0_5_raw": 0.8932174498850439,
+        "p_over_1_5_raw": 0.6543490760399939,
+        "p_over_2_5_raw": 0.38717948717948714,
+        "p_over_0_5": 0.8763197586726998,
+        "p_over_1_5": 0.640661938534279,
+        "p_over_2_5": 0.3619047619047619,
+        "ev_over_2_5": -0.13504761904761897,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": []
+    },
+    {
+      "fixture_id": "ce2b62f3-d8a4-4ad2-b168-2bbd3aab7081",
+      "match_date": "2025-10-28",
+      "home_team": "Rodez",
+      "away_team": "Annecy",
+      "league_code": "F2",
+      "odds": {
+        "over_25": 2.08,
+        "under_25": 1.68
+      },
+      "predictions": {
+        "lambda_market": 2.4635697942319785,
+        "p_over_0_5_raw": 0.914869490507838,
+        "p_over_1_5_raw": 0.7051445387553688,
+        "p_over_2_5_raw": 0.44680851063829774,
+        "p_over_0_5": 0.9136807817589576,
+        "p_over_1_5": 0.6772908366533864,
+        "p_over_2_5": 0.4444444444444444,
+        "ev_over_2_5": -0.0755555555555556,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9136807817589576,
+          "threshold": 0.9
+        }
+      ]
+    },
+    {
+      "fixture_id": "c4ca3bbc-18d0-4f9a-9651-f6c6ca3e3f49",
+      "match_date": "2025-10-28",
+      "home_team": "St Etienne",
+      "away_team": "Pau FC",
+      "league_code": "F2",
+      "odds": {
+        "over_25": 1.59,
+        "under_25": 2.23
+      },
+      "predictions": {
+        "lambda_market": 3.0312274329467144,
+        "p_over_0_5_raw": 0.9517436296989281,
+        "p_over_1_5_raw": 0.8054675962278839,
+        "p_over_2_5_raw": 0.5837696335078534,
+        "p_over_0_5": 0.9662921348314607,
+        "p_over_1_5": 0.8088235294117647,
+        "p_over_2_5": 0.6129032258064516,
+        "ev_over_2_5": -0.02548387096774185,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9662921348314607,
+          "threshold": 0.9
+        },
+        {
+          "market": "Over 1.5",
+          "confidence": 0.8088235294117647,
+          "threshold": 0.8
+        }
+      ]
+    },
+    {
+      "fixture_id": "37ff1481-13bc-4b40-90c0-f31f4aab4820",
+      "match_date": "2025-10-28",
+      "home_team": "Troyes",
+      "away_team": "Amiens",
+      "league_code": "F2",
+      "odds": {
+        "over_25": 1.75,
+        "under_25": 1.99
+      },
+      "predictions": {
+        "lambda_market": 2.80646320487451,
+        "p_over_0_5_raw": 0.9395816978899743,
+        "p_over_1_5_raw": 0.7700199561171951,
+        "p_over_2_5_raw": 0.5320855614973261,
+        "p_over_0_5": 0.9662921348314607,
+        "p_over_1_5": 0.7365269461077845,
+        "p_over_2_5": 0.5681818181818182,
+        "ev_over_2_5": -0.005681818181818121,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9662921348314607,
+          "threshold": 0.9
+        }
+      ]
+    },
+    {
+      "fixture_id": "dde28fd6-0c66-4740-a9c1-95bd89a2cd41",
+      "match_date": "2025-10-28",
+      "home_team": "Lecce",
+      "away_team": "Napoli",
+      "league_code": "I1",
+      "odds": {
+        "over_25": 2.17,
+        "under_25": 1.66
+      },
+      "predictions": {
+        "lambda_market": 2.411988720052932,
+        "p_over_0_5_raw": 0.910363145412729,
+        "p_over_1_5_raw": 0.6941600632472066,
+        "p_over_2_5_raw": 0.4334203655352479,
+        "p_over_0_5": 0.9021739130434783,
+        "p_over_1_5": 0.6704805491990846,
+        "p_over_2_5": 0.3813084112149533,
+        "ev_over_2_5": -0.17256074766355134,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9021739130434783,
+          "threshold": 0.9
+        }
+      ]
+    },
+    {
+      "fixture_id": "3cf3e281-c19d-423e-8e05-efc591aa62c5",
+      "match_date": "2025-10-28",
+      "home_team": "Atalanta",
+      "away_team": "Milan",
+      "league_code": "I1",
+      "odds": {
+        "over_25": 1.91,
+        "under_25": 1.85
+      },
+      "predictions": {
+        "lambda_market": 2.6418342925207092,
+        "p_over_0_5_raw": 0.928769507907899,
+        "p_over_1_5_raw": 0.7405903512258617,
+        "p_over_2_5_raw": 0.4920212765957448,
+        "p_over_0_5": 0.936830835117773,
+        "p_over_1_5": 0.7552521987760851,
+        "p_over_2_5": 0.47418738049713194,
+        "ev_over_2_5": -0.09430210325047805,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.936830835117773,
+          "threshold": 0.9
+        }
+      ]
+    },
+    {
+      "fixture_id": "175c74cc-9b87-4fe3-99f0-df2fe0b2441e",
+      "match_date": "2025-10-29",
+      "home_team": "Como",
+      "away_team": "Verona",
+      "league_code": "I1",
+      "odds": {
+        "over_25": 2.12,
+        "under_25": 1.72
+      },
+      "predictions": {
+        "lambda_market": 2.467861122213386,
+        "p_over_0_5_raw": 0.9152340307050866,
+        "p_over_1_5_raw": 0.706043390595436,
+        "p_over_2_5_raw": 0.4479166666666665,
+        "p_over_0_5": 0.9166666666666666,
+        "p_over_1_5": 0.7073170731707317,
+        "p_over_2_5": 0.3813084112149533,
+        "ev_over_2_5": -0.191626168224299,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9166666666666666,
+          "threshold": 0.9
+        }
+      ]
+    },
+    {
+      "fixture_id": "e94d66e4-ad6a-4c6a-99d7-9c7a82240b53",
+      "match_date": "2025-10-29",
+      "home_team": "Juventus",
+      "away_team": "Udinese",
+      "league_code": "I1",
+      "odds": {
+        "over_25": 1.91,
+        "under_25": 1.86
+      },
+      "predictions": {
+        "lambda_market": 2.6472585939949234,
+        "p_over_0_5_raw": 0.9291548375542816,
+        "p_over_1_5_raw": 0.7416093724268871,
+        "p_over_2_5_raw": 0.49336870026525204,
+        "p_over_0_5": 0.936830835117773,
+        "p_over_1_5": 0.7569060773480663,
+        "p_over_2_5": 0.47418738049713194,
+        "ev_over_2_5": -0.09430210325047805,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.936830835117773,
+          "threshold": 0.9
+        }
+      ]
+    },
+    {
+      "fixture_id": "98459465-9f0d-4599-80b4-9b53a4687eb8",
+      "match_date": "2025-10-29",
+      "home_team": "Roma",
+      "away_team": "Parma",
+      "league_code": "I1",
+      "odds": {
+        "over_25": 2.05,
+        "under_25": 1.72
+      },
+      "predictions": {
+        "lambda_market": 2.50018142551422,
+        "p_over_0_5_raw": 0.9179298923383452,
+        "p_over_1_5_raw": 0.7127397335727236,
+        "p_over_2_5_raw": 0.45623342175066317,
+        "p_over_0_5": 0.9166666666666666,
+        "p_over_1_5": 0.7073170731707317,
+        "p_over_2_5": 0.3813084112149533,
+        "ev_over_2_5": -0.21831775700934586,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9166666666666666,
+          "threshold": 0.9
+        }
+      ]
+    },
+    {
+      "fixture_id": "80dc6c0c-4881-4594-ad5d-c5de1d0c2358",
+      "match_date": "2025-10-29",
+      "home_team": "Bologna",
+      "away_team": "Torino",
+      "league_code": "I1",
+      "odds": {
+        "over_25": 2.22,
+        "under_25": 1.62
+      },
+      "predictions": {
+        "lambda_market": 2.3678710953829807,
+        "p_over_0_5_raw": 0.9063200501834544,
+        "p_over_1_5_raw": 0.6844980047959278,
+        "p_over_2_5_raw": 0.421875,
+        "p_over_0_5": 0.9021739130434783,
+        "p_over_1_5": 0.6704805491990846,
+        "p_over_2_5": 0.3813084112149533,
+        "ev_over_2_5": -0.15349532710280367,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9021739130434783,
+          "threshold": 0.9
+        }
+      ]
+    },
+    {
+      "fixture_id": "f59744e0-52a9-451f-a7c7-785a1623c90f",
+      "match_date": "2025-10-29",
+      "home_team": "Genoa",
+      "away_team": "Cremonese",
+      "league_code": "I1",
+      "odds": {
+        "over_25": 2.44,
+        "under_25": 1.52
+      },
+      "predictions": {
+        "lambda_market": 2.2244633471290722,
+        "p_over_0_5_raw": 0.8918745711104139,
+        "p_over_1_5_raw": 0.6513535176529188,
+        "p_over_2_5_raw": 0.38383838383838387,
+        "p_over_0_5": 0.8682926829268293,
+        "p_over_1_5": 0.6704805491990846,
+        "p_over_2_5": 0.3813084112149533,
+        "ev_over_2_5": -0.06960747663551403,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": []
+    },
+    {
+      "fixture_id": "096ef8b1-dd56-44f0-9266-f4f5e63a3b31",
+      "match_date": "2025-10-29",
+      "home_team": "Inter",
+      "away_team": "Fiorentina",
+      "league_code": "I1",
+      "odds": {
+        "over_25": 1.69,
+        "under_25": 2.1
+      },
+      "predictions": {
+        "lambda_market": 2.9002286795759753,
+        "p_over_0_5_raw": 0.944989361191632,
+        "p_over_1_5_raw": 0.785445928837808,
+        "p_over_2_5_raw": 0.554089709762533,
+        "p_over_0_5": 0.9452247191011236,
+        "p_over_1_5": 0.8194444444444444,
+        "p_over_2_5": 0.6035131744040151,
+        "ev_over_2_5": 0.019937264742785565,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9452247191011236,
+          "threshold": 0.9
+        },
+        {
+          "market": "Over 1.5",
+          "confidence": 0.8194444444444444,
+          "threshold": 0.8
+        }
+      ]
+    },
+    {
+      "fixture_id": "29f87c69-b724-4e0e-a3c6-0c36e6420a67",
+      "match_date": "2025-10-30",
+      "home_team": "Cagliari",
+      "away_team": "Sassuolo",
+      "league_code": "I1",
+      "odds": {
+        "over_25": 2.16,
+        "under_25": 1.66
+      },
+      "predictions": {
+        "lambda_market": 2.4163418408073207,
+        "p_over_0_5_raw": 0.9107524974018383,
+        "p_over_1_5_raw": 0.6951000226863401,
+        "p_over_2_5_raw": 0.4345549738219895,
+        "p_over_0_5": 0.9021739130434783,
+        "p_over_1_5": 0.6704805491990846,
+        "p_over_2_5": 0.3813084112149533,
+        "ev_over_2_5": -0.17637383177570087,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9021739130434783,
+          "threshold": 0.9
+        }
+      ]
+    },
+    {
+      "fixture_id": "1e209cad-3829-423d-94ad-27136e815bfd",
+      "match_date": "2025-10-30",
+      "home_team": "Pisa",
+      "away_team": "Lazio",
+      "league_code": "I1",
+      "odds": {
+        "over_25": 2.2,
+        "under_25": 1.63
+      },
+      "predictions": {
+        "lambda_market": 2.382022917716389,
+        "p_over_0_5_raw": 0.9076364554526359,
+        "p_over_1_5_raw": 0.6876243755792962,
+        "p_over_2_5_raw": 0.4255874673629243,
+        "p_over_0_5": 0.9021739130434783,
+        "p_over_1_5": 0.6704805491990846,
+        "p_over_2_5": 0.3813084112149533,
+        "ev_over_2_5": -0.16112149532710274,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9021739130434783,
+          "threshold": 0.9
+        }
+      ]
+    },
+    {
+      "fixture_id": "f2e79a92-f93c-470f-b8a5-fef9917a7108",
+      "match_date": "2025-10-28",
+      "home_team": "Cesena",
+      "away_team": "Carrarese",
+      "league_code": "I2",
+      "odds": {
+        "over_25": 2.06,
+        "under_25": 1.69
+      },
+      "predictions": {
+        "lambda_market": 2.4785256437162912,
+        "p_over_0_5_raw": 0.9161332159947546,
+        "p_over_1_5_raw": 0.7082672411817388,
+        "p_over_2_5_raw": 0.45066666666666655,
+        "p_over_0_5": 0.9253246753246753,
+        "p_over_1_5": 0.7363636363636363,
+        "p_over_2_5": 0.44298245614035087,
+        "ev_over_2_5": -0.08745614035087723,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9253246753246753,
+          "threshold": 0.9
+        }
+      ]
+    },
+    {
+      "fixture_id": "2a76c633-93ac-4b5b-8ca4-8f404fe0ef07",
+      "match_date": "2025-10-28",
+      "home_team": "Empoli",
+      "away_team": "Sampdoria",
+      "league_code": "I2",
+      "odds": {
+        "over_25": 2.39,
+        "under_25": 1.51
+      },
+      "predictions": {
+        "lambda_market": 2.236960754242128,
+        "p_over_0_5_raw": 0.8932174498850439,
+        "p_over_1_5_raw": 0.6543490760399939,
+        "p_over_2_5_raw": 0.38717948717948714,
+        "p_over_0_5": 0.8872987477638641,
+        "p_over_1_5": 0.7041906327033689,
+        "p_over_2_5": 0.41123595505617977,
+        "ev_over_2_5": -0.017146067415730326,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": []
+    },
+    {
+      "fixture_id": "2e4a2b11-169c-4627-a4e6-4cbf02f50cdc",
+      "match_date": "2025-10-28",
+      "home_team": "Frosinone",
+      "away_team": "Virtus Entella",
+      "league_code": "I2",
+      "odds": {
+        "over_25": 2.23,
+        "under_25": 1.59
+      },
+      "predictions": {
+        "lambda_market": 2.3464130169699384,
+        "p_over_0_5_raw": 0.9042881359526106,
+        "p_over_1_5_raw": 0.679708572273359,
+        "p_over_2_5_raw": 0.4162303664921465,
+        "p_over_0_5": 0.8872987477638641,
+        "p_over_1_5": 0.7041906327033689,
+        "p_over_2_5": 0.4117647058823529,
+        "ev_over_2_5": -0.08176470588235296,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": []
+    },
+    {
+      "fixture_id": "23beadf8-713f-472a-b3cb-64024a0debb6",
+      "match_date": "2025-10-28",
+      "home_team": "Palermo",
+      "away_team": "Monza",
+      "league_code": "I2",
+      "odds": {
+        "over_25": 2.15,
+        "under_25": 1.63
+      },
+      "predictions": {
+        "lambda_market": 2.4035440735445714,
+        "p_over_0_5_raw": 0.9096029887518278,
+        "p_over_1_5_raw": 0.6923297881001416,
+        "p_over_2_5_raw": 0.43121693121693117,
+        "p_over_0_5": 0.8872987477638641,
+        "p_over_1_5": 0.7041906327033689,
+        "p_over_2_5": 0.4117647058823529,
+        "ev_over_2_5": -0.11470588235294121,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": []
+    },
+    {
+      "fixture_id": "fca871cc-430b-4b20-a4c1-19b0c06b3860",
+      "match_date": "2025-10-28",
+      "home_team": "Pescara",
+      "away_team": "Avellino",
+      "league_code": "I2",
+      "odds": {
+        "over_25": 2.21,
+        "under_25": 1.6
+      },
+      "predictions": {
+        "lambda_market": 2.36053586007806,
+        "p_over_0_5_raw": 0.9056303592780953,
+        "p_over_1_5_raw": 0.6828674382513567,
+        "p_over_2_5_raw": 0.4199475065616798,
+        "p_over_0_5": 0.8872987477638641,
+        "p_over_1_5": 0.7041906327033689,
+        "p_over_2_5": 0.4117647058823529,
+        "ev_over_2_5": -0.09000000000000008,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": []
+    },
+    {
+      "fixture_id": "cb34a08f-4efd-47e7-8659-1ad605b3d3ca",
+      "match_date": "2025-10-28",
+      "home_team": "Reggiana",
+      "away_team": "Modena",
+      "league_code": "I2",
+      "odds": {
+        "over_25": 2.16,
+        "under_25": 1.62
+      },
+      "predictions": {
+        "lambda_market": 2.3934209765589634,
+        "p_over_0_5_raw": 0.9086832435592479,
+        "p_over_1_5_raw": 0.690123803182626,
+        "p_over_2_5_raw": 0.4285714285714286,
+        "p_over_0_5": 0.8872987477638641,
+        "p_over_1_5": 0.7041906327033689,
+        "p_over_2_5": 0.4117647058823529,
+        "ev_over_2_5": -0.11058823529411765,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": []
+    },
+    {
+      "fixture_id": "4bb35edf-884a-4f30-8814-2854be8f75f2",
+      "match_date": "2025-10-29",
+      "home_team": "Mantova",
+      "away_team": "Catanzaro",
+      "league_code": "I2",
+      "odds": {
+        "over_25": 1.92,
+        "under_25": 1.8
+      },
+      "predictions": {
+        "lambda_market": 2.6091736222166677,
+        "p_over_0_5_raw": 0.926404663808373,
+        "p_over_1_5_raw": 0.7343816538990124,
+        "p_over_2_5_raw": 0.4838709677419355,
+        "p_over_0_5": 0.9322033898305084,
+        "p_over_1_5": 0.7363636363636363,
+        "p_over_2_5": 0.48109243697478987,
+        "ev_over_2_5": -0.07630252100840351,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9322033898305084,
+          "threshold": 0.9
+        }
+      ]
+    },
+    {
+      "fixture_id": "74d647be-7bb3-4b75-8c29-1a247f9cb9c2",
+      "match_date": "2025-10-29",
+      "home_team": "Spezia",
+      "away_team": "Padova",
+      "league_code": "I2",
+      "odds": {
+        "over_25": 2.22,
+        "under_25": 1.59
+      },
+      "predictions": {
+        "lambda_market": 2.3505606230242364,
+        "p_over_0_5_raw": 0.9046842889482141,
+        "p_over_1_5_raw": 0.68063893179433,
+        "p_over_2_5_raw": 0.4173228346456693,
+        "p_over_0_5": 0.8872987477638641,
+        "p_over_1_5": 0.7041906327033689,
+        "p_over_2_5": 0.4117647058823529,
+        "ev_over_2_5": -0.08588235294117641,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": []
+    },
+    {
+      "fixture_id": "350664ec-26c0-4e75-af65-34f0fa32a6be",
+      "match_date": "2025-10-29",
+      "home_team": "Venezia",
+      "away_team": "Sudtirol",
+      "league_code": "I2",
+      "odds": {
+        "over_25": 1.84,
+        "under_25": 1.86
+      },
+      "predictions": {
+        "lambda_market": 2.6850356684500296,
+        "p_over_0_5_raw": 0.9317812393045346,
+        "p_over_1_5_raw": 0.7486114335797531,
+        "p_over_2_5_raw": 0.5027027027027027,
+        "p_over_0_5": 0.9329896907216495,
+        "p_over_1_5": 0.7363636363636363,
+        "p_over_2_5": 0.48109243697478987,
+        "ev_over_2_5": -0.11478991596638655,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9329896907216495,
+          "threshold": 0.9
+        }
+      ]
+    },
+    {
+      "fixture_id": "eda2617b-b0f5-41a7-8468-395d2b1626f2",
+      "match_date": "2025-10-29",
+      "home_team": "Celtic",
+      "away_team": "Falkirk",
+      "league_code": "SC0",
+      "odds": {
+        "over_25": 1.33,
+        "under_25": 3.14
+      },
+      "predictions": {
+        "lambda_market": 3.6296070141365586,
+        "p_over_0_5_raw": 0.9734733930576607,
+        "p_over_1_5_raw": 0.8771922344385025,
+        "p_over_2_5_raw": 0.7024608501118568,
+        "p_over_0_5": 0.9864864864864865,
+        "p_over_1_5": 0.9666666666666667,
+        "p_over_2_5": 0.7,
+        "ev_over_2_5": -0.06900000000000006,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9864864864864865,
+          "threshold": 0.9
+        },
+        {
+          "market": "Over 1.5",
+          "confidence": 0.9666666666666667,
+          "threshold": 0.8
+        },
+        {
+          "market": "Over 2.5",
+          "confidence": 0.7,
+          "threshold": 0.68,
+          "ev": -0.06900000000000006,
+          "ev_flag": false
+        }
+      ]
+    },
+    {
+      "fixture_id": "4bf351b5-dc59-4e6f-b534-4501600c5b22",
+      "match_date": "2025-10-29",
+      "home_team": "Hibernian",
+      "away_team": "Rangers",
+      "league_code": "SC0",
+      "odds": {
+        "over_25": 1.69,
+        "under_25": 2.09
+      },
+      "predictions": {
+        "lambda_market": 2.8951338282676993,
+        "p_over_0_5_raw": 0.9447083749828616,
+        "p_over_1_5_raw": 0.7846317209758519,
+        "p_over_2_5_raw": 0.5529100529100528,
+        "p_over_0_5": 0.9671361502347418,
+        "p_over_1_5": 0.8333333333333334,
+        "p_over_2_5": 0.6222910216718266,
+        "ev_over_2_5": 0.05167182662538683,
+        "suggest_over_2_5": true,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9671361502347418,
+          "threshold": 0.9
+        },
+        {
+          "market": "Over 1.5",
+          "confidence": 0.8333333333333334,
+          "threshold": 0.8
+        }
+      ]
+    },
+    {
+      "fixture_id": "4b66c6c9-6300-434c-9984-044e4b934688",
+      "match_date": "2025-10-29",
+      "home_team": "Kilmarnock",
+      "away_team": "Aberdeen",
+      "league_code": "SC0",
+      "odds": {
+        "over_25": 1.95,
+        "under_25": 1.79
+      },
+      "predictions": {
+        "lambda_market": 2.5882220303602095,
+        "p_over_0_5_raw": 0.9248464579149429,
+        "p_over_1_5_raw": 0.7303324046307949,
+        "p_over_2_5_raw": 0.4786096256684491,
+        "p_over_0_5": 0.9173290937996821,
+        "p_over_1_5": 0.7416974169741697,
+        "p_over_2_5": 0.5161290322580645,
+        "ev_over_2_5": 0.006451612903225712,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9173290937996821,
+          "threshold": 0.9
+        }
+      ]
+    },
+    {
+      "fixture_id": "e322df95-2526-493f-b642-30f392bffa63",
+      "match_date": "2025-10-29",
+      "home_team": "Motherwell",
+      "away_team": "Dundee United",
+      "league_code": "SC0",
+      "odds": {
+        "over_25": 1.76,
+        "under_25": 1.99
+      },
+      "predictions": {
+        "lambda_market": 2.800504912808943,
+        "p_over_0_5_raw": 0.9392206334042528,
+        "p_over_1_5_raw": 0.7690077186554469,
+        "p_over_2_5_raw": 0.5306666666666666,
+        "p_over_0_5": 0.9671361502347418,
+        "p_over_1_5": 0.8333333333333334,
+        "p_over_2_5": 0.6222910216718266,
+        "ev_over_2_5": 0.0952321981424149,
+        "suggest_over_2_5": true,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9671361502347418,
+          "threshold": 0.9
+        },
+        {
+          "market": "Over 1.5",
+          "confidence": 0.8333333333333334,
+          "threshold": 0.8
+        }
+      ]
+    },
+    {
+      "fixture_id": "1344e383-3a3e-46e0-947e-30323eebd241",
+      "match_date": "2025-10-29",
+      "home_team": "St Mirren",
+      "away_team": "Hearts",
+      "league_code": "SC0",
+      "odds": {
+        "over_25": 1.89,
+        "under_25": 1.84
+      },
+      "predictions": {
+        "lambda_market": 2.6469721355221543,
+        "p_over_0_5_raw": 0.9291345404502444,
+        "p_over_1_5_raw": 0.741555643651069,
+        "p_over_2_5_raw": 0.4932975871313674,
+        "p_over_0_5": 0.9173290937996821,
+        "p_over_1_5": 0.7642276422764228,
+        "p_over_2_5": 0.536144578313253,
+        "ev_over_2_5": 0.01331325301204811,
+        "suggest_over_2_5": false,
+        "model": "OverModelV1"
+      },
+      "recommendations": [
+        {
+          "market": "Over 0.5",
+          "confidence": 0.9173290937996821,
+          "threshold": 0.9
+        }
+      ]
+    }
+  ]
+}

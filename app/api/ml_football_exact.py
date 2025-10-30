@@ -131,7 +131,7 @@ class PredictorConfig:
     market_weight: float = 0.60
 
 
-class ExactSimpleFooballPredictor:
+class ExactSimpleFootballPredictor:
     """Replica del SimpleFootballPredictor adattata a DataFrame DB.
     Mantiene la stessa logica di calcolo (features, lambdas, Poisson).
     """
@@ -197,171 +197,98 @@ class ExactSimpleFooballPredictor:
     # Prediction
     # ----------------------------------------------------------
     def predict_match(self, df: pd.DataFrame, match_idx: int) -> Dict[str, Any]:
-        
-        if not hasattr(self, "df_full") or self.df_full is None:
-            self.df_full = df
-            
-        """Predice un singolo match (probabilità mercati + metadati)."""
+        """
+        Minimal predictor — ONLY Over/Under goals markets:
+        - O/U 0.5
+        - O/U 1.5
+        - O/U 2.5
+        No context, no multigol, no exotic logic.
+        """
+
         match = df.iloc[match_idx]
         current_date = match['Date']
-        
-        # Features squadra (rolling)
+
+        # --- Team history (rolling features)
         home_features = get_team_features(df, match['HomeTeam'], current_date, is_home=True)
         away_features = get_team_features(df, match['AwayTeam'], current_date, is_home=False)
 
-        if not home_features.get('valid', False) or not away_features.get('valid', False):
-            print(f"[SKIP] Storico insufficiente per {match['HomeTeam']} ({home_features.get('total_matches', 0)}) "
-                f"o {match['AwayTeam']} ({away_features.get('total_matches', 0)})")
-            return None
-        
+        if not home_features.get('valid') or not away_features.get('valid'):
+            return None  # not enough history
 
-        # Lambdas dal mercato (se quote presenti)
-        market_lambdas: Tuple[float, float] = (1.3, 1.1)  # default nel caso manchino quote
+        # --- Poisson lambdas from market + stats
+        # 1) market lambda (from 1X2 + OU)
+        market_lambdas = (1.3, 1.1)
         if pd.notna(match.get('AvgH')) and pd.notna(match.get('AvgD')) and pd.notna(match.get('AvgA')):
             odds_1x2 = {'H': match['AvgH'], 'D': match['AvgD'], 'A': match['AvgA']}
             p_1x2 = remove_vig(odds_1x2)
+
             odds_ou = {'over': match.get('Avg>2.5', 1.9), 'under': match.get('Avg<2.5', 1.9)}
             p_ou = remove_vig(odds_ou)
+
             market_lambdas = estimate_lambdas_from_market(p_1x2, p_ou)
 
-        # Lambdas da statistiche
-        
-        current_date = match['Date']
-        matchday_home = df[df['Date'] < current_date].groupby('HomeTeam').size().get(match['HomeTeam'], 0)
-        matchday_away = df[df['Date'] < current_date].groupby('AwayTeam').size().get(match['AwayTeam'], 0)
-        matchday = max(matchday_home, matchday_away)
+        # 2) Stats λ
+        if 'elo_home_pre' not in df.columns or 'elo_away_pre' not in df.columns:
+            df = annotate_pre_match_elo(df)
 
-        source_df = df
+        row_elo = df.iloc[match_idx]
+        elo_home = row_elo.get('elo_home_pre', 1500)
+        elo_away = row_elo.get('elo_away_pre', 1500)
 
-        # Se mancano le colonne ELO, calcolale ora sul DF corrente
-        if 'elo_home_pre' not in source_df.columns or 'elo_away_pre' not in source_df.columns:
-            source_df = annotate_pre_match_elo(source_df)
-
-        # Leggi l'ultima riga con il match_idx sullo STESSO DF
-        row_elo = source_df.iloc[match_idx]
-        elo_home_raw = row_elo.get('elo_home_pre')
-        elo_away_raw = row_elo.get('elo_away_pre')
-
-        # 👇 fallback automatico se il valore è None o NaN
-        elo_home_pre = float(elo_home_raw) if pd.notna(elo_home_raw) and elo_home_raw is not None else 1500.0
-        elo_away_pre = float(elo_away_raw) if pd.notna(elo_away_raw) and elo_away_raw is not None else 1500.0
-        
-        if pd.notna(match.get('AvgH')) and pd.notna(match.get('AvgA')):
-            home_features["odds_home"] = float(match["AvgH"])
-            away_features["odds_away"] = float(match["AvgA"])
-            
-        if DEBUG:
-            print(f"[DEBUG ODDS] Injected odds: home={home_features.get('odds_home')}, away={away_features.get('odds_away')}")
-        lambda_home, lambda_away = estimate_lambdas_from_stats(
-            home_features, away_features,
+        lambda_home_stats, lambda_away_stats = estimate_lambdas_from_stats(
+            home_features,
+            away_features,
             match['HomeTeam'], match['AwayTeam'],
-            matchday=matchday,
-            elo_home_pre=elo_home_pre, elo_away_pre=elo_away_pre,
-            team_profile=getattr(self, "team_profile", None)
+            elo_home_pre=elo_home,
+            elo_away_pre=elo_away
         )
 
-        stats_lambdas = (lambda_home, lambda_away)
+        # Blend
+        w = self.cfg.market_weight
+        lambda_home = w * market_lambdas[0] + (1 - w) * lambda_home_stats
+        lambda_away = w * market_lambdas[1] + (1 - w) * lambda_away_stats
 
-
-        # Probabilità mercati dalla matrice di Poisson
+        # --- Poisson probabilities (we only keep the essentials)
         probs = calculate_probabilities(lambda_home, lambda_away)
-        
-        # ============================
-        # 🔁 Mappa chiavi interne → mercati leggibili
-        # ============================
-        probs = {MARKET_KEY_MAP.get(k, k): v for k, v in probs.items()}
-        
-        # ======================================================
-        # 💡 Raccomandazioni e contesto (betting + context layer)
-        # ======================================================
-        from addons.betting_recommendations import get_recommended_bets
-        from addons.context_scoring_v4 import build_signals_map, compute_context_directives
 
-        # 1️⃣ Genera raccomandazioni grezze (senza contesto)
-        betting_recs = get_recommended_bets({
+        result = {
+            "match_idx": match_idx,
+            "date": current_date,
             "home_team": match["HomeTeam"],
             "away_team": match["AwayTeam"],
-            "lambda_home": lambda_home,
-            "lambda_away": lambda_away,
-            **probs,
-        })
 
-        # 2️⃣ Costruisci la mappa segnali per il contesto
-        signals_map = build_signals_map([{
-            "fixture_id": str(match_idx),
-            "AvgH": match.get("AvgH", 2.0),
-            "AvgA": match.get("AvgA", 3.0),
-            "AvgD": match.get("AvgD", 3.2),
-            "Avg>2.5": match.get("Avg>2.5", 1.8),
-            "Avg<2.5": match.get("Avg<2.5", 2.0),
-        }])
+            "lambda_home": float(lambda_home),
+            "lambda_away": float(lambda_away),
 
-        # 3️⃣ Costruisci lista proto di mercati da valutare
-        proto = [{
-            "fixture_id": str(match_idx),
-            "market": rec["market"],
-            "HomeTeam": match["HomeTeam"],
-            "AwayTeam": match["AwayTeam"],
-            **probs
-        } for rec in betting_recs]
+            # ✅ Only the Over/Under markets we want
+            "Over 0.5": float(probs.get("Over 0.5 Goal", 0)),
+            "Under 0.5": float(probs.get("Under 0.5 Goal", 1)),
 
-        # 4️⃣ Applica le direttive di contesto
-        ctx_dir_all = compute_context_directives(proto, signals_map)
-        ctx_dir = ctx_dir_all.get(str(match_idx), {})
+            "Over 1.5": float(probs.get("Over 1.5 Goal", 0)),
+            "Under 1.5": float(probs.get("Under 1.5 Goal", 1)),
 
-        # 5️⃣ Se esistono delta soglia, applicali direttamente alle raccomandazioni
-        if ctx_dir and "ctx_delta_thresholds" in ctx_dir:
-            for rec in betting_recs:
-                label = rec["market"]
-                delta = ctx_dir["ctx_delta_thresholds"].get(label)
-                if delta:
-                    rec["threshold"] = max(40, min(95, rec["threshold"] + delta))
-
-        # Risultato finale
-        result: Dict[str, Any] = {
-            'match_idx': match_idx,
-            'date': current_date,
-            'home_team': match['HomeTeam'],
-            'away_team': match['AwayTeam'],
-            'lambda_home': float(lambda_home),
-            'lambda_away': float(lambda_away),
-            'lambda_home_market': float(market_lambdas[0]),
-            'lambda_away_market': float(market_lambdas[1]),
-            'lambda_home_stats': float(stats_lambdas[0]),
-            'lambda_away_stats': float(stats_lambdas[1]),
-            'home_matches_count': int(home_features.get('total_matches', 0)),
-            'away_matches_count': int(away_features.get('total_matches', 0)),
-            **probs,
+            "Over 2.5": float(probs.get("Over 2.5 Goal", 0)),
+            "Under 2.5": float(probs.get("Under 2.5 Goal", 1)),
         }
-        # ✅ Identifica e salva la squadra favorita
-        fav = None
-        if pd.notna(match.get("AvgH")) and pd.notna(match.get("AvgA")):
-            try:
-                qH = float(match["AvgH"])
-                qA = float(match["AvgA"])
-                fav = "home" if qH < qA else "away"
-            except Exception:
-                fav = None
 
-        result["favorite_team"] = fav
+        # ✅ include odds if present (for logging)
+        if pd.notna(match.get('AvgH')):
+            result.update({
+                "odds_1": float(match.get("AvgH")),
+                "odds_X": float(match.get("AvgD")),
+                "odds_2": float(match.get("AvgA")),
+                "odds_over_25": float(match.get("Avg>2.5")),
+                "odds_under_25": float(match.get("Avg<2.5")),
+            })
 
-        # Quote 1X2 (se presenti)
-        if pd.notna(match.get('AvgH')) and pd.notna(match.get('AvgD')) and pd.notna(match.get('AvgA')):
-            result['odds_1'] = float(match['AvgH'])
-            result['odds_X'] = float(match['AvgD'])
-            result['odds_2'] = float(match['AvgA'])
-
-         # Risultato reale (se storico)
-        if pd.notna(match.get('FTHG')) and pd.notna(match.get('FTAG')):
-            result['actual_home_goals'] = int(match['FTHG'])
-            result['actual_away_goals'] = int(match['FTAG'])
-            result['actual_total_goals'] = int(match['FTHG']) + int(match['FTAG'])
-            result['actual_scoreline'] = f"{int(match['FTHG'])}-{int(match['FTAG'])}"
-            
-        # ✅ Allegare info utili per analisi / backtest
-        result["betting_recommendations"] = betting_recs                   # solo mercati sopra soglia
-        result["betting_candidates"] = proto                               # tutti i mercati grezzi
-        result["context_directives"] = ctx_dir if ctx_dir else {} 
+        # ✅ actual outcome if historical (for backtest)
+        if pd.notna(match.get("FTHG")):
+            h, a = int(match["FTHG"]), int(match["FTAG"])
+            tot = h + a
+            result["actual_total_goals"] = tot
+            result["actual_over_0.5"] = int(tot > 0.5)
+            result["actual_over_1.5"] = int(tot > 1.5)
+            result["actual_over_2.5"] = int(tot > 2.5)
 
         return result
     
@@ -673,10 +600,10 @@ def compute_context_directives(predictions: List[Dict[str, Any]], signals_map: D
 
 class FootballBacktest:
     def __init__(self, num_matches: int = 500, use_context: bool = False):
-        from app.api.ml_football_exact import ExactSimpleFooballPredictor
+        from app.api.ml_football_exact import ExactSimpleFootballPredictor
         self.num_matches = num_matches
         self.db_path = './data/football_dataset.db'
-        self.predictor = ExactSimpleFooballPredictor()
+        self.predictor = ExactSimpleFootballPredictor()
         self.use_context = use_context
         self.market_stats: Dict[str, Dict[str, int]] = defaultdict(lambda: {"total": 0, "correct": 0})
         
@@ -941,13 +868,13 @@ if __name__ == "__main__":
 # Caching predictor per lega (riduce tempi di I/O)
 # ==============================================================
 
-_LEAGUE_PREDICTORS: Dict[str, ExactSimpleFooballPredictor] = {}
+_LEAGUE_PREDICTORS: Dict[str, ExactSimpleFootballPredictor] = {}
 
 
-def _get_model_for_league(league_code: str) -> ExactSimpleFooballPredictor:
+def _get_model_for_league(league_code: str) -> ExactSimpleFootballPredictor:
     pred = _LEAGUE_PREDICTORS.get(league_code)
     if pred is None:
-        pred = ExactSimpleFooballPredictor()
+        pred = ExactSimpleFootballPredictor()
         _LEAGUE_PREDICTORS[league_code] = pred
     return pred
 
@@ -979,69 +906,67 @@ async def exact_predict_fixture(
     fixture_id: str,
     db: Session = Depends(get_football_db)
 ):
-    """Predice un fixture (da DB) e restituisce raccomandazioni V3 con quote reali."""
+    """
+    Predice un fixture usando il modello Exact + Context Scoring v4
+    e restituisce raccomandazioni già integrate nella pipeline.
+    """
     try:
         from app.db.models_football import Fixture
         from uuid import UUID
+        import pandas as pd
 
-        # Normalizza fixture_id (UUID o stringa)
+        # ✅ Normalizza fixture_id
         try:
             if len(fixture_id) == 32 and '-' not in fixture_id:
                 fixture_uuid = UUID(f"{fixture_id[:8]}-{fixture_id[8:12]}-{fixture_id[12:16]}-{fixture_id[16:20]}-{fixture_id[20:]}")
             elif len(fixture_id) == 36:
                 fixture_uuid = UUID(fixture_id)
             else:
-                fixture_uuid = fixture_id  # potrebbe essere chiave non-UUID
+                fixture_uuid = fixture_id
         except ValueError:
             fixture_uuid = fixture_id
 
+        # ✅ Recupera fixture
         fixture = db.query(Fixture).filter(Fixture.id == fixture_uuid).first()
         if not fixture:
             raise HTTPException(status_code=404, detail=f"Fixture {fixture_id} not found")
         if not fixture.league_code:
             raise HTTPException(status_code=400, detail="Fixture missing league_code")
 
+        # ✅ Carica modello e dati lega
         predictor = _get_model_for_league(fixture.league_code)
         df = predictor.load_data(db, fixture.league_code)
 
-        # Converte il fixture in riga e predice
+        # ✅ Converte fixture in riga, aggiunge agli storici e predice
         row = _build_fixture_row(fixture)
         extended_df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
         match_idx = len(extended_df) - 1
-        prediction = predictor.predict_match(extended_df, match_idx)
-
-        # Metadati
-        prediction['fixture_id'] = fixture_id
-        prediction['league_code'] = fixture.league_code
-        prediction['fixture_date'] = fixture.match_date.isoformat() if getattr(fixture, 'match_date', None) else None
-        prediction['note'] = 'Fixture prediction using V3 Complete system'
-
-        clean_prediction = {k: _convert_numpy_types(v) for k, v in prediction.items()}
-
-        # Quote reali per Multigol baseline
-        real_quotes: Optional[Dict[str, float]] = None
-        if fixture.avg_home_odds and fixture.avg_away_odds:
-            real_quotes = {
-                '1': fixture.avg_home_odds,
-                '2': fixture.avg_away_odds,
-                'X': fixture.avg_draw_odds or 3.2,
-            }
-
-        betting_recs = get_recommended_bets(clean_prediction, quotes=real_quotes)
         
-        clean_recs = [_convert_numpy_types(r) for r in betting_recs]
+        result = predictor.predict_match(extended_df, match_idx)
+        if result is None:
+            raise HTTPException(status_code=400, detail="Insufficient team history for prediction")
+
+        # ✅ Compila metadati
+        result["fixture_id"] = fixture_id
+        result["league_code"] = fixture.league_code
+        result["fixture_date"] = fixture.match_date.isoformat() if getattr(fixture, 'match_date', None) else None
+        result["note"] = "Prediction using Exact Model + Context Scoring v4"
+
+        # ✅ Pulizia numpy types
+        clean_prediction = {k: _convert_numpy_types(v) for k, v in result.items()}
 
         return {
             "success": True,
             "fixture_id": fixture_id,
             "league_code": fixture.league_code,
             "prediction": clean_prediction,
-            "betting_recommendations": clean_recs,
+            "betting_recommendations": clean_prediction.get("betting_recommendations", []),
+            "context_directives": clean_prediction.get("context_directives", {}),
             "model_info": {
-                "version": "V3_COMPLETE",
+                "version": predictor.model_version,
                 "data_source": "database",
                 "training_matches": int(len(df)),
-                "v3_features": "Aggressive thresholds + New Multigol markets",
+                "context_scoring": True,
             },
         }
 
@@ -1154,7 +1079,7 @@ async def get_all_fixtures_recommendations(
             }
 
         # Predictor cache per lega
-        league_predictors: Dict[str, ExactSimpleFooballPredictor] = {}
+        league_predictors: Dict[str, ExactSimpleFootballPredictor] = {}
         fixture_recommendations: List[Dict[str, Any]] = []
         processed_leagues: set[str] = set()
 

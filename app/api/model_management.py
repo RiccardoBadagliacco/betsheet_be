@@ -15,7 +15,7 @@ from pydantic import BaseModel
 
 from app.db.database import get_db
 from app.db.models_football import League, Season, Match
-from app.api.ml_football_exact import ExactSimpleFooballPredictor, get_football_db
+from app.api.ml_football_exact import ExactSimpleFootballPredictor, get_football_db
 from app.storage.model_storage import ModelStorage, model_storage
 
 router = APIRouter()
@@ -49,7 +49,7 @@ class ModelGenerationResponse(BaseModel):
     generation_time_seconds: float
 
 # Cache in-memory dei modelli caricati
-loaded_models: Dict[str, ExactSimpleFooballPredictor] = {}
+loaded_models: Dict[str, ExactSimpleFootballPredictor] = {}
 
 @router.get("/model-status", response_model=List[LeagueModelStatus])
 async def get_all_models_status(db: Session = Depends(get_football_db)):
@@ -150,7 +150,7 @@ async def generate_all_models(
                 
                 # Genera il modello
                 print(f"🧠 Training model for {league.code}...")
-                predictor = ExactSimpleFooballPredictor()
+                predictor = ExactSimpleFootballPredictor()
                 print(f'[INFO] Context scoring attivo = {predictor.use_context_scoring} ({predictor.model_version})')
                 
                 # Carica i dati e "allena" il modello
@@ -308,7 +308,7 @@ async def get_loaded_models():
         "models": models_info
     }
 
-def get_model_for_league(league_code: str) -> ExactSimpleFooballPredictor:
+def get_model_for_league(league_code: str) -> ExactSimpleFootballPredictor:
     """Ottieni un modello per una lega, caricandolo se necessario"""
     
     # Se già in memoria, restituiscilo
