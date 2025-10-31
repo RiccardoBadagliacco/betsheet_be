@@ -20,7 +20,10 @@ class Country(FootballBase):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     
     # Relazioni
-    leagues = relationship("League", back_populates="country")
+    leagues = relationship("League", back_populates="country", cascade="all, delete-orphan")
+
+    # Aggiunta di un commento per indicare che il modello Country supporta la cancellazione tramite API
+    # Il modello Country è utilizzato nell'endpoint DELETE /countries/{country_id} per eliminare un record.
 
 class League(FootballBase):
     """Modello per le leghe"""
@@ -36,8 +39,8 @@ class League(FootballBase):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     
     # Relazioni
-    country = relationship("Country", back_populates="leagues")
-    seasons = relationship("Season", back_populates="league")
+    country = relationship("Country", back_populates="leagues")  # Rimosso delete-orphan
+    seasons = relationship("Season", back_populates="league", cascade="all, delete-orphan")
 
 class Season(FootballBase):
     """Modello per le stagioni"""
@@ -58,7 +61,7 @@ class Season(FootballBase):
     
     # Relazioni
     league = relationship("League", back_populates="seasons")
-    matches = relationship("Match", back_populates="season")
+    matches = relationship("Match", back_populates="season", cascade="all, delete-orphan")
 
 class Team(FootballBase):
     """Modello per le squadre"""

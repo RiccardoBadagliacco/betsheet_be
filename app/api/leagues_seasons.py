@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.db.database_football import get_football_db
 from typing import Dict, Any, List
 from sqlalchemy import func
+from app.constants.leagues import get_all_leagues
 
 router = APIRouter(prefix="/leagues", tags=["Leagues & Seasons"])
 
@@ -140,7 +141,7 @@ async def get_all_leagues_seasons(db: Session = Depends(get_football_db)) -> Dic
     Returns:
         Dizionario con tutte le leghe e le loro stagioni
     """
-    from app.constants.leagues import LEAGUES
+    LEAGUES = get_all_leagues('all')
     from app.db.models_football import Season, League
     
     try:
@@ -234,7 +235,7 @@ async def get_league_seasons(
     Returns:
         Lista delle stagioni per la lega specificata
     """
-    from app.constants.leagues import LEAGUES
+    from app.constants.leagues import get_all_leagues
     from app.db.models_football import Season, League
     
     try:
@@ -242,7 +243,7 @@ async def get_league_seasons(
         league_code = league_code.upper()
         
         # Verifica se la lega esiste nelle costanti
-        league_info = LEAGUES.get(league_code)
+        league_info = get_all_leagues('all').get(league_code)
         if not league_info:
             raise HTTPException(status_code=404, detail=f"Lega {league_code} non trovata")
         

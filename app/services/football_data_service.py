@@ -5,7 +5,7 @@ Servizi per la gestione dei dati calcistici strutturati
 from sqlalchemy.orm import Session
 from app.db.models_football import Country, League, Season, Team, Match
 from app.db.database_football import get_football_db
-from app.constants.leagues import LEAGUES
+from app.constants.leagues import get_all_leagues
 from datetime import datetime, date
 import pandas as pd
 import logging
@@ -53,7 +53,7 @@ class FootballDataService:
         
         if not league:
             # Ottieni info dalla configurazione
-            league_info = LEAGUES.get(league_code, {})
+            league_info = get_all_leagues('all').get(league_code, {})
             league_name = league_info.get("name", f"Unknown League {league_code}")
             country_name = league_info.get("country", "Unknown")
             
@@ -132,7 +132,6 @@ class FootballDataService:
         try:
             # Leggi CSV
             df = pd.read_csv(csv_file_path)
-            logger.info(f"📄 Processing CSV: {csv_file_path} ({len(df)} rows)")
             
             # Ottieni o crea stagione
             season = self.get_or_create_season(league_code, season_code, csv_file_path)
@@ -161,7 +160,8 @@ class FootballDataService:
             # Aggiorna statistiche stagione
             season.processed_matches = matches_created
             season.total_matches = len(df)
-            
+            self.db.flush()
+            self.db.refresh(season)
             # Calcola date inizio/fine stagione
             self._update_season_dates(season)
             
@@ -266,10 +266,12 @@ class FootballDataService:
     def _update_season_dates(self, season: Season):
         """Aggiorna le date di inizio e fine della stagione con logica intelligente"""
         
-        matches = self.db.query(Match).filter(Match.season_id == season.id).all()
         
+        matches = self.db.query(Match).filter(Match.season_id == season.id).all()
+        print('\tSeason', season.code, 'Matches Found:', len(matches))
         if matches:
             dates = [m.match_date for m in matches if m.match_date]
+            print('\tSeason', season.code, 'Start Date', min(dates), 'End Date', max(dates))
             if dates:
                 season.start_date = min(dates)
                 latest_date = max(dates)
@@ -278,6 +280,7 @@ class FootballDataService:
                 
                 # Logica intelligente per determinare se la stagione è completata
                 season.is_completed = self._is_season_completed(season, latest_date, days_since_last)
+                print('\t\tSeason', season.code, 'Is Completed:', season.is_completed)
                 
                 if season.is_completed:
                     season.end_date = latest_date
@@ -323,7 +326,8 @@ class FootballDataService:
         country_codes = {
             "Italy": "ITA", "England": "ENG", "Germany": "GER", "Spain": "ESP",
             "France": "FRA", "Netherlands": "NED", "Belgium": "BEL",
-            "Portugal": "POR", "Scotland": "SCO", "Turkey": "TUR"
+            "Portugal": "POR", "Scotland": "SCO", "Turkey": "TUR","Brazil": "BRA", "Argentina": "ARG",
+            "China": "CHN", "Denmark": "DNK", "Ireland": "IRL"
         }
         return country_codes.get(country_name, country_name[:3].upper())
     
@@ -333,7 +337,7 @@ class FootballDataService:
     
     def _determine_league_tier(self, league_code: str, league_name: str) -> int:
         """Determina il tier della lega (1=prima divisione, 2=seconda, etc.)"""
-        first_tier = ["E0", "I1", "D1", "SP1", "F1", "N1", "P1", "SC0", "T1", "B1"]
+        first_tier = ["E0", "I1", "D1", "SP1", "F1", "N1", "P1", "SC0", "T1", "B1", "BRA", "ARG", "CHN", "DNK", "IRL"]
         if league_code in first_tier:
             return 1
         elif "2" in league_code or "Second" in league_name or "Championship" in league_name:

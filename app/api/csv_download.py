@@ -11,7 +11,7 @@ import logging
 import pandas as pd
 import io
 from sqlalchemy.orm import Session
-from app.constants.leagues import LEAGUES, get_formatted_league_name
+from app.constants.leagues import get_all_leagues, get_formatted_league_name
 from app.db.database import get_db
 from app.db.database_football import get_football_db
 from app.services.football_data_service import FootballDataService
@@ -21,18 +21,25 @@ logger = logging.getLogger(__name__)
 
 # Colonne da mantenere nel CSV finale (in ordine di preferenza)
 REQUIRED_COLUMNS = [
-    'Date', 'Time', 'HomeTeam', 'AwayTeam', 'HTHG', 'HTAG', 'FTHG', 'FTAG',
-    'AvgH', 'AvgD', 'AvgA', 'Avg>2.5', 'Avg<2.5', 'HS', 'AS', 'HST', 'AST'
+    'Date', 'Time', 'HomeTeam', 'AwayTeam', 'HTHG', 'HTAG', 'FTHG', 'FTAG','Season',
+    'AvgH', 'AvgD', 'AvgA','Avg>2.5', 'Avg<2.5'
 ]
 
 # Mapping per colonne con nomi alternativi (formato: nome_target: [possibili_nomi_sorgente])
 COLUMN_MAPPINGS = {
-    'AvgH': ['AvgH', 'BbAvH'],
-    'AvgD': ['AvgD', 'BbAvD'], 
-    'AvgA': ['AvgA', 'BbAvA'],
+    'AvgH': ['AvgH', 'BbAvH','AvgCH'],
+    'AvgD': ['AvgD', 'BbAvD', 'AvgCD'],
+    'AvgA': ['AvgA', 'BbAvA', 'AvgCA'],
     'Avg>2.5': ['Avg>2.5', 'BbAv>2.5'],
-    'Avg<2.5': ['Avg<2.5', 'BbAv<2.5']
+    'Avg<2.5': ['Avg<2.5', 'BbAv<2.5'],
+    'HomeTeam': ['HomeTeam', 'Home'],
+    'AwayTeam': ['AwayTeam', 'Away'],
+    'FTHG': ['FTHG', 'HG'],
+    'FTAG': ['FTAG', 'AG'],
+    'Season': ['Season']
+    
 }
+
 
 def filter_csv_columns(csv_content: bytes) -> bytes:
     """
@@ -301,441 +308,281 @@ async def download_single_csv(league_code: str, season: str, db: Session = None,
             "error": str(e)
         }
 
-@router.get("/download-csv", tags=["CSV Download"])
-async def download_football_csv(
-    season: str = Query(..., description="Season in format YYZZ (e.g., '2324' for 2023/2024)"),
-    league: str = Query(..., description="League code (e.g., 'I1' for Serie A)"),
-    populate_db: bool = Query(True, description="Whether to populate structured database (default: True)"),
-    skip_completed: bool = Query(True, description="Skip seasons that are already completed in database (default: True)"),
-    db: Session = Depends(get_football_db)
-):
+
+
+def process_csv_file(file_path: str, league_code: str, season: str, db: Session = None) -> Dict[str, Any]:
     """
-    Download CSV data from football-data.co.uk for specified season and league.
-    
-    Creates organized folder structure: leagues/{league_code}/{season_years}.csv
-    
-    Examples:
-    - season='2324', league='I1' -> downloads to leagues/I1/2023_2024.csv
-    - season='2223', league='E0' -> downloads to leagues/E0/2022_2023.csv
+    Process a CSV file for a specific league and season.
+
+    Args:
+        file_path: Path to the CSV file.
+        league_code: League code (e.g., 'I1' for Serie A).
+        season: Season code (e.g., '2324' for 2023/2024).
+        db: Database session for saving data (optional).
+
+    Returns:
+        Dict with success status and details.
     """
-    
+    league_upper = league_code.upper()
+
     # Validate season format
     is_valid, error_msg = validate_season_format(season)
     if not is_valid:
-        raise HTTPException(status_code=400, detail=error_msg)
-    
-    # Validate league code (optional - we allow any code but warn if unknown)
-    league_upper = league.upper()
-    league_name = get_formatted_league_name(league_upper)
-    
-    # Check if season is already completed and should be skipped
-    if skip_completed and populate_db:
+        logger.error(f"❌ Invalid season format: {season} - {error_msg}")
+        return {
+            "success": False,
+            "league_code": league_upper,
+            "season": season,
+            "error": error_msg
+        }
+
+    # Add check for completed seasons in process_csv_file
+    if db:
         from app.db.models_football import Season, League
         from sqlalchemy import and_
-        
+
         # Check if season exists and is completed
-        league_obj = db.query(League).filter(League.code == league.upper()).first()
+        league_obj = db.query(League).filter(League.code == league_upper).first()
         if league_obj:
             season_obj = db.query(Season).filter(
                 and_(Season.league_id == league_obj.id, Season.code == season)
             ).first()
-            
+
             if season_obj and season_obj.is_completed:
                 logger.info(f"⏭️  Skipping {league_upper}/{season} - already completed")
-                season_display = f"20{season[:2]}/20{season[2:]}" if len(season) == 4 else season
-                return JSONResponse(content={
-                    "status": "skipped",
-                    "message": f"Season {season_display} already completed in database",
-                    "league": league_name,
-                    "season": season_display,
-                    "file_path": None,
-                    "is_completed": True
-                })
+                return {
+                    "success": True,
+                    "skipped": True,
+                    "league_code": league_upper,
+                    "season": season,
+                    "message": f"Season {season} already completed",
+                    "file_path": None
+                }
 
-    # Build download URL
-    base_url = "https://www.football-data.co.uk/mmz4281"
-    download_url = f"{base_url}/{season}/{league_upper}.csv"
-    
     try:
-        # Download the CSV file
-        response = requests.get(download_url, timeout=30)
-        response.raise_for_status()
-        
         # Filtra le colonne del CSV
         logger.info(f"📝 Filtering CSV columns for {league_upper}/{season}")
-        filtered_content = filter_csv_columns(response.content)
+        with open(file_path, "rb") as f:
+            original_content = f.read()
+        original_size = len(original_content)
+        filtered_content = filter_csv_columns(original_content)
+        filtered_size = len(filtered_content)
         
-        # Create league directory
-        league_dir = create_league_directory(league_upper)
-        
-        # Create filename with year format
-        year_format = season_code_to_years(season)
-        filename = f"{year_format}.csv"
-        file_path = league_dir / filename
-        
+
+        logger.debug(f"📊 Size reduction: {original_size} → {filtered_size} bytes ({((original_size-filtered_size)/original_size*100):.1f}% smaller)")
+
         # Save the filtered file
-        with open(file_path, 'wb') as f:
+        with open(file_path, "wb") as f:
             f.write(filtered_content)
-        
+
         # Get file size for response (filtered file)
-        file_size = len(filtered_content)
-        
-        # Popola il database strutturato se richiesto
+        file_size = filtered_size
+
+        logger.debug(f"💾 Processed {league_upper}/{season}: {file_path} ({file_size} bytes, filtered)")
+
+        # Popola il database strutturato se sessione DB fornita
         database_result = None
-        if populate_db:
+        if db is not None:
             try:
                 logger.info(f"🗃️  Populating database for {league_upper}/{season}...")
                 service = FootballDataService(db)
-                database_result = service.process_csv_to_database(str(file_path), league_upper, season)
+                database_result = service.process_csv_to_database(file_path, league_upper, season)
                 logger.info(f"✅ Database populated: {database_result.get('matches_processed', 0)} matches")
             except Exception as e:
                 logger.error(f"❌ Database population failed for {league_upper}/{season}: {str(e)}")
                 database_result = {"success": False, "error": str(e)}
-        
-        response_data = {
+
+        result = {
             "success": True,
-            "message": "CSV downloaded successfully",
-            "details": {
-                "source_url": download_url,
-                "saved_to": str(file_path),
-                "league_code": league_upper,
-                "league_name": league_name,
-                "season": season,
-                "season_years": year_format.replace("_", "/"),
-                "file_size_bytes": file_size,
-                "filename": filename
-            }
+            "league_code": league_upper,
+            "season": season,
+            "filename": Path(file_path).name,
+            "file_size_bytes": file_size,
+            "saved_to": file_path
         }
-        
+
         # Aggiungi info database se disponibili
         if database_result:
-            response_data["database"] = database_result
-        
-        return JSONResponse(response_data)
-        
-    except requests.exceptions.Timeout:
-        raise HTTPException(status_code=408, detail="Request timeout - server took too long to respond")
-    
-    except requests.exceptions.ConnectionError:
-        raise HTTPException(status_code=503, detail="Connection error - unable to reach football-data.co.uk")
-    
-    except requests.exceptions.HTTPError as e:
-        if e.response.status_code == 404:
-            raise HTTPException(
-                status_code=404, 
-                detail=f"CSV not found for season {season} and league {league_upper}. Check if the combination exists on football-data.co.uk"
-            )
-        else:
-            raise HTTPException(
-                status_code=e.response.status_code,
-                detail=f"HTTP error from source: {e.response.status_code}"
-            )
-    
+            result["database"] = database_result
+
+        return result
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
-
-
-@router.post("/download-multiple-seasons", tags=["CSV Download"])
-async def download_multiple_seasons_for_league(
-    league: str = Query(..., description="League code (e.g., 'I1' for Serie A)"),
-    seasons: Optional[int] = Query(6, description="Number of recent seasons to download (default: 6)"),
-    custom_seasons: Optional[str] = Query(None, description="Comma-separated list of specific seasons (e.g., '2324,2223,2122')"),
-    populate_db: bool = Query(True, description="Whether to populate structured database (default: True)"),
-    skip_completed: bool = Query(True, description="Skip seasons that are already completed in database (default: True)"),
-    db: Session = Depends(get_football_db)
-):
-    """
-    Download multiple seasons for a specific league.
-    
-    You can either:
-    - Use 'seasons' to download the N most recent seasons automatically
-    - Use 'custom_seasons' to specify exact seasons (comma-separated)
-    
-    Examples:
-    - league='I1', seasons=3 -> downloads last 3 seasons for Serie A
-    - league='E0', custom_seasons='2324,2223,2122' -> downloads specific seasons for Premier League
-    """
-    league_upper = league.upper()
-    
-    # Validate league code exists in our constants
-    if league_upper not in LEAGUES:
-        return JSONResponse({
+        logger.error(f"❌ Unexpected error for {league_upper}/{season}: {str(e)}")
+        return {
             "success": False,
-            "error": f"Unknown league code: {league_upper}",
-            "available_leagues": list(LEAGUES.keys())
-        })
-    
-    # Determine which seasons to download
-    if custom_seasons:
-        seasons_list = [s.strip() for s in custom_seasons.split(',')]
-        # Validate each season
-        for season in seasons_list:
-            is_valid, error_msg = validate_season_format(season)
-            if not is_valid:
-                raise HTTPException(status_code=400, detail=f"Invalid season '{season}': {error_msg}")
-    else:
-        seasons_list = generate_recent_seasons(seasons)
-    
-    league_info = LEAGUES[league_upper]
-    
-    # Start downloads
-    results = []
-    total_downloads = len(seasons_list)
-    successful_downloads = 0
-    
-    for season in seasons_list:
-        db_session = db if populate_db else None
-        result = await download_single_csv(league_upper, season, db_session, skip_completed)
-        results.append(result)
-        
-        if result["success"]:
-            successful_downloads += 1
-        
-        # Small delay between downloads
-        await asyncio.sleep(0.5)
-    
-    return {
-        "success": True,
-        "league_code": league_upper,
-        "league_name": f"{league_info['name']} ({league_info['country']})",
-        "total_requested": total_downloads,
-        "successful_downloads": successful_downloads,
-        "failed_downloads": total_downloads - successful_downloads,
-        "success_rate": round(successful_downloads / total_downloads * 100, 1) if total_downloads > 0 else 0,
-        "results": results,
-        "summary": {
-            "seasons_downloaded": [r["season"] for r in results if r["success"]],
-            "seasons_failed": [r["season"] for r in results if not r["success"]]
+            "league_code": league_upper,
+            "season": season,
+            "error": str(e)
         }
-    }
-
-@router.post("/download-all-recent", tags=["CSV Download"])
-async def download_recent_seasons_all_leagues(
-    seasons: Optional[int] = Query(6, description="Number of recent seasons to download for each league (default: 6)"),
-    league_filter: Optional[str] = Query(None, description="Comma-separated list of specific leagues to include (e.g., 'I1,E0,D1')"),
-    populate_db: bool = Query(True, description="Whether to populate structured database (default: True)"),
-    skip_completed: bool = Query(True, description="Skip seasons that are already completed in database (default: True)"),
+        
+@router.post("/download-all-leagues-centralized", tags=["CSV Download"])
+async def download_all_leagues_centralized(
+    n_seasons: int = Query(6, description="Numero stagioni recenti da scaricare per le leghe 'main'"),
+    populate_db: bool = Query(True, description="Se True, scrive i dati nel database"),
     db: Session = Depends(get_football_db)
 ):
     """
-    Download recent seasons for all leagues (or filtered leagues).
-    
-    This endpoint downloads the last N seasons for multiple leagues in parallel.
-    
-    Examples:
-    - seasons=3 -> downloads last 3 seasons for all leagues
-    - seasons=6, league_filter='I1,E0,D1' -> downloads 6 seasons for Serie A, Premier League, and Bundesliga
+    🔁 Scarica e popola il database per tutte le leghe ('main' e 'other'),
+    salvando i file CSV in leagues/{league_code}/{season}.csv.
+    ❗ Se il file è già presente, viene riutilizzato senza riscaricarlo.
     """
-    
     start_time = datetime.now()
-    logger.info(f"🚀 Starting bulk download - seasons: {seasons}, league_filter: {league_filter}")
-    
-    # Determine which leagues to process
-    if league_filter:
-        requested_leagues = [l.strip().upper() for l in league_filter.split(',')]
-        # Validate leagues
-        invalid_leagues = [l for l in requested_leagues if l not in LEAGUES]
-        if invalid_leagues:
-            logger.error(f"❌ Invalid league codes requested: {invalid_leagues}")
-            raise HTTPException(
-                status_code=400, 
-                detail=f"Invalid league codes: {', '.join(invalid_leagues)}. Available: {', '.join(LEAGUES.keys())}"
-            )
-        leagues_to_process = requested_leagues
-        logger.info(f"📋 Processing filtered leagues: {leagues_to_process}")
-    else:
-        leagues_to_process = list(LEAGUES.keys())
-        logger.info(f"📋 Processing all {len(leagues_to_process)} leagues")
-    
-    # Generate seasons
-    seasons_list = generate_recent_seasons(seasons)
-    logger.info(f"📅 Seasons to download: {seasons_list}")
-    
-    # Prepare summary
-    total_downloads = len(leagues_to_process) * len(seasons_list)
-    league_results = []
-    overall_successful = 0
-    overall_failed = 0
-    
-    logger.info(f"📊 Total downloads planned: {total_downloads} ({len(leagues_to_process)} leagues × {len(seasons_list)} seasons)")
-    
-    # Process each league
-    for idx, league_code in enumerate(sorted(leagues_to_process), 1):
-        league_info = LEAGUES[league_code]
-        league_name = f"{league_info['name']} ({league_info['country']})"
-        
-        logger.info(f"📁 [{idx}/{len(leagues_to_process)}] Starting {league_code}: {league_name}")
-        
-        league_successful = 0
-        league_failed = 0
-        league_downloads = []
-        
-        # Download all seasons for this league
-        for season_idx, season in enumerate(seasons_list, 1):
-            season_years = season_code_to_years(season).replace("_", "/")
-            logger.info(f"   📥 [{season_idx}/{len(seasons_list)}] Downloading {league_code} season {season_years}...")
-            
-            db_session = db if populate_db else None
-            result = await download_single_csv(league_code, season, db_session, skip_completed)
-            league_downloads.append(result)
-            
-            if result["success"]:
-                league_successful += 1
-                overall_successful += 1
-                
-                if result.get("skipped"):
-                    logger.info(f"   ⏭️  Skipped: {result['message']}")
+    logger.info(f"🚀 Avvio download centralizzato con caching locale (n_seasons={n_seasons})")
+
+    service = FootballDataService(db)
+    results = {"main": [], "other": []}
+    total_processed = 0
+    total_errors = 0
+
+    # === MAIN LEAGUES ===
+    main_leagues = get_all_leagues("main")
+    recent_seasons = generate_recent_seasons(n_seasons)
+    base_url = "https://www.football-data.co.uk/mmz4281"
+
+    for league_code, info in main_leagues.items():
+        league_name = f"{info['name']} ({info['country']})"
+        logger.info(f"⚽ Processing MAIN league: {league_code} - {league_name}")
+
+        league_dir = create_league_directory(league_code)
+
+        for season in recent_seasons:
+            season_filename = f"{season_code_to_years(season)}.csv"
+            file_path = league_dir / season_filename
+
+            try:
+                if file_path.exists():
+                    logger.info(f"⏭️ File già presente: {file_path}")
                 else:
-                    file_size_mb = result["file_size_bytes"] / 1024 / 1024
-                    logger.info(f"   ✅ Success: {result['filename']} ({file_size_mb:.1f}MB)")
-            else:
-                league_failed += 1
-                overall_failed += 1
-                logger.warning(f"   ❌ Failed: {result['error']}")
-            
-            # Small delay between downloads
-            await asyncio.sleep(0.3)
-        
-        league_success_rate = round(league_successful / len(seasons_list) * 100, 1)
-        logger.info(f"📈 {league_code} completed: {league_successful}/{len(seasons_list)} successes ({league_success_rate}%)")
-        
-        league_results.append({
-            "league_code": league_code,
-            "league_name": league_name,
-            "successful": league_successful,
-            "failed": league_failed,
-            "success_rate": league_success_rate,
-            "downloads": league_downloads
-        })
-    
-    # Calculate final statistics
+                    download_url = f"{base_url}/{season}/{league_code}.csv"
+                    response = requests.get(download_url, timeout=20)
+                    if response.status_code == 404:
+                        logger.warning(f"⚠️ Nessun file trovato per {league_code} stagione {season}")
+                        results["main"].append({
+                            "league": league_name,
+                            "season": season,
+                            "success": False,
+                            "error": "File CSV non trovato"
+                        })
+                        continue
+
+                    filtered_csv = filter_csv_columns(response.content)
+                    with open(file_path, "wb") as f:
+                        f.write(filtered_csv)
+                    logger.info(f"💾 Salvato: {file_path}")
+
+                # Processa la stagione (solo se richiesto)
+                db_result = None
+                if populate_db:
+                    db_result = service.process_csv_to_database(str(file_path), league_code, season)
+
+                total_processed += 1
+                results["main"].append({
+                    "league": league_name,
+                    "season": season,
+                    "file": str(file_path),
+                    "cached": file_path.exists(),
+                    "success": db_result.get("success", True) if db_result else True,
+                    "matches_processed": db_result.get("matches_processed") if db_result else None,
+                    "errors_count": db_result.get("errors_count") if db_result else None
+                })
+
+            except Exception as e:
+                total_errors += 1
+                logger.error(f"❌ Errore su {league_code}/{season}: {str(e)}")
+                results["main"].append({
+                    "league": league_name,
+                    "season": season,
+                    "success": False,
+                    "error": str(e)
+                })
+
+            await asyncio.sleep(0.2)
+
+    # === OTHER LEAGUES ===
+    other_leagues = get_all_leagues("other")
+    url_template = "https://www.football-data.co.uk/new/{league_code}.csv"
+
+    for league_code, info in other_leagues.items():
+        league_name = f"{info['name']} ({info['country']})"
+        url = url_template.format(league_code=league_code)
+        logger.info(f"🌍 Processing OTHER league: {league_code} - {league_name}")
+
+        league_dir = create_league_directory(league_code)
+
+        try:
+            # se abbiamo già file separati per stagione, salta download
+            existing_files = list(league_dir.glob("*.csv"))
+            if existing_files:
+                logger.info(f"⏭️ CSV stagionali già presenti per {league_code}, salto download generale.")
+                for f in existing_files:
+                    if populate_db:
+                        # determina season_name dal nome file
+                        season_name = f.stem
+                        service.process_csv_to_database(str(f), league_code, season_name)
+                continue
+
+            # scarica il CSV unico se non ci sono file salvati
+            response = requests.get(url, timeout=25)
+            response.raise_for_status()
+            filtered_csv = filter_csv_columns(response.content)
+            df = pd.read_csv(io.BytesIO(filtered_csv))
+
+            if "Season" not in df.columns:
+                logger.warning(f"⚠️ Nessuna colonna 'Season' trovata per {league_code}")
+                continue
+
+            df = df.sort_values(by="Season", ascending=True)
+            unique_seasons = df["Season"].drop_duplicates().tail(n_seasons)
+
+            for season in unique_seasons:
+                season_str = str(season)
+                formatted_season = season_str.replace("/", "_")
+                file_path = league_dir / f"{formatted_season}.csv"
+                
+                if file_path.exists():
+                    logger.info(f"⏭️ File già presente: {file_path}")
+                else:
+                    df[df["Season"] == season].to_csv(file_path, index=False)
+                    logger.info(f"💾 Salvato: {file_path}")
+
+                if populate_db:
+                    service.process_csv_to_database(str(file_path), league_code, formatted_season)
+
+                total_processed += 1
+                results["other"].append({
+                    "league": league_name,
+                    "season": formatted_season,
+                    "file": str(file_path),
+                    "cached": file_path.exists(),
+                    "success": True
+                })
+
+                await asyncio.sleep(0.2)
+
+        except Exception as e:
+            total_errors += 1
+            logger.error(f"❌ Errore su {league_code}: {str(e)}")
+            results["other"].append({
+                "league": league_name,
+                "success": False,
+                "error": str(e)
+            })
+
+    # === SUMMARY ===
     end_time = datetime.now()
-    duration = (end_time - start_time).total_seconds()
-    overall_success_rate = round(overall_successful / total_downloads * 100, 1) if total_downloads > 0 else 0
-    
-    # Final summary logs
-    logger.info(f"🏁 Bulk download completed!")
-    logger.info(f"⏱️  Duration: {duration:.1f} seconds")
-    logger.info(f"📊 Results: {overall_successful}/{total_downloads} successes ({overall_success_rate}%)")
-    logger.info(f"📈 Success rate by league:")
-    
-    for result in sorted(league_results, key=lambda x: x["success_rate"], reverse=True):
-        status_emoji = "✅" if result["success_rate"] == 100.0 else "⚠️" if result["success_rate"] >= 50.0 else "❌"
-        logger.info(f"   {status_emoji} {result['league_code']}: {result['success_rate']}% ({result['successful']}/{result['successful']+result['failed']})")
-    
-    if overall_failed > 0:
-        logger.warning(f"⚠️  {overall_failed} downloads failed - check individual league results for details")
-    
-    # Calculate statistics
-    most_successful = sorted(league_results, key=lambda x: x["success_rate"], reverse=True)[:5]
-    leagues_with_failures = [r for r in league_results if r["failed"] > 0]
-    
-    logger.info(f"💾 Files saved to: ./leagues/ directory structure")
-    
-    return {
+    duration = round((end_time - start_time).total_seconds(), 1)
+
+    summary = {
         "success": True,
-        "execution_time_seconds": round(duration, 1),
-        "summary": {
-            "leagues_processed": len(leagues_to_process),
-            "seasons_per_league": len(seasons_list),
-            "total_downloads_attempted": total_downloads,
-            "overall_successful": overall_successful,
-            "overall_failed": overall_failed,
-            "overall_success_rate": overall_success_rate,
-            "seasons_requested": seasons_list,
-            "started_at": start_time.isoformat(),
-            "completed_at": end_time.isoformat()
-        },
-        "league_results": league_results,
-        "statistics": {
-            "most_successful_leagues": [
-                {"league": r["league_code"], "success_rate": r["success_rate"]} 
-                for r in most_successful
-            ],
-            "leagues_with_failures": [
-                {"league": r["league_code"], "failed_count": r["failed"]} 
-                for r in leagues_with_failures
-            ]
-        }
+        "processed_seasons": total_processed,
+        "errors": total_errors,
+        "duration_seconds": duration,
+        "results": results
     }
-    """
-    Get comprehensive help and examples for all CSV download endpoints.
-    """
-    return {
-        "csv_download_api": {
-            "description": "API for downloading football CSV data from football-data.co.uk",
-            "base_url": "/csv",
-            "endpoints": {
-                "GET /leagues": {
-                    "description": "List all supported league codes and names",
-                    "example": "curl http://localhost:8000/csv/leagues"
-                },
-                "GET /download-csv": {
-                    "description": "Download a single CSV file for specific league and season",
-                    "parameters": {
-                        "league": "League code (e.g., 'I1' for Serie A)",
-                        "season": "Season in format YYZZ (e.g., '2324' for 2023/2024)"
-                    },
-                    "example": "curl 'http://localhost:8000/csv/download-csv?league=I1&season=2324'"
-                },
-                "POST /download-multiple-seasons": {
-                    "description": "Download multiple seasons for a specific league",
-                    "parameters": {
-                        "league": "League code (required)",
-                        "seasons": "Number of recent seasons (default: 6)",
-                        "custom_seasons": "Comma-separated specific seasons (optional)"
-                    },
-                    "examples": [
-                        "curl -X POST 'http://localhost:8000/csv/download-multiple-seasons?league=I1&seasons=3'",
-                        "curl -X POST 'http://localhost:8000/csv/download-multiple-seasons?league=E0&custom_seasons=2324,2223,2122'"
-                    ]
-                },
-                "POST /download-all-recent": {
-                    "description": "Download recent seasons for multiple leagues",
-                    "parameters": {
-                        "seasons": "Number of recent seasons per league (default: 6)",
-                        "league_filter": "Comma-separated league codes to include (optional)"
-                    },
-                    "examples": [
-                        "curl -X POST 'http://localhost:8000/csv/download-all-recent?seasons=6'",
-                        "curl -X POST 'http://localhost:8000/csv/download-all-recent?seasons=3&league_filter=I1,E0,D1'"
-                    ]
-                },
-                "GET /leagues/{league_code}/files": {
-                    "description": "List downloaded files for a specific league",
-                    "example": "curl http://localhost:8000/csv/leagues/I1/files"
-                }
-            },
-            "common_use_cases": {
-                "download_all_recent": {
-                    "description": "Download last 6 seasons for all leagues",
-                    "command": "curl -X POST 'http://localhost:8000/csv/download-all-recent'"
-                },
-                "download_top_5_leagues": {
-                    "description": "Download recent seasons for top 5 European leagues",
-                    "command": "curl -X POST 'http://localhost:8000/csv/download-all-recent?league_filter=E0,D1,I1,SP1,F1'"
-                },
-                "download_serie_a_history": {
-                    "description": "Download last 10 Serie A seasons",
-                    "command": "curl -X POST 'http://localhost:8000/csv/download-multiple-seasons?league=I1&seasons=10'"
-                },
-                "download_specific_seasons": {
-                    "description": "Download specific seasons for Premier League",
-                    "command": "curl -X POST 'http://localhost:8000/csv/download-multiple-seasons?league=E0&custom_seasons=2324,2223,2122,2021'"
-                }
-            },
-            "file_organization": {
-                "structure": "leagues/{league_code}/{YYYY_YYYY}.csv",
-                "examples": [
-                    "leagues/I1/2023_2024.csv",
-                    "leagues/E0/2022_2023.csv",
-                    "leagues/D1/2024_2025.csv"
-                ]
-            },
-            "supported_leagues": {
-                "total": len(LEAGUES),
-                "top_tier": ["E0", "D1", "I1", "SP1", "F1", "N1", "P1"],
-                "all_codes": sorted(LEAGUES.keys())
-            }
-        }
-    }
+
+    logger.info(f"🏁 Download centralizzato completato in {duration}s "
+                f"({total_processed} stagioni processate, {total_errors} errori)")
+
+    return JSONResponse(content=summary)
+ 

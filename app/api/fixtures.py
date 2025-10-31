@@ -2,7 +2,7 @@
 API semplice per scaricare il palinsesto e salvarlo nel database
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import delete
 import pandas as pd
@@ -132,9 +132,8 @@ def get_country_from_league_code(league_code: str) -> str:
         
         # Turchia
         'T1': 'Turkey',
-        
-        # Grecia
-        'G1': 'Greece'
+        # Cina
+        'CHN': 'China',
     }
     
     return league_country_mapping.get(league_code, 'Unknown')
@@ -777,3 +776,51 @@ async def create_fixtures_tables():
     except Exception as e:
         logger.error(f"Errore nella creazione tabelle: {e}")
         raise HTTPException(status_code=500, detail=f"Errore: {str(e)}")
+
+@router.delete("/delete-data-by-country", tags=["Data Management"])
+async def delete_data_by_country(
+    country_id: str = Query(..., description="ID of the country to delete data for"),
+    db: Session = Depends(get_football_db),
+):
+    """
+    Delete all data related to a specific country by its unique ID.
+
+    Args:
+        country_id: The unique ID of the country whose data should be deleted.
+
+    Returns:
+        A message indicating the success or failure of the operation.
+    """
+    try:
+        # Delete related data from the database
+        from app.db.models_football import League, Season, Match
+
+        # Find leagues associated with the country
+        leagues = db.query(League).filter(League.country_uuid == country_id).all()
+
+        if not leagues:
+            return {
+                "success": False,
+                "message": f"No leagues found for country ID {country_id}.",
+            }
+
+        # Delete matches, seasons, and leagues
+        for league in leagues:
+            db.query(Match).filter(Match.league_id == league.id).delete()
+            db.query(Season).filter(Season.league_id == league.id).delete()
+            db.delete(league)
+
+        db.commit()
+
+        return {
+            "success": True,
+            "message": f"All data for country ID {country_id} has been deleted.",
+        }
+
+    except Exception as e:
+        db.rollback()
+        logger.error(f"❌ Failed to delete data for country ID {country_id}: {str(e)}")
+        return {
+            "success": False,
+            "message": f"Failed to delete data for country ID {country_id}: {str(e)}",
+        }
