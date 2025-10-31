@@ -1,11 +1,11 @@
 {
   "success": true,
   "fixtures_count": 42,
-  "generated_at": "2025-10-30T21:49:25.005298",
+  "generated_at": "2025-10-31T07:44:48.176893",
   "model": "OverModelV1_patch7",
   "fixtures": [
     {
-      "fixture_id": "79fc8b12-4b32-4697-9dbd-1a85a3339f97",
+      "fixture_id": "39d305f1-2d15-43c6-a27e-87209907b9b3",
       "match_date": "2025-10-29",
       "home_team": "Le Havre",
       "away_team": "Brest",
@@ -19,23 +19,23 @@
         "p_over_0_5_raw": 0.9276100714373234,
         "p_over_1_5_raw": 0.7375366976301804,
         "p_over_2_5_raw": 0.488,
-        "p_over_0_5": 0.9433249370277078,
-        "p_over_1_5": 0.7617328519855595,
-        "p_over_2_5": 0.4865384615384615,
-        "ev_over_2_5": -0.065846153846154,
+        "p_over_0_5": 0.943609022556391,
+        "p_over_1_5": 0.7589928057553957,
+        "p_over_2_5": 0.48560460652591164,
+        "ev_over_2_5": -0.06763915547024968,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9433249370277078,
+          "confidence": 0.943609022556391,
           "threshold": 0.9
         }
       ]
     },
     {
-      "fixture_id": "9ba20f96-043c-4255-83fe-a5fab639613c",
+      "fixture_id": "cda4c5db-dfa9-4be9-adb5-ade4beb46557",
       "match_date": "2025-10-29",
       "home_team": "Lorient",
       "away_team": "Paris SG",
@@ -49,35 +49,28 @@
         "p_over_0_5_raw": 0.9675892254539767,
         "p_over_1_5_raw": 0.8564441113018015,
         "p_over_2_5_raw": 0.6658711217183771,
-        "p_over_0_5": 0.9866666666666667,
-        "p_over_1_5": 0.8689655172413793,
-        "p_over_2_5": 0.6842105263157895,
-        "ev_over_2_5": -0.04210526315789476,
+        "p_over_0_5": 0.9868421052631579,
+        "p_over_1_5": 0.8698630136986302,
+        "p_over_2_5": 0.6776859504132231,
+        "ev_over_2_5": -0.05123966942148772,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9866666666666667,
+          "confidence": 0.9868421052631579,
           "threshold": 0.9
         },
         {
           "market": "Over 1.5",
-          "confidence": 0.8689655172413793,
+          "confidence": 0.8698630136986302,
           "threshold": 0.8
-        },
-        {
-          "market": "Over 2.5",
-          "confidence": 0.6842105263157895,
-          "threshold": 0.68,
-          "ev": -0.04210526315789476,
-          "ev_flag": false
         }
       ]
     },
     {
-      "fixture_id": "73a8ebe9-b1ef-4bd0-87ec-888c3e4d82f7",
+      "fixture_id": "c8625a8a-044c-4f33-a93e-5f01a7487f24",
       "match_date": "2025-10-29",
       "home_team": "Metz",
       "away_team": "Lens",
@@ -91,28 +84,28 @@
         "p_over_0_5_raw": 0.948243614748127,
         "p_over_1_5_raw": 0.7949822202267773,
         "p_over_2_5_raw": 0.5680628272251308,
-        "p_over_0_5": 0.9461538461538461,
-        "p_over_1_5": 0.8020833333333334,
-        "p_over_2_5": 0.5927152317880795,
-        "ev_over_2_5": -0.022019867549668892,
+        "p_over_0_5": 0.9473684210526315,
+        "p_over_1_5": 0.803834808259587,
+        "p_over_2_5": 0.5936507936507937,
+        "ev_over_2_5": -0.020476190476190537,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9461538461538461,
+          "confidence": 0.9473684210526315,
           "threshold": 0.9
         },
         {
           "market": "Over 1.5",
-          "confidence": 0.8020833333333334,
+          "confidence": 0.803834808259587,
           "threshold": 0.8
         }
       ]
     },
     {
-      "fixture_id": "98dd53b3-9f80-4546-8e30-bc769b9c130a",
+      "fixture_id": "45d324aa-3040-458d-95a5-d3e0541b3b0d",
       "match_date": "2025-10-29",
       "home_team": "Nice",
       "away_team": "Lille",
@@ -126,28 +119,28 @@
         "p_over_0_5_raw": 0.9424966063705028,
         "p_over_1_5_raw": 0.7782720139522016,
         "p_over_2_5_raw": 0.5437665782493367,
-        "p_over_0_5": 0.9433249370277078,
-        "p_over_1_5": 0.8020833333333334,
-        "p_over_2_5": 0.5757575757575758,
-        "ev_over_2_5": -0.009696969696969648,
+        "p_over_0_5": 0.943609022556391,
+        "p_over_1_5": 0.803834808259587,
+        "p_over_2_5": 0.5705521472392638,
+        "ev_over_2_5": -0.01865030674846624,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9433249370277078,
+          "confidence": 0.943609022556391,
           "threshold": 0.9
         },
         {
           "market": "Over 1.5",
-          "confidence": 0.8020833333333334,
+          "confidence": 0.803834808259587,
           "threshold": 0.8
         }
       ]
     },
     {
-      "fixture_id": "7972abc4-d318-405d-9219-22fc1abb65c5",
+      "fixture_id": "a91186ea-ed49-45a8-a2e8-33c44583cb0b",
       "match_date": "2025-10-29",
       "home_team": "Marseille",
       "away_team": "Angers",
@@ -161,28 +154,28 @@
         "p_over_0_5_raw": 0.952676485879894,
         "p_over_1_5_raw": 0.8083043707839674,
         "p_over_2_5_raw": 0.588082901554404,
-        "p_over_0_5": 0.9541984732824428,
-        "p_over_1_5": 0.8020833333333334,
-        "p_over_2_5": 0.5927152317880795,
-        "ev_over_2_5": -0.0575827814569535,
+        "p_over_0_5": 0.9543726235741445,
+        "p_over_1_5": 0.803834808259587,
+        "p_over_2_5": 0.5936507936507937,
+        "ev_over_2_5": -0.05609523809523809,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9541984732824428,
+          "confidence": 0.9543726235741445,
           "threshold": 0.9
         },
         {
           "market": "Over 1.5",
-          "confidence": 0.8020833333333334,
+          "confidence": 0.803834808259587,
           "threshold": 0.8
         }
       ]
     },
     {
-      "fixture_id": "658b92ea-3681-4b98-a73a-146c42b004fc",
+      "fixture_id": "533a8faa-5fc8-4a56-9672-e7c4c345ca3e",
       "match_date": "2025-10-29",
       "home_team": "Nantes",
       "away_team": "Monaco",
@@ -196,28 +189,28 @@
         "p_over_0_5_raw": 0.948582927718332,
         "p_over_1_5_raw": 0.795988111028481,
         "p_over_2_5_raw": 0.5695538057742783,
-        "p_over_0_5": 0.9461538461538461,
-        "p_over_1_5": 0.8020833333333334,
-        "p_over_2_5": 0.5927152317880795,
-        "ev_over_2_5": -0.02794701986754966,
+        "p_over_0_5": 0.9473684210526315,
+        "p_over_1_5": 0.803834808259587,
+        "p_over_2_5": 0.5936507936507937,
+        "ev_over_2_5": -0.026412698412698443,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9461538461538461,
+          "confidence": 0.9473684210526315,
           "threshold": 0.9
         },
         {
           "market": "Over 1.5",
-          "confidence": 0.8020833333333334,
+          "confidence": 0.803834808259587,
           "threshold": 0.8
         }
       ]
     },
     {
-      "fixture_id": "94384abb-1804-4b77-9b1f-272e61382179",
+      "fixture_id": "7ddbac3c-4bde-4fd8-a840-7156c7da743a",
       "match_date": "2025-10-29",
       "home_team": "Paris FC",
       "away_team": "Lyon",
@@ -231,28 +224,28 @@
         "p_over_0_5_raw": 0.9471166776251033,
         "p_over_1_5_raw": 0.791657306406697,
         "p_over_2_5_raw": 0.5631578947368423,
-        "p_over_0_5": 0.9461538461538461,
-        "p_over_1_5": 0.8020833333333334,
-        "p_over_2_5": 0.5818181818181818,
-        "ev_over_2_5": -0.03418181818181831,
+        "p_over_0_5": 0.9473684210526315,
+        "p_over_1_5": 0.803834808259587,
+        "p_over_2_5": 0.5936507936507937,
+        "ev_over_2_5": -0.01453968253968263,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9461538461538461,
+          "confidence": 0.9473684210526315,
           "threshold": 0.9
         },
         {
           "market": "Over 1.5",
-          "confidence": 0.8020833333333334,
+          "confidence": 0.803834808259587,
           "threshold": 0.8
         }
       ]
     },
     {
-      "fixture_id": "688f5be6-6ac4-46c7-ab6b-6cadd6fa3a2e",
+      "fixture_id": "42b4d2ae-1360-4688-9749-be760e750647",
       "match_date": "2025-10-29",
       "home_team": "Strasbourg",
       "away_team": "Auxerre",
@@ -266,28 +259,28 @@
         "p_over_0_5_raw": 0.9392206334042528,
         "p_over_1_5_raw": 0.7690077186554469,
         "p_over_2_5_raw": 0.5306666666666666,
-        "p_over_0_5": 0.9433249370277078,
-        "p_over_1_5": 0.8020833333333334,
-        "p_over_2_5": 0.5549132947976878,
-        "ev_over_2_5": -0.023352601156069408,
+        "p_over_0_5": 0.943609022556391,
+        "p_over_1_5": 0.803834808259587,
+        "p_over_2_5": 0.5574712643678161,
+        "ev_over_2_5": -0.01885057471264362,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9433249370277078,
+          "confidence": 0.943609022556391,
           "threshold": 0.9
         },
         {
           "market": "Over 1.5",
-          "confidence": 0.8020833333333334,
+          "confidence": 0.803834808259587,
           "threshold": 0.8
         }
       ]
     },
     {
-      "fixture_id": "0e90da11-12fb-4ca0-bfe2-43cde63c4af5",
+      "fixture_id": "f99de916-67c9-469c-a262-51876fa195d2",
       "match_date": "2025-10-29",
       "home_team": "Toulouse",
       "away_team": "Rennes",
@@ -301,23 +294,23 @@
         "p_over_0_5_raw": 0.9321404229456087,
         "p_over_1_5_raw": 0.7495768017136684,
         "p_over_2_5_raw": 0.5039999999999999,
-        "p_over_0_5": 0.9433249370277078,
-        "p_over_1_5": 0.7824267782426778,
-        "p_over_2_5": 0.5303030303030303,
-        "ev_over_2_5": -0.013636363636363669,
+        "p_over_0_5": 0.943609022556391,
+        "p_over_1_5": 0.7833333333333333,
+        "p_over_2_5": 0.5373134328358209,
+        "ev_over_2_5": -0.0005970149253731183,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9433249370277078,
+          "confidence": 0.943609022556391,
           "threshold": 0.9
         }
       ]
     },
     {
-      "fixture_id": "0f031c46-ed77-4e74-b926-fc4e9d3d0ce7",
+      "fixture_id": "43069c80-48d5-4994-b73e-3a57db6ed728",
       "match_date": "2025-10-28",
       "home_team": "Boulogne",
       "away_team": "Reims",
@@ -331,23 +324,23 @@
         "p_over_0_5_raw": 0.9152613928731647,
         "p_over_1_5_raw": 0.7061109210429382,
         "p_over_2_5_raw": 0.44800000000000006,
-        "p_over_0_5": 0.9136807817589576,
-        "p_over_1_5": 0.6772908366533864,
-        "p_over_2_5": 0.4607645875251509,
-        "ev_over_2_5": -0.04621730382293765,
+        "p_over_0_5": 0.9142394822006472,
+        "p_over_1_5": 0.6781002638522428,
+        "p_over_2_5": 0.4624277456647399,
+        "ev_over_2_5": -0.042774566473988584,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9136807817589576,
+          "confidence": 0.9142394822006472,
           "threshold": 0.9
         }
       ]
     },
     {
-      "fixture_id": "b1e5b364-6836-4e6c-8dde-1fb5cc08521a",
+      "fixture_id": "c0bf9c31-bd23-423e-906b-07f4211e4ceb",
       "match_date": "2025-10-28",
       "home_team": "Clermont",
       "away_team": "Montpellier",
@@ -361,23 +354,23 @@
         "p_over_0_5_raw": 0.9135971766468598,
         "p_over_1_5_raw": 0.7020195653963559,
         "p_over_2_5_raw": 0.44297082228116713,
-        "p_over_0_5": 0.9136807817589576,
-        "p_over_1_5": 0.6772908366533864,
-        "p_over_2_5": 0.43859649122807015,
-        "ev_over_2_5": -0.07894736842105265,
+        "p_over_0_5": 0.9142394822006472,
+        "p_over_1_5": 0.6781002638522428,
+        "p_over_2_5": 0.43617021276595747,
+        "ev_over_2_5": -0.08404255319148923,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9136807817589576,
+          "confidence": 0.9142394822006472,
           "threshold": 0.9
         }
       ]
     },
     {
-      "fixture_id": "4540a7c4-5372-412e-ae35-5a9ac577b153",
+      "fixture_id": "8e16c43a-b8c4-4b06-a092-71d16201afe2",
       "match_date": "2025-10-28",
       "home_team": "Dunkerque",
       "away_team": "Red Star",
@@ -391,23 +384,23 @@
         "p_over_0_5_raw": 0.9207717754569503,
         "p_over_1_5_raw": 0.7198947385967988,
         "p_over_2_5_raw": 0.46524064171123003,
-        "p_over_0_5": 0.9136807817589576,
-        "p_over_1_5": 0.6772908366533864,
-        "p_over_2_5": 0.4607645875251509,
-        "ev_over_2_5": -0.07847082494969815,
+        "p_over_0_5": 0.9142394822006472,
+        "p_over_1_5": 0.6781002638522428,
+        "p_over_2_5": 0.4624277456647399,
+        "ev_over_2_5": -0.07514450867052025,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9136807817589576,
+          "confidence": 0.9142394822006472,
           "threshold": 0.9
         }
       ]
     },
     {
-      "fixture_id": "ff5394f2-ddd7-40ea-8c57-0a86261bdead",
+      "fixture_id": "420d60db-e5d3-482c-bac2-a2846abcc759",
       "match_date": "2025-10-28",
       "home_team": "Grenoble",
       "away_team": "Guingamp",
@@ -421,23 +414,23 @@
         "p_over_0_5_raw": 0.926404663808373,
         "p_over_1_5_raw": 0.7343816538990124,
         "p_over_2_5_raw": 0.4838709677419355,
-        "p_over_0_5": 0.9366197183098591,
-        "p_over_1_5": 0.6772908366533864,
-        "p_over_2_5": 0.4607645875251509,
-        "ev_over_2_5": -0.11533199195171029,
+        "p_over_0_5": 0.9333333333333333,
+        "p_over_1_5": 0.6781002638522428,
+        "p_over_2_5": 0.4624277456647399,
+        "ev_over_2_5": -0.11213872832369942,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9366197183098591,
+          "confidence": 0.9333333333333333,
           "threshold": 0.9
         }
       ]
     },
     {
-      "fixture_id": "46914f55-276b-4dc9-8ade-e75d1725cec5",
+      "fixture_id": "be78f6b3-995a-4adf-9036-a7bdfb1927d3",
       "match_date": "2025-10-28",
       "home_team": "Laval",
       "away_team": "Le Mans",
@@ -451,17 +444,17 @@
         "p_over_0_5_raw": 0.8887731214651053,
         "p_over_1_5_raw": 0.6444985180001271,
         "p_over_2_5_raw": 0.3762626262626261,
-        "p_over_0_5": 0.8722222222222222,
-        "p_over_1_5": 0.640661938534279,
-        "p_over_2_5": 0.3619047619047619,
-        "ev_over_2_5": -0.10609523809523802,
+        "p_over_0_5": 0.8725761772853186,
+        "p_over_1_5": 0.6414893617021277,
+        "p_over_2_5": 0.35962145110410093,
+        "ev_over_2_5": -0.1117350157728706,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": []
     },
     {
-      "fixture_id": "007e08dc-fa78-4b03-a468-bb5da65d59c3",
+      "fixture_id": "23c51bd1-9360-43c5-bf01-19c1911b4369",
       "match_date": "2025-10-28",
       "home_team": "Nancy",
       "away_team": "Bastia",
@@ -475,17 +468,17 @@
         "p_over_0_5_raw": 0.8932174498850439,
         "p_over_1_5_raw": 0.6543490760399939,
         "p_over_2_5_raw": 0.38717948717948714,
-        "p_over_0_5": 0.8763197586726998,
-        "p_over_1_5": 0.640661938534279,
-        "p_over_2_5": 0.3619047619047619,
-        "ev_over_2_5": -0.13504761904761897,
+        "p_over_0_5": 0.8765060240963856,
+        "p_over_1_5": 0.6414893617021277,
+        "p_over_2_5": 0.35962145110410093,
+        "ev_over_2_5": -0.14050473186119872,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": []
     },
     {
-      "fixture_id": "ce2b62f3-d8a4-4ad2-b168-2bbd3aab7081",
+      "fixture_id": "083778a7-e7d0-43c7-ac48-036b4b893166",
       "match_date": "2025-10-28",
       "home_team": "Rodez",
       "away_team": "Annecy",
@@ -499,23 +492,23 @@
         "p_over_0_5_raw": 0.914869490507838,
         "p_over_1_5_raw": 0.7051445387553688,
         "p_over_2_5_raw": 0.44680851063829774,
-        "p_over_0_5": 0.9136807817589576,
-        "p_over_1_5": 0.6772908366533864,
-        "p_over_2_5": 0.4444444444444444,
-        "ev_over_2_5": -0.0755555555555556,
+        "p_over_0_5": 0.9142394822006472,
+        "p_over_1_5": 0.6781002638522428,
+        "p_over_2_5": 0.4624277456647399,
+        "ev_over_2_5": -0.03815028901734108,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9136807817589576,
+          "confidence": 0.9142394822006472,
           "threshold": 0.9
         }
       ]
     },
     {
-      "fixture_id": "c4ca3bbc-18d0-4f9a-9651-f6c6ca3e3f49",
+      "fixture_id": "d952e0a7-233c-46eb-aef2-70e14b0a628c",
       "match_date": "2025-10-28",
       "home_team": "St Etienne",
       "away_team": "Pau FC",
@@ -529,28 +522,28 @@
         "p_over_0_5_raw": 0.9517436296989281,
         "p_over_1_5_raw": 0.8054675962278839,
         "p_over_2_5_raw": 0.5837696335078534,
-        "p_over_0_5": 0.9662921348314607,
-        "p_over_1_5": 0.8088235294117647,
-        "p_over_2_5": 0.6129032258064516,
-        "ev_over_2_5": -0.02548387096774185,
+        "p_over_0_5": 0.967032967032967,
+        "p_over_1_5": 0.8115942028985508,
+        "p_over_2_5": 0.6190476190476191,
+        "ev_over_2_5": -0.01571428571428568,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9662921348314607,
+          "confidence": 0.967032967032967,
           "threshold": 0.9
         },
         {
           "market": "Over 1.5",
-          "confidence": 0.8088235294117647,
+          "confidence": 0.8115942028985508,
           "threshold": 0.8
         }
       ]
     },
     {
-      "fixture_id": "37ff1481-13bc-4b40-90c0-f31f4aab4820",
+      "fixture_id": "8fba9cfb-e5f9-4bb8-ab2b-a8eb89dd02c2",
       "match_date": "2025-10-28",
       "home_team": "Troyes",
       "away_team": "Amiens",
@@ -564,23 +557,23 @@
         "p_over_0_5_raw": 0.9395816978899743,
         "p_over_1_5_raw": 0.7700199561171951,
         "p_over_2_5_raw": 0.5320855614973261,
-        "p_over_0_5": 0.9662921348314607,
-        "p_over_1_5": 0.7365269461077845,
-        "p_over_2_5": 0.5681818181818182,
-        "ev_over_2_5": -0.005681818181818121,
+        "p_over_0_5": 0.967032967032967,
+        "p_over_1_5": 0.7380952380952381,
+        "p_over_2_5": 0.5789473684210527,
+        "ev_over_2_5": 0.013157894736842035,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9662921348314607,
+          "confidence": 0.967032967032967,
           "threshold": 0.9
         }
       ]
     },
     {
-      "fixture_id": "dde28fd6-0c66-4740-a9c1-95bd89a2cd41",
+      "fixture_id": "63e67c60-2627-47b1-861c-6c7ae3d6079e",
       "match_date": "2025-10-28",
       "home_team": "Lecce",
       "away_team": "Napoli",
@@ -594,23 +587,17 @@
         "p_over_0_5_raw": 0.910363145412729,
         "p_over_1_5_raw": 0.6941600632472066,
         "p_over_2_5_raw": 0.4334203655352479,
-        "p_over_0_5": 0.9021739130434783,
-        "p_over_1_5": 0.6704805491990846,
-        "p_over_2_5": 0.3813084112149533,
-        "ev_over_2_5": -0.17256074766355134,
+        "p_over_0_5": 0.8972602739726028,
+        "p_over_1_5": 0.667420814479638,
+        "p_over_2_5": 0.3815028901734104,
+        "ev_over_2_5": -0.17213872832369947,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
-      "recommendations": [
-        {
-          "market": "Over 0.5",
-          "confidence": 0.9021739130434783,
-          "threshold": 0.9
-        }
-      ]
+      "recommendations": []
     },
     {
-      "fixture_id": "3cf3e281-c19d-423e-8e05-efc591aa62c5",
+      "fixture_id": "9fd35bbf-eaf2-4b87-a3e3-42655cb17c7e",
       "match_date": "2025-10-28",
       "home_team": "Atalanta",
       "away_team": "Milan",
@@ -624,23 +611,23 @@
         "p_over_0_5_raw": 0.928769507907899,
         "p_over_1_5_raw": 0.7405903512258617,
         "p_over_2_5_raw": 0.4920212765957448,
-        "p_over_0_5": 0.936830835117773,
-        "p_over_1_5": 0.7552521987760851,
-        "p_over_2_5": 0.47418738049713194,
-        "ev_over_2_5": -0.09430210325047805,
+        "p_over_0_5": 0.936965811965812,
+        "p_over_1_5": 0.7595628415300546,
+        "p_over_2_5": 0.4742857142857143,
+        "ev_over_2_5": -0.0941142857142857,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.936830835117773,
+          "confidence": 0.936965811965812,
           "threshold": 0.9
         }
       ]
     },
     {
-      "fixture_id": "175c74cc-9b87-4fe3-99f0-df2fe0b2441e",
+      "fixture_id": "b15b2d05-cfe3-4b7d-934d-c2c53af57a64",
       "match_date": "2025-10-29",
       "home_team": "Como",
       "away_team": "Verona",
@@ -654,23 +641,23 @@
         "p_over_0_5_raw": 0.9152340307050866,
         "p_over_1_5_raw": 0.706043390595436,
         "p_over_2_5_raw": 0.4479166666666665,
-        "p_over_0_5": 0.9166666666666666,
-        "p_over_1_5": 0.7073170731707317,
-        "p_over_2_5": 0.3813084112149533,
-        "ev_over_2_5": -0.191626168224299,
+        "p_over_0_5": 0.9175824175824175,
+        "p_over_1_5": 0.712,
+        "p_over_2_5": 0.3815028901734104,
+        "ev_over_2_5": -0.1912138728323699,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9166666666666666,
+          "confidence": 0.9175824175824175,
           "threshold": 0.9
         }
       ]
     },
     {
-      "fixture_id": "e94d66e4-ad6a-4c6a-99d7-9c7a82240b53",
+      "fixture_id": "3390ad24-cd62-4a6e-b810-452d2d542edf",
       "match_date": "2025-10-29",
       "home_team": "Juventus",
       "away_team": "Udinese",
@@ -684,23 +671,23 @@
         "p_over_0_5_raw": 0.9291548375542816,
         "p_over_1_5_raw": 0.7416093724268871,
         "p_over_2_5_raw": 0.49336870026525204,
-        "p_over_0_5": 0.936830835117773,
-        "p_over_1_5": 0.7569060773480663,
-        "p_over_2_5": 0.47418738049713194,
-        "ev_over_2_5": -0.09430210325047805,
+        "p_over_0_5": 0.936965811965812,
+        "p_over_1_5": 0.7595628415300546,
+        "p_over_2_5": 0.4742857142857143,
+        "ev_over_2_5": -0.0941142857142857,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.936830835117773,
+          "confidence": 0.936965811965812,
           "threshold": 0.9
         }
       ]
     },
     {
-      "fixture_id": "98459465-9f0d-4599-80b4-9b53a4687eb8",
+      "fixture_id": "1dbf2863-8fa0-4e14-bfc4-1cd0b606223f",
       "match_date": "2025-10-29",
       "home_team": "Roma",
       "away_team": "Parma",
@@ -714,23 +701,23 @@
         "p_over_0_5_raw": 0.9179298923383452,
         "p_over_1_5_raw": 0.7127397335727236,
         "p_over_2_5_raw": 0.45623342175066317,
-        "p_over_0_5": 0.9166666666666666,
-        "p_over_1_5": 0.7073170731707317,
-        "p_over_2_5": 0.3813084112149533,
-        "ev_over_2_5": -0.21831775700934586,
+        "p_over_0_5": 0.9175824175824175,
+        "p_over_1_5": 0.712,
+        "p_over_2_5": 0.391304347826087,
+        "ev_over_2_5": -0.19782608695652182,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9166666666666666,
+          "confidence": 0.9175824175824175,
           "threshold": 0.9
         }
       ]
     },
     {
-      "fixture_id": "80dc6c0c-4881-4594-ad5d-c5de1d0c2358",
+      "fixture_id": "a2a38072-5cf9-49af-a576-69f2652cfdb8",
       "match_date": "2025-10-29",
       "home_team": "Bologna",
       "away_team": "Torino",
@@ -744,23 +731,17 @@
         "p_over_0_5_raw": 0.9063200501834544,
         "p_over_1_5_raw": 0.6844980047959278,
         "p_over_2_5_raw": 0.421875,
-        "p_over_0_5": 0.9021739130434783,
-        "p_over_1_5": 0.6704805491990846,
-        "p_over_2_5": 0.3813084112149533,
-        "ev_over_2_5": -0.15349532710280367,
+        "p_over_0_5": 0.875,
+        "p_over_1_5": 0.667420814479638,
+        "p_over_2_5": 0.3815028901734104,
+        "ev_over_2_5": -0.15306358381502883,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
-      "recommendations": [
-        {
-          "market": "Over 0.5",
-          "confidence": 0.9021739130434783,
-          "threshold": 0.9
-        }
-      ]
+      "recommendations": []
     },
     {
-      "fixture_id": "f59744e0-52a9-451f-a7c7-785a1623c90f",
+      "fixture_id": "fb6a3718-c6ab-46fa-a482-d0c226ad517f",
       "match_date": "2025-10-29",
       "home_team": "Genoa",
       "away_team": "Cremonese",
@@ -774,17 +755,17 @@
         "p_over_0_5_raw": 0.8918745711104139,
         "p_over_1_5_raw": 0.6513535176529188,
         "p_over_2_5_raw": 0.38383838383838387,
-        "p_over_0_5": 0.8682926829268293,
-        "p_over_1_5": 0.6704805491990846,
-        "p_over_2_5": 0.3813084112149533,
-        "ev_over_2_5": -0.06960747663551403,
+        "p_over_0_5": 0.8689320388349514,
+        "p_over_1_5": 0.667420814479638,
+        "p_over_2_5": 0.3815028901734104,
+        "ev_over_2_5": -0.06913294797687874,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": []
     },
     {
-      "fixture_id": "096ef8b1-dd56-44f0-9266-f4f5e63a3b31",
+      "fixture_id": "db868e07-f2ca-4231-98c7-18e77214e59f",
       "match_date": "2025-10-29",
       "home_team": "Inter",
       "away_team": "Fiorentina",
@@ -798,28 +779,28 @@
         "p_over_0_5_raw": 0.944989361191632,
         "p_over_1_5_raw": 0.785445928837808,
         "p_over_2_5_raw": 0.554089709762533,
-        "p_over_0_5": 0.9452247191011236,
-        "p_over_1_5": 0.8194444444444444,
-        "p_over_2_5": 0.6035131744040151,
-        "ev_over_2_5": 0.019937264742785565,
-        "suggest_over_2_5": false,
+        "p_over_0_5": 0.9453015427769986,
+        "p_over_1_5": 0.8213256484149856,
+        "p_over_2_5": 0.6040100250626567,
+        "ev_over_2_5": 0.02077694235588967,
+        "suggest_over_2_5": true,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9452247191011236,
+          "confidence": 0.9453015427769986,
           "threshold": 0.9
         },
         {
           "market": "Over 1.5",
-          "confidence": 0.8194444444444444,
+          "confidence": 0.8213256484149856,
           "threshold": 0.8
         }
       ]
     },
     {
-      "fixture_id": "29f87c69-b724-4e0e-a3c6-0c36e6420a67",
+      "fixture_id": "d52e2640-9419-4cf7-af02-841e82a3a5a6",
       "match_date": "2025-10-30",
       "home_team": "Cagliari",
       "away_team": "Sassuolo",
@@ -833,23 +814,17 @@
         "p_over_0_5_raw": 0.9107524974018383,
         "p_over_1_5_raw": 0.6951000226863401,
         "p_over_2_5_raw": 0.4345549738219895,
-        "p_over_0_5": 0.9021739130434783,
-        "p_over_1_5": 0.6704805491990846,
-        "p_over_2_5": 0.3813084112149533,
-        "ev_over_2_5": -0.17637383177570087,
+        "p_over_0_5": 0.8972602739726028,
+        "p_over_1_5": 0.667420814479638,
+        "p_over_2_5": 0.3815028901734104,
+        "ev_over_2_5": -0.1759537572254335,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
-      "recommendations": [
-        {
-          "market": "Over 0.5",
-          "confidence": 0.9021739130434783,
-          "threshold": 0.9
-        }
-      ]
+      "recommendations": []
     },
     {
-      "fixture_id": "1e209cad-3829-423d-94ad-27136e815bfd",
+      "fixture_id": "9e968128-0916-44f0-9744-bce8e8797454",
       "match_date": "2025-10-30",
       "home_team": "Pisa",
       "away_team": "Lazio",
@@ -863,23 +838,17 @@
         "p_over_0_5_raw": 0.9076364554526359,
         "p_over_1_5_raw": 0.6876243755792962,
         "p_over_2_5_raw": 0.4255874673629243,
-        "p_over_0_5": 0.9021739130434783,
-        "p_over_1_5": 0.6704805491990846,
-        "p_over_2_5": 0.3813084112149533,
-        "ev_over_2_5": -0.16112149532710274,
+        "p_over_0_5": 0.8823529411764706,
+        "p_over_1_5": 0.667420814479638,
+        "p_over_2_5": 0.3815028901734104,
+        "ev_over_2_5": -0.16069364161849709,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
-      "recommendations": [
-        {
-          "market": "Over 0.5",
-          "confidence": 0.9021739130434783,
-          "threshold": 0.9
-        }
-      ]
+      "recommendations": []
     },
     {
-      "fixture_id": "f2e79a92-f93c-470f-b8a5-fef9917a7108",
+      "fixture_id": "7165397c-b8eb-4a01-bdf7-f2212edd4ce1",
       "match_date": "2025-10-28",
       "home_team": "Cesena",
       "away_team": "Carrarese",
@@ -893,23 +862,23 @@
         "p_over_0_5_raw": 0.9161332159947546,
         "p_over_1_5_raw": 0.7082672411817388,
         "p_over_2_5_raw": 0.45066666666666655,
-        "p_over_0_5": 0.9253246753246753,
-        "p_over_1_5": 0.7363636363636363,
-        "p_over_2_5": 0.44298245614035087,
-        "ev_over_2_5": -0.08745614035087723,
+        "p_over_0_5": 0.9255663430420712,
+        "p_over_1_5": 0.7371601208459214,
+        "p_over_2_5": 0.44696969696969696,
+        "ev_over_2_5": -0.07924242424242423,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9253246753246753,
+          "confidence": 0.9255663430420712,
           "threshold": 0.9
         }
       ]
     },
     {
-      "fixture_id": "2a76c633-93ac-4b5b-8ca4-8f404fe0ef07",
+      "fixture_id": "5602c688-8a9e-4054-b58e-31a2580b99ec",
       "match_date": "2025-10-28",
       "home_team": "Empoli",
       "away_team": "Sampdoria",
@@ -923,17 +892,17 @@
         "p_over_0_5_raw": 0.8932174498850439,
         "p_over_1_5_raw": 0.6543490760399939,
         "p_over_2_5_raw": 0.38717948717948714,
-        "p_over_0_5": 0.8872987477638641,
-        "p_over_1_5": 0.7041906327033689,
-        "p_over_2_5": 0.41123595505617977,
-        "ev_over_2_5": -0.017146067415730326,
+        "p_over_0_5": 0.8879003558718861,
+        "p_over_1_5": 0.7048242027800491,
+        "p_over_2_5": 0.4103139013452915,
+        "ev_over_2_5": -0.019349775784753276,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": []
     },
     {
-      "fixture_id": "2e4a2b11-169c-4627-a4e6-4cbf02f50cdc",
+      "fixture_id": "22cdabe4-737b-4ecf-94b9-fb11f33b4ec4",
       "match_date": "2025-10-28",
       "home_team": "Frosinone",
       "away_team": "Virtus Entella",
@@ -947,17 +916,17 @@
         "p_over_0_5_raw": 0.9042881359526106,
         "p_over_1_5_raw": 0.679708572273359,
         "p_over_2_5_raw": 0.4162303664921465,
-        "p_over_0_5": 0.8872987477638641,
-        "p_over_1_5": 0.7041906327033689,
-        "p_over_2_5": 0.4117647058823529,
-        "ev_over_2_5": -0.08176470588235296,
+        "p_over_0_5": 0.8879003558718861,
+        "p_over_1_5": 0.7048242027800491,
+        "p_over_2_5": 0.41168289290681503,
+        "ev_over_2_5": -0.08194714881780252,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": []
     },
     {
-      "fixture_id": "23beadf8-713f-472a-b3cb-64024a0debb6",
+      "fixture_id": "cfaa7c91-2dea-4e9b-ad02-42e3576dfc3b",
       "match_date": "2025-10-28",
       "home_team": "Palermo",
       "away_team": "Monza",
@@ -971,17 +940,17 @@
         "p_over_0_5_raw": 0.9096029887518278,
         "p_over_1_5_raw": 0.6923297881001416,
         "p_over_2_5_raw": 0.43121693121693117,
-        "p_over_0_5": 0.8872987477638641,
-        "p_over_1_5": 0.7041906327033689,
-        "p_over_2_5": 0.4117647058823529,
-        "ev_over_2_5": -0.11470588235294121,
+        "p_over_0_5": 0.8879003558718861,
+        "p_over_1_5": 0.7048242027800491,
+        "p_over_2_5": 0.41168289290681503,
+        "ev_over_2_5": -0.11488178025034768,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": []
     },
     {
-      "fixture_id": "fca871cc-430b-4b20-a4c1-19b0c06b3860",
+      "fixture_id": "79824751-5348-4840-b468-bccb5f372154",
       "match_date": "2025-10-28",
       "home_team": "Pescara",
       "away_team": "Avellino",
@@ -995,17 +964,17 @@
         "p_over_0_5_raw": 0.9056303592780953,
         "p_over_1_5_raw": 0.6828674382513567,
         "p_over_2_5_raw": 0.4199475065616798,
-        "p_over_0_5": 0.8872987477638641,
-        "p_over_1_5": 0.7041906327033689,
-        "p_over_2_5": 0.4117647058823529,
-        "ev_over_2_5": -0.09000000000000008,
+        "p_over_0_5": 0.8879003558718861,
+        "p_over_1_5": 0.7048242027800491,
+        "p_over_2_5": 0.41168289290681503,
+        "ev_over_2_5": -0.09018080667593875,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": []
     },
     {
-      "fixture_id": "cb34a08f-4efd-47e7-8659-1ad605b3d3ca",
+      "fixture_id": "7113f405-c300-4b42-a851-5ea6808f2ea6",
       "match_date": "2025-10-28",
       "home_team": "Reggiana",
       "away_team": "Modena",
@@ -1019,17 +988,17 @@
         "p_over_0_5_raw": 0.9086832435592479,
         "p_over_1_5_raw": 0.690123803182626,
         "p_over_2_5_raw": 0.4285714285714286,
-        "p_over_0_5": 0.8872987477638641,
-        "p_over_1_5": 0.7041906327033689,
-        "p_over_2_5": 0.4117647058823529,
-        "ev_over_2_5": -0.11058823529411765,
+        "p_over_0_5": 0.8879003558718861,
+        "p_over_1_5": 0.7048242027800491,
+        "p_over_2_5": 0.41168289290681503,
+        "ev_over_2_5": -0.1107649513212795,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": []
     },
     {
-      "fixture_id": "4bb35edf-884a-4f30-8814-2854be8f75f2",
+      "fixture_id": "bc01999c-7338-4dcd-ab0e-40bafa7173a4",
       "match_date": "2025-10-29",
       "home_team": "Mantova",
       "away_team": "Catanzaro",
@@ -1043,23 +1012,23 @@
         "p_over_0_5_raw": 0.926404663808373,
         "p_over_1_5_raw": 0.7343816538990124,
         "p_over_2_5_raw": 0.4838709677419355,
-        "p_over_0_5": 0.9322033898305084,
-        "p_over_1_5": 0.7363636363636363,
-        "p_over_2_5": 0.48109243697478987,
-        "ev_over_2_5": -0.07630252100840351,
+        "p_over_0_5": 0.9323671497584541,
+        "p_over_1_5": 0.7371601208459214,
+        "p_over_2_5": 0.4832635983263599,
+        "ev_over_2_5": -0.07213389121338898,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9322033898305084,
+          "confidence": 0.9323671497584541,
           "threshold": 0.9
         }
       ]
     },
     {
-      "fixture_id": "74d647be-7bb3-4b75-8c29-1a247f9cb9c2",
+      "fixture_id": "735a6939-6679-4ad4-bd94-2ed2eab17edd",
       "match_date": "2025-10-29",
       "home_team": "Spezia",
       "away_team": "Padova",
@@ -1073,17 +1042,17 @@
         "p_over_0_5_raw": 0.9046842889482141,
         "p_over_1_5_raw": 0.68063893179433,
         "p_over_2_5_raw": 0.4173228346456693,
-        "p_over_0_5": 0.8872987477638641,
-        "p_over_1_5": 0.7041906327033689,
-        "p_over_2_5": 0.4117647058823529,
-        "ev_over_2_5": -0.08588235294117641,
+        "p_over_0_5": 0.8879003558718861,
+        "p_over_1_5": 0.7048242027800491,
+        "p_over_2_5": 0.41168289290681503,
+        "ev_over_2_5": -0.08606397774687058,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": []
     },
     {
-      "fixture_id": "350664ec-26c0-4e75-af65-34f0fa32a6be",
+      "fixture_id": "ba86e222-5576-4112-89f7-27e93102cbe6",
       "match_date": "2025-10-29",
       "home_team": "Venezia",
       "away_team": "Sudtirol",
@@ -1097,23 +1066,23 @@
         "p_over_0_5_raw": 0.9317812393045346,
         "p_over_1_5_raw": 0.7486114335797531,
         "p_over_2_5_raw": 0.5027027027027027,
-        "p_over_0_5": 0.9329896907216495,
-        "p_over_1_5": 0.7363636363636363,
-        "p_over_2_5": 0.48109243697478987,
-        "ev_over_2_5": -0.11478991596638655,
+        "p_over_0_5": 0.9333333333333333,
+        "p_over_1_5": 0.7371601208459214,
+        "p_over_2_5": 0.4832635983263599,
+        "ev_over_2_5": -0.11079497907949776,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9329896907216495,
+          "confidence": 0.9333333333333333,
           "threshold": 0.9
         }
       ]
     },
     {
-      "fixture_id": "eda2617b-b0f5-41a7-8468-395d2b1626f2",
+      "fixture_id": "3ad4e7e2-8422-4949-a61a-79545600613b",
       "match_date": "2025-10-29",
       "home_team": "Celtic",
       "away_team": "Falkirk",
@@ -1127,35 +1096,35 @@
         "p_over_0_5_raw": 0.9734733930576607,
         "p_over_1_5_raw": 0.8771922344385025,
         "p_over_2_5_raw": 0.7024608501118568,
-        "p_over_0_5": 0.9864864864864865,
-        "p_over_1_5": 0.9666666666666667,
-        "p_over_2_5": 0.7,
-        "ev_over_2_5": -0.06900000000000006,
+        "p_over_0_5": 0.9866666666666667,
+        "p_over_1_5": 0.967741935483871,
+        "p_over_2_5": 0.704225352112676,
+        "ev_over_2_5": -0.06338028169014087,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9864864864864865,
+          "confidence": 0.9866666666666667,
           "threshold": 0.9
         },
         {
           "market": "Over 1.5",
-          "confidence": 0.9666666666666667,
+          "confidence": 0.967741935483871,
           "threshold": 0.8
         },
         {
           "market": "Over 2.5",
-          "confidence": 0.7,
+          "confidence": 0.704225352112676,
           "threshold": 0.68,
-          "ev": -0.06900000000000006,
+          "ev": -0.06338028169014087,
           "ev_flag": false
         }
       ]
     },
     {
-      "fixture_id": "4bf351b5-dc59-4e6f-b534-4501600c5b22",
+      "fixture_id": "1f76d2fc-2bff-49a4-9b4e-71023971eaf7",
       "match_date": "2025-10-29",
       "home_team": "Hibernian",
       "away_team": "Rangers",
@@ -1169,28 +1138,28 @@
         "p_over_0_5_raw": 0.9447083749828616,
         "p_over_1_5_raw": 0.7846317209758519,
         "p_over_2_5_raw": 0.5529100529100528,
-        "p_over_0_5": 0.9671361502347418,
-        "p_over_1_5": 0.8333333333333334,
-        "p_over_2_5": 0.6222910216718266,
-        "ev_over_2_5": 0.05167182662538683,
+        "p_over_0_5": 0.9672897196261683,
+        "p_over_1_5": 0.8316062176165803,
+        "p_over_2_5": 0.6184615384615385,
+        "ev_over_2_5": 0.04520000000000013,
         "suggest_over_2_5": true,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9671361502347418,
+          "confidence": 0.9672897196261683,
           "threshold": 0.9
         },
         {
           "market": "Over 1.5",
-          "confidence": 0.8333333333333334,
+          "confidence": 0.8316062176165803,
           "threshold": 0.8
         }
       ]
     },
     {
-      "fixture_id": "4b66c6c9-6300-434c-9984-044e4b934688",
+      "fixture_id": "967b1e4b-0938-422f-8c81-385c8ab0fe29",
       "match_date": "2025-10-29",
       "home_team": "Kilmarnock",
       "away_team": "Aberdeen",
@@ -1204,23 +1173,23 @@
         "p_over_0_5_raw": 0.9248464579149429,
         "p_over_1_5_raw": 0.7303324046307949,
         "p_over_2_5_raw": 0.4786096256684491,
-        "p_over_0_5": 0.9173290937996821,
-        "p_over_1_5": 0.7416974169741697,
-        "p_over_2_5": 0.5161290322580645,
-        "ev_over_2_5": 0.006451612903225712,
+        "p_over_0_5": 0.9175911251980983,
+        "p_over_1_5": 0.7389705882352942,
+        "p_over_2_5": 0.5,
+        "ev_over_2_5": -0.025000000000000022,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9173290937996821,
+          "confidence": 0.9175911251980983,
           "threshold": 0.9
         }
       ]
     },
     {
-      "fixture_id": "e322df95-2526-493f-b642-30f392bffa63",
+      "fixture_id": "58558212-05c1-4f92-ad69-c58558cd1071",
       "match_date": "2025-10-29",
       "home_team": "Motherwell",
       "away_team": "Dundee United",
@@ -1234,28 +1203,28 @@
         "p_over_0_5_raw": 0.9392206334042528,
         "p_over_1_5_raw": 0.7690077186554469,
         "p_over_2_5_raw": 0.5306666666666666,
-        "p_over_0_5": 0.9671361502347418,
-        "p_over_1_5": 0.8333333333333334,
-        "p_over_2_5": 0.6222910216718266,
-        "ev_over_2_5": 0.0952321981424149,
+        "p_over_0_5": 0.9672897196261683,
+        "p_over_1_5": 0.8316062176165803,
+        "p_over_2_5": 0.6184615384615385,
+        "ev_over_2_5": 0.08849230769230787,
         "suggest_over_2_5": true,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9671361502347418,
+          "confidence": 0.9672897196261683,
           "threshold": 0.9
         },
         {
           "market": "Over 1.5",
-          "confidence": 0.8333333333333334,
+          "confidence": 0.8316062176165803,
           "threshold": 0.8
         }
       ]
     },
     {
-      "fixture_id": "1344e383-3a3e-46e0-947e-30323eebd241",
+      "fixture_id": "772eadcf-8671-424f-a5e4-e3a893b2df1e",
       "match_date": "2025-10-29",
       "home_team": "St Mirren",
       "away_team": "Hearts",
@@ -1269,20 +1238,21 @@
         "p_over_0_5_raw": 0.9291345404502444,
         "p_over_1_5_raw": 0.741555643651069,
         "p_over_2_5_raw": 0.4932975871313674,
-        "p_over_0_5": 0.9173290937996821,
-        "p_over_1_5": 0.7642276422764228,
-        "p_over_2_5": 0.536144578313253,
-        "ev_over_2_5": 0.01331325301204811,
+        "p_over_0_5": 0.9175911251980983,
+        "p_over_1_5": 0.7661290322580645,
+        "p_over_2_5": 0.5392156862745098,
+        "ev_over_2_5": 0.01911764705882346,
         "suggest_over_2_5": false,
         "model": "OverModelV1"
       },
       "recommendations": [
         {
           "market": "Over 0.5",
-          "confidence": 0.9173290937996821,
+          "confidence": 0.9175911251980983,
           "threshold": 0.9
         }
       ]
     }
-  ]
+  ],
+  "generated_by": "cron_fixtures_over"
 }

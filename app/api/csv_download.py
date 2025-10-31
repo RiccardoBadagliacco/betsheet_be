@@ -434,50 +434,6 @@ async def download_football_csv(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
 
-@router.get("/leagues", tags=["CSV Download"])
-async def list_supported_leagues():
-    """List supported league codes and their descriptions."""
-    return {
-        "supported_leagues": LEAGUES,
-        "note": "You can use any league code, but these are commonly available on football-data.co.uk"
-    }
-
-@router.get("/leagues/{league_code}/files", tags=["CSV Download"])
-async def list_downloaded_files(league_code: str):
-    """List all downloaded CSV files for a specific league."""
-    league_upper = league_code.upper()
-    league_path = Path("leagues") / league_upper
-    
-    if not league_path.exists():
-        raise HTTPException(status_code=404, detail=f"No downloads found for league {league_upper}")
-    
-    csv_files = list(league_path.glob("*.csv"))
-    
-    if not csv_files:
-        return {
-            "league_code": league_upper,
-            "league_name": get_formatted_league_name(league_upper),
-            "files": [],
-            "message": "No CSV files found for this league"
-        }
-    
-    file_info = []
-    for file_path in sorted(csv_files):
-        stat = file_path.stat()
-        file_info.append({
-            "filename": file_path.name,
-            "season_years": file_path.stem.replace("_", "/"),
-            "file_size_bytes": stat.st_size,
-            "created_at": stat.st_ctime,
-            "modified_at": stat.st_mtime
-        })
-    
-    return {
-        "league_code": league_upper,
-        "league_name": get_formatted_league_name(league_upper),
-        "files": file_info,
-        "total_files": len(file_info)
-    }
 
 @router.post("/download-multiple-seasons", tags=["CSV Download"])
 async def download_multiple_seasons_for_league(
@@ -702,9 +658,6 @@ async def download_recent_seasons_all_leagues(
             ]
         }
     }
-
-@router.get("/help", tags=["CSV Download"])
-async def get_api_help():
     """
     Get comprehensive help and examples for all CSV download endpoints.
     """

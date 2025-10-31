@@ -34,37 +34,7 @@ app.add_middleware(
 app.include_router(api_router)
 
 
-@app.on_event("startup")
-def on_startup():
-    # In development it's convenient creare le tabelle se mancano.
-    # In produzione preferire Alembic per le migrazioni.
-    Base.metadata.create_all(bind=engine)
-    
-    # Auto-load saved models at startup
-    try:
-        from app.storage.model_storage import model_storage
-        from app.api.model_management import loaded_models
-        
-        saved_models = model_storage.list_saved_models()
-        loaded_count = 0
-        
-        for league_code in saved_models.keys():
-            try:
-                if model_storage.is_model_fresh(league_code, max_age_hours=48):  # Load if < 48h old
-                    predictor = model_storage.load_model(league_code)
-                    if predictor:
-                        loaded_models[league_code] = predictor
-                        loaded_count += 1
-            except Exception as e:
-                print(f"⚠️  Failed to auto-load model {league_code}: {e}")
-        
-        if loaded_count > 0:
-            print(f"🚀 Auto-loaded {loaded_count} fresh models at startup")
-        else:
-            print("📋 No fresh models found. Generate them using /api/v1/models/generate-all-models")
-            
-    except Exception as e:
-        print(f"⚠️  Error during model auto-loading: {e}")
+
 
 
 # Global exception handler to return ErrorResponse shape

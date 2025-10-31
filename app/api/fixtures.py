@@ -13,7 +13,7 @@ from app.db.models_football import Fixture, Team, Season, League
 import logging
 import json
 import os
-
+from app.api.recommendations import generate_recommendations
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
@@ -54,64 +54,41 @@ def get_league_name_from_code(league_code: str) -> str:
     return league_names.get(league_code, f'League {league_code}')
 
 
-async def generate_all_predictions_and_save():
+async def generate_all_predictions_and_save(save: bool = True):
     """
-    Genera le predizioni per tutte le fixture chiamando la logica esistente
-    e salva il risultato in un file JSON
+    ✅ Usa la nuova logica OverModelV1 con patch7 e soglie
     """
     try:
-        # Import della funzione esistente per evitare circular imports
-        from app.api.ml_football_exact import get_all_fixtures_recommendations
-        from app.db.database_football import get_football_db
-        
-        # Ottieni sessione database
         db = next(get_football_db())
-        
         try:
-            # Chiama la logica esistente per ottenere tutte le predizioni
-            logger.info("Chiamando get_all_fixtures_recommendations...")
-            
-            # Chiamiamo la funzione senza limit per ottenere tutte le fixture
-            result = await get_all_fixtures_recommendations(
-                league_code=None,  # Tutte le leghe
-                limit=1000,        # Limite alto per prendere tutte
-                db=db,
-                use_context=True
-            )
-            
-            # Crea directory se non esiste
-            os.makedirs("data", exist_ok=True)
-            
-            # Aggiungi timestamp al risultato
+            logger.info("🔄 Generazione previsioni Over...")
+
+            # ✅ chiamiamo direttamente la nuova API
+            result = await generate_recommendations(save=True)
+
             result["generated_at"] = datetime.utcnow().isoformat()
-            result["generated_by"] = "fixtures_download_auto"
-            
-            # Salva in file JSON
+            result["generated_by"] = "cron_fixtures_over"
+
+            os.makedirs("data", exist_ok=True)
             json_file = "data/all_predictions.json"
+
             with open(json_file, 'w', encoding='utf-8') as f:
                 json.dump(result, f, indent=2, ensure_ascii=False, default=str)
-            
-            logger.info(f"Predizioni salvate in {json_file}")
-            
+
+            logger.info(f"✅ Predizioni Over salvate in {json_file}")
+
             return {
                 "success": True,
-                "total_fixtures": result.get("total_fixtures", 0),
-                "successful_predictions": result.get("successful_predictions", 0),
-                "total_recommendations": result.get("total_recommendations", 0),
+                "fixtures": result.get("fixtures_count"),
                 "json_file": json_file
             }
-            
+
         finally:
             db.close()
-            
-    except Exception as e:
-        logger.error(f"Errore nel generare e salvare predizioni: {e}")
-        return {
-            "success": False,
-            "error": str(e),
-            "total_recommendations": 0
-        }
 
+    except Exception as e:
+        logger.error(f"❌ Errore generazione predizioni: {e}")
+        return {"success": False, "error": str(e)}
 
 def get_country_from_league_code(league_code: str) -> str:
     """
