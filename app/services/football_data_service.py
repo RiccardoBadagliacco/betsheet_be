@@ -286,38 +286,40 @@ class FootballDataService:
                     season.end_date = latest_date
     
     def _is_season_completed(self, season: Season, latest_date: date, days_since_last: int) -> bool:
-        """Determina intelligentemente se una stagione è completata"""
-        
-        # 1. Stagioni molto vecchie (prima del 2022) sono sempre completate
-        season_year = int(season.code[:2]) + 2000
-        if season_year < 2022:
+
+        start_code = season.code.split("/")[0]
+        if len(start_code) == 2:
+            season_year = 2000 + int(start_code)
+        else:
+            season_year = int(start_code)
+
+        if season_year < date.today().year - 2:
             return True
-            
-        # 2. Stagioni 2022 e successive: controlla per anno calcistico
-        current_year = date.today().year
-        current_month = date.today().month
-        
-        # Anno calcistico europeo: agosto-maggio
-        if current_month >= 8:  # Da agosto in poi, siamo nella nuova stagione
+
+        today = date.today()
+        current_year = today.year
+        current_month = today.month
+
+        if current_month >= 8:
             current_football_year = current_year
-        else:  # Da gennaio a luglio, siamo ancora nella stagione precedente
+        else:
             current_football_year = current_year - 1
-            
-        # Se è più di 2 stagioni fa, è completata
+
+        if season_year > current_football_year:
+            return False
+
         if season_year < current_football_year - 1:
             return True
-            
-        # Se è la stagione corrente o quella appena finita, controlla le date
-        if season_year >= current_football_year - 1:
-            # Se l'ultima partita è più di 4 mesi fa, probabilmente è finita
-            if days_since_last > 120:  # 4 mesi
-                return True
-                
-            # Se siamo in estate (giugno-agosto) e l'ultima partita è a maggio/giugno
-            if current_month >= 6 and current_month <= 8:
-                if latest_date.month <= 6:  # Ultima partita prima dell'estate
-                    return True
-                    
+
+        if season_year == current_football_year:
+            return False
+
+        if days_since_last > 120:
+            return True
+
+        if 6 <= current_month <= 8 and latest_date.month <= 6:
+            return True
+
         return False
 
     # Metodi di utilità
