@@ -10,8 +10,8 @@ CALIB_LEAGUES = os.path.join(CALIB_BASE, "leagues")
 # === Config soglie operative (dalla tua sweep) ===
 DEFAULT_THRESHOLDS = {
     "O0_5": 0.90,  # banker
-    "O1_5": 0.80,  # high volume
-    "O2_5": 0.68,  # premium select
+    "O1_5": 0.85,  # high volume
+    "O2_5": 0.65,  # premium select
 }
 
 

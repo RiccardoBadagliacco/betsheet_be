@@ -11,8 +11,7 @@ import logging
 import pandas as pd
 import io
 from sqlalchemy.orm import Session
-from app.constants.leagues import get_all_leagues, get_formatted_league_name
-from app.db.database import get_db
+from app.constants.leagues import get_all_leagues
 from app.db.database_football import get_football_db
 from app.services.football_data_service import FootballDataService
 
@@ -57,7 +56,6 @@ def filter_csv_columns(csv_content: bytes) -> bytes:
         
         # Log delle colonne disponibili
         available_columns = df.columns.tolist()
-        logger.debug(f"📋 Colonne disponibili nel CSV: {available_columns}")
         
         # Costruisci il DataFrame finale con le colonne richieste
         final_columns = []
@@ -71,7 +69,6 @@ def filter_csv_columns(csv_content: bytes) -> bytes:
                 final_columns.append(required_col)
                 final_data[required_col] = df[required_col]
                 column_found = True
-                logger.debug(f"✅ Trovata colonna: {required_col}")
             
             # Se non trovata, prova i mapping alternativi
             elif required_col in COLUMN_MAPPINGS:
@@ -80,7 +77,6 @@ def filter_csv_columns(csv_content: bytes) -> bytes:
                         final_columns.append(required_col)
                         final_data[required_col] = df[alt_name]
                         column_found = True
-                        logger.debug(f"✅ Mappata colonna: {alt_name} -> {required_col}")
                         break
             
             if not column_found:

@@ -4,113 +4,6 @@ Structure: {league_code: {"name": league_name, "country": country_name}}
 """
 
 
-""" 
-LEAGUES = {
-    # Major European Leagues - Tier 1
-    "main": {
-        "E0": {
-        "name": "Premier League",
-        "country": "England"
-        },
-        "E1": {
-            "name": "Championship", 
-            "country": "England"
-        },
-        
-        "SC0": {
-            "name": "Premier League",
-            "country": "Scotland"
-        },
-        
-        "D1": {
-            "name": "Bundesliga",
-            "country": "Germany"
-        },
-        "D2": {
-            "name": "2. Bundesliga",
-            "country": "Germany"
-        },
-        
-        "I1": {
-            "name": "Serie A",
-            "country": "Italy"
-        },
-        "I2": {
-            "name": "Serie B",
-            "country": "Italy"
-        },
-    
-        "SP1": {
-            "name": "La Liga",
-            "country": "Spain"
-        },
-        "SP2": {
-            "name": "Segunda División",
-            "country": "Spain"
-        },
-        
-        "F1": {
-            "name": "Ligue 1",
-            "country": "France"
-        },
-        "F2": {
-            "name": "Ligue 2",
-            "country": "France"
-        },
-        
-        "N1": {
-            "name": "Eredivisie",
-            "country": "Netherlands"
-        },
-        
-        "B1": {
-            "name": "Jupiler Pro League",
-            "country": "Belgium"
-        },
-    
-        "P1": {
-            "name": "Primeira Liga",
-            "country": "Portugal"
-        },
-        
-        "T1": {
-            "name": "Süper Lig",
-            "country": "Turkey"
-        },
-    },
-    "other": {
-        "AUT": {
-            "name": "Austrian Bundesliga",
-            "country": "Austria"
-        },
-        "CHN": {
-            "name": "Chinese Super League",
-            "country": "China"
-        },
-    }   
-}
-
-# Countries grouped for easy reference
-COUNTRIES = {
-    "England": ["E0", "E1", "E2", "E3", "EC"],
-    "Scotland": ["SC0", "SC1", "SC2", "SC3"],
-    "Germany": ["D1", "D2"],
-    "Italy": ["I1", "I2"],
-    "Spain": ["SP1", "SP2"],
-    "France": ["F1", "F2"],
-    "Netherlands": ["N1"],
-    "Belgium": ["B1"],
-    "Portugal": ["P1"],
-    "Turkey": ["T1"],
-    "Greece": ["G1"],
-    "Argentina": ["ARG"],
-    "Brazil": ["BRA"],
-    "Mexico": ["MEX"],
-    "USA": ["USA"],
-    "China": ["CHN"],
-    "Japan": ["JPN"],
-}
- """
 # Top tier  for quick access
 TOP_TIER_LEAGUES = ["E0", "D1", "I1", "SP1", "F1", "N1", "P1"]
 
@@ -233,9 +126,59 @@ COUNTRY_LEAGUE_STRUCTURE = {
         {"league": {"main": True, "name": "Süper Lig", "code": "T1"}}
     ],
     "Austria": [
-        {"league": {"main": False, "name": "Austrian Bundesliga", "code": "AUT"}}
+        {"league": {"main": False, "name": "Bundesliga", "code": "AUT"}}
     ],
     "China": [
-        {"league": {"main": False, "name": "Chinese Super League", "code": "CHN"}}
+        {"league": {"main": False, "name": "Super League", "code": "CHN"}}
+    ],
+    "Denmark": [
+        {"league": {"main": False, "name": "Superliga", "code": "DNK"}}
+    ],
+    "Finland": [
+        {"league": {"main": False, "name": "Veikkausliiga", "code": "FIN"}}
+    ],
+    "Ireland": [
+        {"league": {"main": False, "name": "Premier Division", "code": "IRL"}}
+    ],
+    "Norway": [
+        {"league": {"main": False, "name": "Eliteserien", "code": "NOR"}}
+    ],
+    "Sweden": [
+        {"league": {"main": False, "name": "Allsvenskan", "code": "SWE"}}
     ]
 }
+
+def get_league_name_from_code(league_code: str) -> str:
+    """
+    Converte il codice lega nel nome completo
+
+    Args:
+        league_code: Codice della lega (es. "E0", "I1")
+
+    Returns:
+        Nome completo della lega
+    """
+    for country, leagues in COUNTRY_LEAGUE_STRUCTURE.items():
+        for league_entry in leagues:
+            league = league_entry["league"]
+            if league["code"].upper() == league_code.upper():
+                return league["name"]
+    return f"League {league_code}"
+
+
+def get_country_from_league_code(league_code: str) -> str:
+    """
+    Mappa il codice lega al paese corrispondente
+
+    Args:
+        league_code: Codice della lega (es. "E0", "I1")
+
+    Returns:
+        Nome del paese corrispondente o 'Unknown' se non trovato
+    """
+    for country, leagues in COUNTRY_LEAGUE_STRUCTURE.items():
+        for league_entry in leagues:
+            league = league_entry["league"]
+            if league["code"].upper() == league_code.upper():
+                return country
+    return 'Unknown'

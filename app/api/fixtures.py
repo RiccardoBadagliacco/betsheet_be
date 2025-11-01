@@ -14,44 +14,18 @@ import logging
 import json
 import os
 from app.api.recommendations import generate_recommendations
+from app.constants.leagues import get_league_name_from_code, get_country_from_league_code
+from typing import List, Optional
+from app.db.models_football import Country
+
+
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
 # URL fisso del CSV fixtures
 FIXTURES_CSV_URL = "https://www.football-data.co.uk/fixtures.csv"
+FIXTURES_CSV_OTHER_URL = "https://www.football-data.co.uk/new_league_fixtures.csv"
 
-def get_league_name_from_code(league_code: str) -> str:
-    """
-    Converte il codice lega nel nome completo
-    
-    Args:
-        league_code: Codice della lega (es. "E0", "I1")
-        
-    Returns:
-        Nome completo della lega
-    """
-    league_names = {
-        'E0': 'Premier League',
-        'E1': 'Championship', 
-        'E2': 'League One',
-        'E3': 'League Two',
-        'SC0': 'Scottish Premiership',
-        'SC1': 'Scottish Championship',
-        'D1': 'Bundesliga',
-        'D2': '2. Bundesliga',
-        'I1': 'Serie A',
-        'I2': 'Serie B',
-        'SP1': 'La Liga',
-        'SP2': 'Segunda División',
-        'F1': 'Ligue 1',
-        'F2': 'Ligue 2',
-        'N1': 'Eredivisie',
-        'B1': 'Jupiler Pro League',
-        'P1': 'Primeira Liga',
-        'T1': 'Süper Lig',
-        'G1': 'Super League Greece'
-    }
-    return league_names.get(league_code, f'League {league_code}')
 
 
 async def generate_all_predictions_and_save(save: bool = True):
@@ -90,53 +64,7 @@ async def generate_all_predictions_and_save(save: bool = True):
         logger.error(f"❌ Errore generazione predizioni: {e}")
         return {"success": False, "error": str(e)}
 
-def get_country_from_league_code(league_code: str) -> str:
-    """
-    Mappa il codice lega al paese corrispondente
-    """
-    league_country_mapping = {
-        # Inghilterra
-        'E0': 'England',
-        'E1': 'England', 
-        'E2': 'England',
-        'E3': 'England',
-        
-        # Scozia
-        'SC0': 'Scotland',
-        'SC1': 'Scotland',
-        
-        # Germania
-        'D1': 'Germany',
-        'D2': 'Germany',
-        
-        # Italia
-        'I1': 'Italy',
-        'I2': 'Italy',
-        
-        # Spagna
-        'SP1': 'Spain',
-        'SP2': 'Spain',
-        
-        # Francia
-        'F1': 'France',
-        'F2': 'France',
-        
-        # Olanda
-        'N1': 'Netherlands',
-        
-        # Belgio
-        'B1': 'Belgium',
-        
-        # Portogallo
-        'P1': 'Portugal',
-        
-        # Turchia
-        'T1': 'Turkey',
-        # Cina
-        'CHN': 'China',
-    }
-    
-    return league_country_mapping.get(league_code, 'Unknown')
+
 
 
 def organize_predictions_by_hierarchy(fixtures: list) -> dict:
@@ -337,8 +265,6 @@ def clean_fixtures_data(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         DataFrame pulito nel formato del progetto
     """
-    logger.info(f"Pulizia dati: {len(df)} righe originali")
-    logger.info(f"Colonne disponibili: {list(df.columns)}")
     
     # Crea copia per evitare modifiche originale
     cleaned_df = df.copy()
@@ -363,7 +289,9 @@ def clean_fixtures_data(df: pd.DataFrame) -> pd.DataFrame:
         'AvgD': 'avg_draw_odds',
         'AvgA': 'avg_away_odds',
         'Avg>2.5': 'avg_over_25_odds',
-        'Avg<2.5': 'avg_under_25_odds'
+        'Avg<2.5': 'avg_under_25_odds',
+        'Home':'home_team_name',
+        'Away':'away_team_name',
     }
     
     # Rinomina le colonne se esistono
@@ -372,11 +300,7 @@ def clean_fixtures_data(df: pd.DataFrame) -> pd.DataFrame:
         if old_col in cleaned_df.columns:
             cleaned_df = cleaned_df.rename(columns={old_col: new_col})
             mapped_columns.append(f"{old_col} -> {new_col}")
-            logger.info(f"Mappata colonna: {old_col} -> {new_col}")
     
-    logger.info(f"Colonne mappate: {mapped_columns}")
-    
-    logger.info(f"Colonne dopo mapping: {list(cleaned_df.columns)}")
     
     # Verifica speciale per league_code
     if 'league_code' in cleaned_df.columns:
@@ -420,6 +344,45 @@ def clean_fixtures_data(df: pd.DataFrame) -> pd.DataFrame:
     
     return cleaned_df
 
+
+def process_additional_csv_with_db(response_other: pd.DataFrame, db: Session) -> pd.DataFrame:
+    """
+    Processa un CSV aggiuntivo (responseOther) per uniformarlo al formato del progetto utilizzando il database.
+
+    Args:
+        response_other: DataFrame grezzo dal secondo CSV
+        db: Sessione database
+
+    Returns:
+        DataFrame pulito e unito al primo CSV
+    """
+    logger.info(f"Pulizia dati aggiuntivi con DB: {len(response_other)} righe originali")
+
+    # Crea copia per evitare modifiche originale
+    cleaned_other_df = response_other.copy()
+    print("\t\tcleaned_other_df row:", len(cleaned_other_df))
+
+    # Recupera il codice della lega (Div) basandosi su Country e League
+    def map_league_code(row):
+        country = row.get("Country") or row.get("ï»¿Country")
+        league = row.get("League")
+        if country and league:
+            print('\t\tMapping league code for:', country, league, map_league_code_from_db(db, country, league))
+            return map_league_code_from_db(db, country, league)
+        return None
+
+    cleaned_other_df["Div"] = cleaned_other_df.apply(map_league_code, axis=1)
+
+    # Filtra righe senza Div valido
+    initial_count = len(cleaned_other_df)
+    cleaned_other_df = cleaned_other_df.dropna(subset=["Div"])
+    logger.info(f"Rimosse {initial_count - len(cleaned_other_df)} righe senza Div valido")
+
+    # Passa il CSV pulito attraverso clean_fixtures_data
+    cleaned_other_df = clean_fixtures_data(cleaned_other_df)
+
+    return cleaned_other_df
+
 @router.post("/fixtures/download")
 async def download_fixtures():
     """
@@ -427,76 +390,88 @@ async def download_fixtures():
     """
     try:
         logger.info(f"Scaricando fixtures da: {FIXTURES_CSV_URL}")
-        
-        # 1. Scarica il CSV
+
+        # Ottieni sessione database
+        db: Session = next(get_football_db())
+
+        # 1. Scarica il CSV principale
         response = requests.get(FIXTURES_CSV_URL, timeout=30)
         response.raise_for_status()
-        
-        # 2. Carica in DataFrame
         from io import StringIO
         df = pd.read_csv(StringIO(response.text))
         logger.info(f"CSV scaricato: {len(df)} righe")
-        
-        # 3. Pulisce i dati
+
+        # 2. Pulisce i dati principali
         cleaned_df = clean_fixtures_data(df)
+
+        # 3. Scarica il CSV aggiuntivo
+        response_other = requests.get(FIXTURES_CSV_OTHER_URL, timeout=30)
+        response_other.raise_for_status()
+        cleaned_other_df = process_additional_csv_with_db(pd.read_csv(StringIO(response_other.text)), db)
+        logger.info(f"CSV aggiuntivo scaricato e pulito: {len(cleaned_other_df)} righe")
+
+        logger.info(f"cleaned_df row: {len(cleaned_df)}")
+        # 4. Unisci i DataFrame principali e aggiuntivi
+        combined_df = pd.concat([cleaned_df, cleaned_other_df], ignore_index=True)
         
-        if len(cleaned_df) == 0:
+        logger.info(f"DataFrame combinato: {len(combined_df)} righe")
+
+        if len(combined_df) == 0:
             return {
                 "success": False,
                 "message": "Nessuna fixture valida trovata nel CSV",
                 "total_downloaded": len(df),
                 "fixtures_saved": 0
             }
-        
-        # 4. Salva nel database
+
+        # 5. Salva nel database
         fixtures_saved = 0
         fixtures_skipped = 0
-        
-        # Ottieni sessione database
-        db: Session = next(get_football_db())
-        
+
         try:
             # Cancella fixtures esistenti (opzionale - rimuovi se vuoi mantenere storico)
             db.execute(delete(Fixture))
             db.commit()
             logger.info("Fixtures esistenti cancellate")
-            
+
             # Inserisci nuove fixtures
-            for _, row in cleaned_df.iterrows():
+            for _, row in combined_df.iterrows():
                 # Trova o crea le squadre
                 home_team = None
                 away_team = None
                 season = None
-                
+
                 # Recupera i dati base
                 home_team_name = row.get('home_team_name')
                 away_team_name = row.get('away_team_name')
-                league_code = row.get('league_code')
+                print('\tProcessing fixture:', home_team_name, 'vs', away_team_name)
                 
+                league_code = row.get('league_code')
+
                 # Trova la stagione corrente per la lega prima di tutto
                 season = None
                 if league_code and pd.notna(league_code):
                     season = find_current_season(db, str(league_code))
                     if fixtures_saved < 5:  # Log solo per le prime 5 fixtures
                         logger.info(f"League code: '{league_code}' -> Season: {season.id if season else 'None'}")
-                
+
                 # Salta le fixtures senza stagione valida (non creare nemmeno i team)
                 if not season:
                     fixtures_skipped += 1
                     if fixtures_skipped <= 10:  # Log prime 10 fixtures saltate
                         logger.info(f"Saltata fixture senza stagione valida: {home_team_name} vs {away_team_name} (League: {league_code})")
                     continue
-                
+
                 # Ora crea i team (solo per fixture valide)
                 home_team = None
                 away_team = None
-                
+
                 if home_team_name and pd.notna(home_team_name):
                     home_team = find_or_create_team(db, str(home_team_name))
-                
+
                 if away_team_name and pd.notna(away_team_name):
                     away_team = find_or_create_team(db, str(away_team_name))
-                
+
                 # Gestisci la data correttamente
                 match_date_value = row.get('match_date')
                 parsed_date = None
@@ -511,22 +486,22 @@ async def download_fixtures():
                         except:
                             logger.warning(f"Impossibile parsare data: {match_date_value}")
                             parsed_date = None
-                
+
                 # Crea la fixture con i campi relazionali popolati
                 fixture = Fixture(
                     # Campi relazionali
                     season_id=season.id if season else None,
                     home_team_id=home_team.id if home_team else None,
                     away_team_id=away_team.id if away_team else None,
-                    
+
                     # Dati temporali
                     match_date=parsed_date,
                     match_time=row.get('match_time') if pd.notna(row.get('match_time')) else None,
-                    
+
                     # Dati grezzi per identificazione
                     league_code=str(league_code) if pd.notna(league_code) else None,
                     league_name=row.get('league_name') if pd.notna(row.get('league_name')) else None,
-                    
+
                     # Risultati (sempre NULL per fixtures)
                     home_goals_ft=None,
                     away_goals_ft=None,
@@ -536,26 +511,27 @@ async def download_fixtures():
                     away_shots=None,
                     home_shots_target=None,
                     away_shots_target=None,
-                    
+
                     # Quote
                     avg_home_odds=float(row.get('avg_home_odds')) if pd.notna(row.get('avg_home_odds')) else None,
                     avg_draw_odds=float(row.get('avg_draw_odds')) if pd.notna(row.get('avg_draw_odds')) else None,
                     avg_away_odds=float(row.get('avg_away_odds')) if pd.notna(row.get('avg_away_odds')) else None,
                     avg_over_25_odds=float(row.get('avg_over_25_odds')) if pd.notna(row.get('avg_over_25_odds')) else None,
                     avg_under_25_odds=float(row.get('avg_under_25_odds')) if pd.notna(row.get('avg_under_25_odds')) else None,
-                    
+
                     # Metadati
                     csv_row_number=int(row.get('csv_row_number')) if pd.notna(row.get('csv_row_number')) else None,
                     downloaded_at=datetime.utcnow()
                 )
-                
+                print('\t\tCreated fixture for:', home_team_name, 'vs', away_team_name)
+
                 db.add(fixture)
                 fixtures_saved += 1
-                
+
                 # Log per debug
                 if fixtures_saved % 50 == 0:
                     logger.info(f"Processate {fixtures_saved} fixtures...")
-                    
+
                 # Log dettagli per le prime fixture
                 if fixtures_saved <= 3:
                     home_name = home_team.name if home_team else 'Unknown'
@@ -565,22 +541,22 @@ async def download_fixtures():
                     logger.info(f"  - Away Team ID: {away_team.id if away_team else 'None'}")
                     logger.info(f"  - Season ID: {season.id if season else 'None'} ({league_code})")
                     logger.info(f"  - Match Date: {fixture.match_date}")
-            
+
             # Commit delle modifiche
             db.commit()
             logger.info(f"Salvate {fixtures_saved} fixtures nel database")
             if fixtures_skipped > 0:
                 logger.info(f"Saltate {fixtures_skipped} fixtures senza stagione valida")
-            
+
         except Exception as e:
             db.rollback()
             logger.error(f"Errore nel salvataggio database: {e}")
             raise HTTPException(status_code=500, detail=f"Errore nel salvataggio: {str(e)}")
-        
+
         finally:
             db.close()
-        
-        # 5. Calcola automaticamente le predizioni chiamando la logica esistente
+
+        # 6. Calcola automaticamente le predizioni chiamando la logica esistente
         predictions_result = None
         try:
             logger.info("Iniziando calcolo predizioni per tutte le fixture...")
@@ -593,7 +569,7 @@ async def download_fixtures():
                 "error": str(e),
                 "total_recommendations": 0
             }
-        
+
         return {
             "success": True,
             "message": f"Fixtures scaricate e salvate con successo",
@@ -603,11 +579,11 @@ async def download_fixtures():
             "url": FIXTURES_CSV_URL,
             "predictions": predictions_result
         }
-        
+
     except requests.RequestException as e:
         logger.error(f"Errore nel download CSV: {e}")
         raise HTTPException(status_code=500, detail=f"Errore nel download: {str(e)}")
-    
+
     except Exception as e:
         logger.error(f"Errore generico: {e}")
         raise HTTPException(status_code=500, detail=f"Errore: {str(e)}")
@@ -824,3 +800,37 @@ async def delete_data_by_country(
             "success": False,
             "message": f"Failed to delete data for country ID {country_id}: {str(e)}",
         }
+
+def map_league_code_from_db(db: Session, country_name: str, league_name: str) -> Optional[str]:
+    """
+    Recupera il codice della lega dal database basandosi sul nome del paese e della lega.
+
+    Args:
+        db: Sessione database
+        country_name: Nome del paese (es. "Brazil")
+        league_name: Nome della lega (es. "Serie A")
+
+    Returns:
+        Codice della lega (es. "BRA") o None se non trovato
+    """
+    try:
+        # Cerca il paese nel database
+        country = db.query(Country).filter(Country.name.ilike(country_name)).first()
+        if not country:
+            logger.warning(f"Paese non trovato: {country_name}")
+            return None
+
+        # Cerca la lega nel database
+        # Cerca la lega all'interno di country.leagues
+        league = next(
+            (l for l in country.leagues if l.name.lower() == league_name.lower()), 
+            None
+        )
+        if not league:
+            logger.warning(f"Lega non trovata: {league_name} per paese {country_name}")
+            return None
+
+        return league.code
+    except Exception as e:
+        logger.error(f"Errore nel recupero del codice lega: {e}")
+        return None
