@@ -278,6 +278,7 @@ def process_csv_file(file_path: str, league_code: str, season: str, db: Session 
 async def download_all_leagues_centralized(
     n_seasons: int = Query(6, description="Numero stagioni recenti da scaricare per le leghe 'main'"),
     populate_db: bool = Query(True, description="Se True, scrive i dati nel database"),
+    skip_completed: bool = Query(True, description="Se True, scarica sempre le stagioni non completate"),
     db: Session = Depends(get_football_db)
 ):
     """
@@ -309,9 +310,39 @@ async def download_all_leagues_centralized(
             file_path = league_dir / season_filename
 
             try:
-                if file_path.exists():
-                    logger.info(f"⏭️ File già presente: {file_path}")
+                # Se skip_completed è True, controlla se la stagione è completata
+                download_csv = False
+                stagione_completata = False
+                if skip_completed:
+                    from app.db.models_football import Season, League
+                    from sqlalchemy import and_
+                    league_obj = db.query(League).filter(League.code == league_code.upper()).first()
+                    season_obj = None
+                    if league_obj:
+                        season_obj = db.query(Season).filter(
+                            and_(Season.league_id == league_obj.id, Season.code == season)
+                        ).first()
+                    if season_obj and season_obj.is_completed:
+                        stagione_completata = True
+                        logger.info(f"⏭️  Skipping {league_code}/{season} - already completed (skip_completed=True)")
+                        results["main"].append({
+                            "league": league_name,
+                            "season": season,
+                            "success": True,
+                            "skipped": True,
+                            "message": f"Season {season} already completed (skip_completed=True)",
+                            "file": str(file_path),
+                            "cached": file_path.exists()
+                        })
+                        continue
+                    else:
+                        # stagione non completata: scarica sempre e sovrascrivi
+                        download_csv = True
                 else:
+                    # skip_completed è False: scarica solo se non esiste
+                    download_csv = not file_path.exists()
+
+                if download_csv:
                     download_url = f"{base_url}/{season}/{league_code}.csv"
                     response = requests.get(download_url, timeout=20)
                     if response.status_code == 404:
@@ -328,6 +359,8 @@ async def download_all_leagues_centralized(
                     with open(file_path, "wb") as f:
                         f.write(filtered_csv)
                     logger.info(f"💾 Salvato: {file_path}")
+                else:
+                    logger.info(f"⏭️ File già presente: {file_path}")
 
                 # Processa la stagione (solo se richiesto)
                 db_result = None
@@ -369,18 +402,7 @@ async def download_all_leagues_centralized(
         league_dir = create_league_directory(league_code)
 
         try:
-            # se abbiamo già file separati per stagione, salta download
-            existing_files = list(league_dir.glob("*.csv"))
-            if existing_files:
-                logger.info(f"⏭️ CSV stagionali già presenti per {league_code}, salto download generale.")
-                for f in existing_files:
-                    if populate_db:
-                        # determina season_name dal nome file
-                        season_name = f.stem
-                        service.process_csv_to_database(str(f), league_code, season_name)
-                continue
-
-            # scarica il CSV unico se non ci sono file salvati
+            # scarica il CSV unico sempre
             response = requests.get(url, timeout=25)
             response.raise_for_status()
             filtered_csv = filter_csv_columns(response.content)
@@ -391,18 +413,42 @@ async def download_all_leagues_centralized(
                 continue
 
             df = df.sort_values(by="Season", ascending=True)
+            # Prendi solo le n_seasons più recenti
             unique_seasons = df["Season"].drop_duplicates().tail(n_seasons)
+            df_recent = df[df["Season"].isin(unique_seasons)]
+
+            from app.db.models_football import Season, League
+            from sqlalchemy import and_
+            league_obj = db.query(League).filter(League.code == league_code.upper()).first()
 
             for season in unique_seasons:
                 season_str = str(season)
                 formatted_season = season_str.replace("/", "_")
                 file_path = league_dir / f"{formatted_season}.csv"
-                
-                if file_path.exists():
-                    logger.info(f"⏭️ File già presente: {file_path}")
-                else:
-                    df[df["Season"] == season].to_csv(file_path, index=False)
-                    logger.info(f"💾 Salvato: {file_path}")
+
+                stagione_completata = False
+                if skip_completed and league_obj:
+                    season_obj = db.query(Season).filter(
+                        and_(Season.league_id == league_obj.id, Season.code == season_str)
+                    ).first()
+                    if season_obj and season_obj.is_completed:
+                        stagione_completata = True
+                        logger.info(f"⏭️  Skipping {league_code}/{season_str} - already completed (skip_completed=True)")
+                        results["other"].append({
+                            "league": league_name,
+                            "season": formatted_season,
+                            "success": True,
+                            "skipped": True,
+                            "message": f"Season {season_str} already completed (skip_completed=True)",
+                            "file": str(file_path),
+                            "cached": file_path.exists()
+                        })
+                        continue
+
+                # Scrivi solo le stagioni più recenti
+                df_season = df_recent[df_recent["Season"] == season]
+                df_season.to_csv(file_path, index=False)
+                logger.info(f"💾 Salvato: {file_path}")
 
                 if populate_db:
                     service.process_csv_to_database(str(file_path), league_code, formatted_season)

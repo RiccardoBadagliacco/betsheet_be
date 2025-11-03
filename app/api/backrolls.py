@@ -269,7 +269,11 @@ def list_backrolls(id: Optional[str] = Query(None, alias="id"), db: Session = De
 
 
 @router.get("/stats", tags=["Backrolls"])
-def backrolls_stats(include_per_backroll: bool = Query(True, description="Include per-backroll histories"), db: Session = Depends(get_db)):
+def backrolls_stats(
+    include_per_backroll: bool = Query(True, description="Include per-backroll histories"),
+    groupBy: str = Query("day", description="Raggruppa le statistiche per: day, week, month, year"),
+    db: Session = Depends(get_db)
+):
     """Return total history: for each date sum the backroll_finale of every backroll.
 
     Rule: if for a backroll there is no value for a certain date, use the previous day's value (carry-forward).
@@ -300,6 +304,24 @@ def backrolls_stats(include_per_backroll: bool = Query(True, description="Includ
         except Exception:
             return None
         return None
+
+    # Helper: raggruppa la data secondo il groupBy richiesto
+    def _group_date(date_str: str) -> str:
+        from datetime import datetime
+        if not date_str:
+            return None
+        dt = datetime.fromisoformat(date_str)
+        if groupBy == "day":
+            return dt.date().isoformat()
+        elif groupBy == "week":
+            # ISO week: YYYY-Www
+            return f"{dt.isocalendar().year}-W{dt.isocalendar().week:02d}"
+        elif groupBy == "month":
+            return dt.strftime("%Y-%m")
+        elif groupBy == "year":
+            return dt.strftime("%Y")
+        else:
+            return dt.date().isoformat()
 
     # collect all date keys present across bets
     all_dates = set()
@@ -363,8 +385,9 @@ def backrolls_stats(include_per_backroll: bool = Query(True, description="Includ
                     date_key = ds[:10]
 
             if date_key:
-                per_map[date_key] = running_total
-                all_dates.add(date_key)
+                group_key = _group_date(date_key)
+                per_map[group_key] = running_total
+                all_dates.add(group_key)
 
         per_br_dates[br.id] = {"name": br.name, "starting": starting, "dates": per_map}
 
@@ -373,12 +396,14 @@ def backrolls_stats(include_per_backroll: bool = Query(True, description="Includ
 
     # build full sorted date list
     sorted_dates = sorted(all_dates)
-
-    # Ensure dates are contiguous by including intermediate dates between min and max
-    min_date = datetime.fromisoformat(sorted_dates[0]).date()
-    max_date = datetime.fromisoformat(sorted_dates[-1]).date()
-    span = (max_date - min_date).days
-    full_dates = [(min_date + timedelta(days=i)).isoformat() for i in range(span + 1)]
+    full_dates = sorted_dates
+    # Solo per day si può interpolare le date mancanti, per week/month/year si usano solo le chiavi presenti
+    if groupBy == "day" and sorted_dates:
+        min_date = datetime.fromisoformat(sorted_dates[0]).date()
+        max_date = datetime.fromisoformat(sorted_dates[-1]).date()
+        span = (max_date - min_date).days
+        full_dates = [(min_date + timedelta(days=i)).isoformat() for i in range(span + 1)]
+    # altrimenti, per week/month/year, usiamo solo le date raggruppate trovate
 
     # fill per-backroll series by carry-forward, starting from starting value
     per_br_filled: Dict[str, Dict[str, float]] = {}
@@ -424,7 +449,8 @@ def backrolls_stats(include_per_backroll: bool = Query(True, description="Includ
 
             date_key = _parse_date_key(getattr(b, "data", None))
             if date_key:
-                profit_by_date[date_key] += float(profit_amount or 0.0)
+                group_key = _group_date(date_key)
+                profit_by_date[group_key] += float(profit_amount or 0.0)
 
     date_array = []
     values_array = []

@@ -264,28 +264,36 @@ class FootballDataService:
             return None
     
     def _update_season_dates(self, season: Season):
-        """Aggiorna le date di inizio e fine della stagione con logica intelligente"""
-        
-        
-        matches = self.db.query(Match).filter(Match.season_id == season.id).all()
-        print('\tSeason', season.code, 'Matches Found:', len(matches))
-        if matches:
-            dates = [m.match_date for m in matches if m.match_date]
-            print('\tSeason', season.code, 'Start Date', min(dates), 'End Date', max(dates))
-            if dates:
-                season.start_date = min(dates)
-                latest_date = max(dates)
-                today = date.today()
-                days_since_last = (today - latest_date).days
-                
-                # Logica intelligente per determinare se la stagione è completata
-                season.is_completed = self._is_season_completed(season, latest_date, days_since_last)
-                print('\t\tSeason', season.code, 'Is Completed:', season.is_completed)
-                
-                if season.is_completed:
-                    season.end_date = latest_date
+        matches = (
+            self.db.query(Match)
+            .filter(Match.season_id == season.id, Match.match_date.isnot(None))
+            .all()
+        )
+
+        if not matches:
+            print(f"No matches found for season {season.code}")
+            return
+
+        dates = [m.match_date for m in matches]
+
+        season.start_date = min(dates)
+        latest_date = max(dates)
+        today = date.today()
+        days_since_last = (today - latest_date).days
+
+        season.is_completed = self._is_season_completed(season, latest_date, days_since_last)
+        print(f"Season {season.code} completed: {season.is_completed}")
+
+        if season.is_completed:
+            season.end_date = latest_date
+
+        self.db.add(season)
     
     def _is_season_completed(self, season: Season, latest_date: date, days_since_last: int) -> bool:
+
+        # ✅ Se c'è già una end_date, la stagione è completata
+        if season.end_date is not None:
+            return True
 
         start_code = season.code.split("/")[0]
         if len(start_code) == 2:
@@ -293,6 +301,7 @@ class FootballDataService:
         else:
             season_year = int(start_code)
 
+        # Stagione più vecchia di 2 anni -> completata
         if season_year < date.today().year - 2:
             return True
 
@@ -300,27 +309,34 @@ class FootballDataService:
         current_year = today.year
         current_month = today.month
 
+        # calcolo stagione calcistica corrente
         if current_month >= 8:
             current_football_year = current_year
         else:
             current_football_year = current_year - 1
 
+        # se la stagione è nel futuro → non completata
         if season_year > current_football_year:
             return False
 
+        # se la stagione è più vecchia di una prima dell'attuale → completata
         if season_year < current_football_year - 1:
             return True
 
+        # stagione corrente (in corso)
         if season_year == current_football_year:
             return False
 
+        # nessuna partita da 120 giorni → probabilmente finita
         if days_since_last > 120:
             return True
 
+        # siamo nel periodo estivo e l'ultima partita è a giugno o prima → finita
         if 6 <= current_month <= 8 and latest_date.month <= 6:
             return True
 
         return False
+
 
     # Metodi di utilità
     def _generate_country_code(self, country_name: str) -> str:

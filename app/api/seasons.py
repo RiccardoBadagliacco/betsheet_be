@@ -10,6 +10,7 @@ from app.db.models_football import Season, League, Match
 from datetime import datetime, date
 from typing import List, Dict, Any
 import logging
+from app.services.football_data_service import FootballDataService
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -147,94 +148,17 @@ async def update_seasons_completion_status(
         db.rollback()
         logger.error(f"Errore nell'aggiornamento stagioni: {e}")
         raise HTTPException(status_code=500, detail=f"Errore: {str(e)}")
-
-@router.get("/seasons/old-active")
-async def get_old_active_seasons(
-    db: Session = Depends(get_football_db)
-):
+     
+@router.post("/update-all-season-dates", tags=["CSV Download"])
+def update_all_season_dates(db: Session = Depends(get_football_db)):
     """
-    Trova stagioni vecchie che risultano ancora attive (is_completed=False)
+    Scansiona tutte le stagioni presenti nel DB e aggiorna le date di inizio/fine e lo stato di completamento.
     """
-    try:
-        current_year = datetime.now().year
-        old_seasons = []
-        
-        seasons = db.query(Season).join(League).filter(
-            Season.is_completed == False
-        ).all()
-        
-        for season in seasons:
-            # Determina l'anno di inizio della stagione
-            season_start_year = int(season.code[:2])
-            if season_start_year > 50:  # 1900+
-                season_start_year += 1900
-            else:  # 2000+
-                season_start_year += 2000
-            
-            # Se la stagione non ha end_date, deve rimanere attiva (is_completed = False)
-            if season.end_date is None:
-                match_count = db.query(Match).filter(Match.season_id == season.id).count()
-                
-                old_seasons.append({
-                    "id": str(season.id),
-                    "league_code": season.league.code,
-                    "league_name": season.league.name,
-                    "season_name": season.name,
-                    "season_code": season.code,
-                    "season_start_year": season_start_year,
-                    "match_count": match_count,
-                    "years_old": current_year - season_start_year,
-                    "should_be_completed": True
-                })
-        
-        return {
-            "success": True,
-            "old_active_seasons": len(old_seasons),
-            "current_year": current_year,
-            "seasons": old_seasons,
-            "message": f"Trovate {len(old_seasons)} stagioni vecchie ancora marcate come attive"
-        }
-        
-    except Exception as e:
-        logger.error(f"Errore nel recupero stagioni vecchie: {e}")
-        raise HTTPException(status_code=500, detail=f"Errore: {str(e)}")
-
-@router.post("/seasons/mark-completed")
-async def mark_seasons_completed(
-    season_codes: List[str] = Query(..., description="Lista dei codici stagione da marcare come completate"),
-    db: Session = Depends(get_football_db)
-):
-    """
-    Marca specifiche stagioni come completate
-    """
-    try:
-        updated_seasons = []
-        
-        for season_code in season_codes:
-            seasons = db.query(Season).filter(Season.code == season_code).all()
-            
-            for season in seasons:
-                if not season.is_completed:
-                    season.is_completed = True
-                    season.updated_at = datetime.utcnow()
-                    
-                    updated_seasons.append({
-                        "id": str(season.id),
-                        "league_code": season.league.code,
-                        "season_name": season.name,
-                        "season_code": season.code
-                    })
-        
-        db.commit()
-        
-        return {
-            "success": True,
-            "updated_count": len(updated_seasons),
-            "updated_seasons": updated_seasons,
-            "message": f"Marcate {len(updated_seasons)} stagioni come completate"
-        }
-        
-    except Exception as e:
-        db.rollback()
-        logger.error(f"Errore nel marcare stagioni completate: {e}")
-        raise HTTPException(status_code=500, detail=f"Errore: {str(e)}")
+    service = FootballDataService(db)
+    seasons = db.query(Season).all()
+    updated = 0
+    for season in seasons:
+        service._update_season_dates(season)
+        updated += 1
+    db.commit()
+    return {"success": True, "seasons_updated": updated}
