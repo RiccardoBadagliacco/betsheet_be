@@ -19,6 +19,9 @@ from tqdm import tqdm
 
 from model import MGModelV1, MARKETS
 
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
 # ---- Config ----
 DB_PATH = os.environ.get("FOOTBALL_DB_PATH", "./data/football_dataset.db")
 CAL_ROOT = "app/ml/mg/v1"
@@ -37,6 +40,8 @@ def load_matches() -> pd.DataFrame:
     SELECT
         l.code AS league_code,
         m.match_date AS match_date,
+        m.home_team_id AS home_team_id,
+        m.away_team_id AS away_team_id,
         m.home_goals_ft AS home_goals,
         m.away_goals_ft AS away_goals,
         m.avg_home_odds  AS odd_home,
@@ -104,6 +109,7 @@ def split_time(df: pd.DataFrame):
 def predict_block(df: pd.DataFrame, model: MGModelV1) -> pd.DataFrame:
     preds = []
     for _, r in tqdm(df.iterrows(), total=len(df), desc="Predicting matches"):
+        print(f"Processing match on {r['match_date'].date()} between {r['home_team_id']} and {r['away_team_id']}")
         payload = {
             "avg_home_odds": float(r["odd_home"]),
             "avg_draw_odds": float(r["odd_draw"]),
@@ -112,6 +118,8 @@ def predict_block(df: pd.DataFrame, model: MGModelV1) -> pd.DataFrame:
             "avg_under_25_odds": float(r["odd_under25"]) if not pd.isna(r["odd_under25"]) else None,
             "league_code": r["league_code"],
             "season": r["season"],
+            "home_team_id": r["home_team_id"],   # 👈 aggiungi
+            "away_team_id": r["away_team_id"],   # 👈 aggiungi
         }
         out = model.predict(payload)
         preds.append(out.probs)
@@ -140,7 +148,42 @@ def optimize_thresholds(df: pd.DataFrame) -> dict:
         out[mkt] = {"tau": best_tau, "accuracy": best_acc, "n": int(len(p))}
     return out
 
-def main(patch: int = 0):
+def optimize_gate_thresholds(df: pd.DataFrame) -> dict:
+    # griglia sensata
+    grid = np.round(np.arange(0.50, 0.86, 0.02), 2)
+    best = {"home": {"tau": 0.65, "score": 1e9},
+            "away": {"tau": 0.60, "score": 1e9}}
+
+    # Valutiamo una loss semplice: media Brier dei mercati del lato
+    # NB: i NaN (mercati azzerati) vengono esclusi, quindi "premiamo" filtri che riducono errori.
+
+    def side_markets(side):
+        return [m for m in MARKETS if ("HOME" in m) == (side=="home")]
+
+    for side in ("home", "away"):
+        mkts = side_markets(side)
+        for tau in grid:
+            # Applica il gate "virtualmente": seleziona righe dove il lato è favorito e p_ge1 < tau → escludi
+            # Pre-calcola flag favorito e p_ge1 (puoi ricavarli e salvarli dal modello, oppure ricalcolarli brevemente)
+            # Se non li hai nel df, salta a prima iterazione: puoi iniziare con tau default e affinare poi.
+            briers = []
+            for m in mkts:
+                p = df[m].astype(float).values
+                y = df["y_"+m].astype(int).values
+                mask = ~np.isnan(p)
+                if mask.sum() == 0:
+                    continue
+                briers.append( np.mean((p[mask]-y[mask])**2) )
+            if len(briers)==0: 
+                continue
+            score = float(np.mean(briers))
+            if score < best[side]["score"]:
+                best[side] = {"tau": float(tau), "score": score}
+
+    return {"gate_tau_home": best["home"]["tau"], "gate_tau_away": best["away"]["tau"]}
+
+
+def main(patch: int = 0,sample_size: int = 10000):
     # 1) load and label
     df_all = load_matches()
     df_all = add_targets(df_all)
@@ -202,6 +245,16 @@ def main(patch: int = 0):
             "coverage": float(len(y) / N_total),
     }
 
+    # 4.5) ottimizzazione del gate "favorite must score"
+    if patch >= 4:   # o se vuoi attivarlo anche su P3, togli la condizione
+        gate = optimize_gate_thresholds(test_pred)
+        with open(f"data/mg_gate_thresholds_P{patch}.json", "w") as f:
+            json.dump(gate, f, indent=2)
+        print("Saved gate thresholds:", gate)
+
+        # Applica le soglie al modello (opzionale, se vuoi usarle nei run successivi)
+        model.gate_tau_home = gate["gate_tau_home"]
+        model.gate_tau_away = gate["gate_tau_away"]
 
     # 5) threshold optimization on train (or on test for quick demo)
     thresholds = optimize_thresholds(test_pred)
@@ -214,7 +267,6 @@ def main(patch: int = 0):
     print("=== MG Backtest Report (TEST) ===")
     for mkt, d in report.items():
         print(mkt, d)
-    print("\nSaved thresholds to:", THRESHOLDS_OUT)
 
 if __name__ == "__main__":
     import sys

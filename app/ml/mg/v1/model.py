@@ -15,7 +15,7 @@ from dataclasses import dataclass
 from typing import Dict, Optional, Tuple
 
 import numpy as np
-
+from .utils import shin_derake, build_mu_priors, compute_recent_form
 try:
     # Optional: used if calibrators are present (sklearn IsotonicRegression pickles)
     import pickle
@@ -34,6 +34,9 @@ class MGInput:
     season: Optional[str] = None  # free text (e.g., "2023/2024")
     # Optional prior for total goals if O/U is missing
     mu_total_prior: Optional[float] = None  # typical ~2.6 (league-season prior)
+    
+    home_team_id: Optional[str] = None
+    away_team_id: Optional[str] = None
 
 
 @dataclass
@@ -65,13 +68,14 @@ class MGModelV1:
 
     def __init__(
         self,
-        patch: int = 0, 
+        patch: int = 0,
         calibrators_global_dir: Optional[str] = None,
         calibrators_leagues_dir: Optional[str] = None,
         use_league_calibrators: bool = True,
         home_fav_threshold: float = 1.8,
         away_fav_threshold: float = 1.9,
         max_goals_grid: int = 12,
+      
     ):
         self.patch = patch
         self.version = f"MGModelV1-P{patch}"
@@ -86,8 +90,43 @@ class MGModelV1:
             self.cal_global = self._load_calibrators_dir(calibrators_global_dir)
         if calibrators_leagues_dir and pickle is not None and self.use_league_calibrators:
             self.cal_leagues = self._load_calibrators_dir(calibrators_leagues_dir, by_league=True)
+            
+        self.enable_gate = False  # disattivo di default
+        self.gate_tau_home = 0.65
+        self.gate_tau_away = 0.60
+            
+        # P2: carica i priors di lega/stagione
+        try:
+            self.mu_priors = build_mu_priors()
+            print(f"[P2] Loaded {len(self.mu_priors)} μ_total priors from DB.")
+            # 👇 AGGIUNGI QUESTO BLOCCO
+        except Exception as e:
+            print(f"[WARN] Could not load μ priors: {e}")
+            self.mu_priors = {}
+            
+        try:
+
+            self.form_df = compute_recent_form()
+            print(self.form_df.sample(5))
+            print(self.form_df["gf_recent"].describe())
+            print(f"[P1] Loaded recent form table: {len(self.form_df)} entries")
+        except Exception as e:
+            print(f"[WARN] Could not load recent form data: {e}")
+            self.form_df = None
 
     # ---------- Public API ----------
+    
+    def _derake_shin(self, odds):
+        """
+        Usa il metodo di Shin (1993) per derakare le quote 1X2.
+        """
+        try:
+            if any(o is None or o <= 1.0 for o in odds):
+                return self._derake_threeway(*odds)   # derake proporzionale di fallback
+            probs, zeta = shin_derake(odds)
+            return probs
+        except Exception:
+            return self._derake_threeway(*odds)
 
     def predict(self, data: Dict) -> MGOutput:
         """
@@ -95,11 +134,21 @@ class MGModelV1:
         Returns: MGOutput with probabilities for the six MG markets.
         """
         inp = MGInput(**data)
+        
+        self.current_league = inp.league_code
+        self.current_season = inp.season
+        
+        self.home_id = inp.home_team_id
+        self.away_id = inp.away_team_id
+                
+        # P2: normalizza il formato season (es. "2025_2026" -> "2025/2026")
+        if inp.season and "_" in inp.season:
+            inp.season = inp.season.replace("_", "/")
 
         # 1) Derake 1X2 (and O/U if present)
-        p1, px, p2 = self._derake_threeway(
+        p1, px, p2 = self._derake_shin([
             inp.avg_home_odds, inp.avg_draw_odds, inp.avg_away_odds
-        )
+        ])
 
         p_over25 = p_under25 = None
         p_over25, p_under25, _ = self._derake_threeway(
@@ -108,19 +157,45 @@ class MGModelV1:
 
         # 2) Estimate lambdas
         lam_h, lam_a = self._estimate_lambdas(
-            p1=p1, px=px, p2=p2, p_over25=p_over25, mu_total_prior=inp.mu_total_prior
+            p1=p1, px=px, p2=p2,
+            p_over25=p_over25,
+            mu_total_prior=inp.mu_total_prior,
+            league_code=inp.league_code,
+            season=inp.season,
         )
 
         # 3) Raw MG probs from Poisson marginals
         raw = self._compute_mg_probs(lam_h, lam_a)
         
-        # --- PATCH 1: MG selettivo per favoriti ---
         if inp.avg_home_odds and inp.avg_home_odds > self.home_fav_threshold:
             for k in ["MG_HOME_1_3","MG_HOME_1_4","MG_HOME_1_5"]:
                 raw[k] = None
         if inp.avg_away_odds and inp.avg_away_odds > self.away_fav_threshold:
             for k in ["MG_AWAY_1_3","MG_AWAY_1_4","MG_AWAY_1_5"]:
                 raw[k] = None
+        
+        if hasattr(self, "enable_gate") and self.enable_gate:
+            # Probabilità che ciascuna segni almeno 1
+            p_h_ge1 = 1.0 - math.exp(-lam_h)
+            p_a_ge1 = 1.0 - math.exp(-lam_a)
+
+            # Favorito dal derake 1X2
+            # (usa p1, p2 già calcolate: home favorito se p1 > p2)
+            is_home_fav = (p1 is not None and p2 is not None and p1 > p2)
+            is_away_fav = (p1 is not None and p2 is not None and p2 > p1)
+
+            # soglie (parametrizzabili)
+            tau_home = getattr(self, "gate_tau_home", 0.65)  # default
+            tau_away = getattr(self, "gate_tau_away", 0.60)  # default
+
+            # se favorito non supera la soglia, azzera i mercati del suo lato
+            if is_home_fav and (p_h_ge1 < tau_home):
+                for k in ("MG_HOME_1_3", "MG_HOME_1_4", "MG_HOME_1_5"):
+                    raw[k] = None
+            if is_away_fav and (p_a_ge1 < tau_away):
+                for k in ("MG_AWAY_1_3", "MG_AWAY_1_4", "MG_AWAY_1_5"):
+                    raw[k] = None
+                
 
         # 4) Calibration (league-specific -> global fallback)
         calibrated = False
@@ -175,6 +250,8 @@ class MGModelV1:
         p2: float,
         p_over25: Optional[float] = None,
         mu_total_prior: Optional[float] = None,
+        league_code: Optional[str] = None,
+        season: Optional[str] = None,
     ) -> Tuple[float, float]:
         """
         Compute (lambda_home, lambda_away).
@@ -185,8 +262,18 @@ class MGModelV1:
         # Step A: total goals (mu)
         if p_over25 is not None:
             mu = self._invert_over25_to_mu(p_over25)
+        elif hasattr(self, "mu_priors"):
+            key = (league_code, season)
+            mu = self.mu_priors.get(key, 2.6)
         else:
-            mu = float(mu_total_prior) if (mu_total_prior and mu_total_prior > 0) else 2.6
+            mu = float(mu_total_prior) if mu_total_prior else 2.6
+            
+        # μ adattivo (baseline P3.2)
+        if p1 is not None and p2 is not None:
+            imbalance = abs(p1 - p2)
+            if imbalance > 0.2:
+                alpha = 0.18
+                mu *= (1 - alpha * imbalance)
 
         # Step B: find delta (difference in means) consistent with 1X2
         # Bounds for delta: must be within [-mu+eps, mu-eps], but allow a bit wider for safety
@@ -194,6 +281,75 @@ class MGModelV1:
 
         lam_h = max(0.05, (mu + delta) / 2.0)
         lam_a = max(0.05, (mu - delta) / 2.0)
+        
+        if getattr(self, "form_df", None) is not None:
+            try:
+                form = self.form_df
+                league = league_code
+                season = season
+
+                # Media dei gol totali di lega per normalizzare
+                mu_league = np.mean([
+                    v for k, v in self.mu_priors.items()
+                    if k[0] == league
+                ]) if self.mu_priors else 2.6
+                mu_home_league = mu_league / 2.0
+
+                # Recupera forma recente di home e away (EMA smussata)
+                gf_home = form.loc[
+                    (form["team_id"] == getattr(self, "home_id", None)) &
+                    (form["season"] == season),
+                    "gf_recent"
+                ].mean()
+                ga_home = form.loc[
+                    (form["team_id"] == getattr(self, "home_id", None)) &
+                    (form["season"] == season),
+                    "ga_recent"
+                ].mean()
+                gf_away = form.loc[
+                    (form["team_id"] == getattr(self, "away_id", None)) &
+                    (form["season"] == season),
+                    "gf_recent"
+                ].mean()
+                ga_away = form.loc[
+                    (form["team_id"] == getattr(self, "away_id", None)) &
+                    (form["season"] == season),
+                    "ga_recent"
+                ].mean()
+
+                # --- (1) Correzione individuale di forma ---
+                alpha = 0.3
+                if not np.isnan(gf_home) and mu_home_league > 0:
+                    old_h = lam_h
+                    ratio = gf_home / mu_home_league
+                    lam_h *= (1 + alpha * (ratio - 1))
+                    print(f"[Form] Home ratio={ratio:.2f} λ_h: {old_h:.2f}→{lam_h:.2f}")
+
+                if not np.isnan(ga_away) and mu_home_league > 0:
+                    old_a = lam_a
+                    ratio = ga_away / mu_home_league
+                    lam_a *= (1 + alpha * (ratio - 1))
+                    print(f"[Form] Away ratio={ratio:.2f} λ_a: {old_a:.2f}→{lam_a:.2f}")
+
+                # --- (2) MATCHUP ADJUSTMENT ---
+                if not np.isnan(gf_home) and not np.isnan(ga_away):
+                    old_h = lam_h
+                    adj = 0.5 * (gf_home / mu_home_league) + 0.5 * (ga_away / mu_home_league)
+                    lam_h *= (1 + 0.25 * (adj - 1))
+                    print(f"[Form-MU] Home matchup adj: {adj:.2f} λ_h {old_h:.2f}→{lam_h:.2f}")
+
+                if not np.isnan(ga_home) and not np.isnan(gf_away):
+                    old_a = lam_a
+                    adj = 0.5 * (gf_away / mu_home_league) + 0.5 * (ga_home / mu_home_league)
+                    lam_a *= (1 + 0.25 * (adj - 1))
+                    print(f"[Form-MU] Away matchup adj: {adj:.2f} λ_a {old_a:.2f}→{lam_a:.2f}")
+
+            except Exception as e:
+                print(f"[Form][WARN] adjustment failed: {e}")
+
+        # --- (3) Clipping finale di sicurezza ---
+        lam_h = np.clip(lam_h, 0.4, 3.5)
+        lam_a = np.clip(lam_a, 0.3, 3.0)
         return lam_h, lam_a
 
     def _invert_over25_to_mu(self, p_over25: float) -> float:

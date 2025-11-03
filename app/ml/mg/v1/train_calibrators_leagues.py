@@ -30,17 +30,17 @@ parser.add_argument("--patch", type=int, default=int(os.getenv("MG_PATCH", 0)))
 args = parser.parse_args()
 PATCH = args.patch
 DB_PATH = os.environ.get("FOOTBALL_DB_PATH", "./data/football_dataset.db")
-OUT_BASE = f"app/ml/mg/v1/calibrators_p{PATCH}/leagues"
+OUT_BASE = f"app/ml/mg/v1/calibrators/leagues"
 
 
 def load_matches(limit=None) -> pd.DataFrame:
     conn = sqlite3.connect(DB_PATH)
     q = """
-    SELECT
+    SELECT 
         l.code AS league_code,
         m.match_date AS match_date,
-        m.home_goals_ft AS home_goals,
-        m.away_goals_ft AS away_goals,
+        m.home_goals_ft AS home_goals_ft,
+        m.away_goals_ft AS away_goals_ft,
         m.avg_home_odds  AS odd_home,
         m.avg_draw_odds  AS odd_draw,
         m.avg_away_odds  AS odd_away,
@@ -61,15 +61,27 @@ def load_matches(limit=None) -> pd.DataFrame:
     return df
 
 def label_targets(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Crea le colonne target (y_MG_HOME_*, y_MG_AWAY_*) per i mercati MG.
+    Usa i gol finali (colonne '_ft').
+    """
     df = df.copy()
-    hg = df["home_goals"].astype(int)
-    ag = df["away_goals"].astype(int)
+
+    # Usa i nomi corretti delle colonne dal DB
+    if "home_goals_ft" not in df.columns or "away_goals_ft" not in df.columns:
+        raise KeyError("Missing columns 'home_goals_ft' or 'away_goals_ft' in DataFrame")
+
+    hg = df["home_goals_ft"].astype(int)
+    ag = df["away_goals_ft"].astype(int)
+
     df["y_MG_HOME_1_3"] = ((hg >= 1) & (hg <= 3)).astype(int)
     df["y_MG_HOME_1_4"] = ((hg >= 1) & (hg <= 4)).astype(int)
     df["y_MG_HOME_1_5"] = ((hg >= 1) & (hg <= 5)).astype(int)
+
     df["y_MG_AWAY_1_3"] = ((ag >= 1) & (ag <= 3)).astype(int)
     df["y_MG_AWAY_1_4"] = ((ag >= 1) & (ag <= 4)).astype(int)
     df["y_MG_AWAY_1_5"] = ((ag >= 1) & (ag <= 5)).astype(int)
+
     return df
 
 def main():
