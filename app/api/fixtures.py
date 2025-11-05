@@ -79,56 +79,137 @@ def organize_predictions_by_hierarchy(fixtures: list) -> dict:
     """
     organized = {}
     
+    # Ottieni mapping league_code -> country_code dal DB
+    from app.db.database_football import get_football_db
+    db = next(get_football_db())
+    league_to_country = {}
+    try:
+        from app.db.models_football import League, Country
+        leagues = db.query(League).all()
+        for l in leagues:
+            if l.country and l.country.code:
+                league_to_country[l.code] = l.country.code
+    except Exception:
+        pass
+    finally:
+        try:
+            db.close()
+        except Exception:
+            pass
+
     for fixture in fixtures:
-        # Estrai informazioni
-        match_date = fixture.get('match_date', 'Unknown')
+        # Skip fixtures without recommendations or with empty recommendations
+        recs = fixture.get('recommendations')
+        if not recs or (isinstance(recs, (list, dict)) and len(recs) == 0):
+            continue
+        # Normalizza la data della fixture al formato YYYY-MM-DD
+        raw_md = fixture.get('match_date', None)
+        match_date = 'Unknown'
+        try:
+            if raw_md is not None and str(raw_md).strip() != '':
+                    # Parse with month-first interpretation (dayfirst=False) to
+                    # ensure ambiguous dates like '11/01/2025' become 2025-11-01
+                    dt = pd.to_datetime(raw_md, errors='coerce', dayfirst=False, yearfirst=False)
+                    if pd.isna(dt):
+                        # fallback: try dayfirst parsing if month-first fails
+                        dt = pd.to_datetime(raw_md, errors='coerce', dayfirst=True)
+                    if not pd.isna(dt):
+                        match_date = dt.date().isoformat()
+        except Exception:
+            try:
+                # fallback: prendi i primi 10 caratteri se sembra una ISO string
+                s = str(raw_md)
+                if len(s) >= 10:
+                    match_date = s[:10]
+            except Exception:
+                match_date = 'Unknown'
         league_code = fixture.get('league_code', 'Unknown')
-        country = get_country_from_league_code(league_code)
+        country_code = league_to_country.get(league_code, 'UNK')
         league_name = get_league_name_from_code(league_code)
-        
-        # Crea struttura gerarchica se non esiste
+
         if match_date not in organized:
             organized[match_date] = {}
-        
-        if country not in organized[match_date]:
-            organized[match_date][country] = {}
-        
-        if league_code not in organized[match_date][country]:
-            organized[match_date][country][league_code] = {
+        if country_code not in organized[match_date]:
+            organized[match_date][country_code] = {}
+        if league_code not in organized[match_date][country_code]:
+            organized[match_date][country_code][league_code] = {
                 "league_name": league_name,
-                "country": country,
+                "country": country_code,
                 "fixtures": []
             }
-        
-        # Aggiungi la fixture alla struttura
-        organized[match_date][country][league_code]["fixtures"].append(fixture)
+
+        # Normalizza e assicura che la fixture contenga anche l'ora (match_time) nel formato HH:MM
+        fixture_out = dict(fixture) if isinstance(fixture, dict) else {}
+        # Assicura che il campo match_date nella fixture abbia lo stesso formato YYYY-MM-DD
+        fixture_out['match_date'] = match_date if match_date != 'Unknown' else None
+        mt = fixture.get('match_time') or fixture.get('time') or None
+        if mt is None:
+            # prova a estrarre l'ora da match_date se è un datetime
+            md = fixture.get('match_date')
+            try:
+                import pandas as _pd
+                if md is not None and not _pd.isna(md):
+                    parsed = _pd.to_datetime(md)
+                    if parsed and (parsed.hour or parsed.minute):
+                        fixture_out['match_time'] = parsed.strftime('%H:%M')
+                    else:
+                        fixture_out['match_time'] = None
+                else:
+                    fixture_out['match_time'] = None
+            except Exception:
+                fixture_out['match_time'] = None
+        else:
+            # Normalizza stringhe "HH:MM[:SS]" o datetime-like
+            try:
+                from datetime import datetime as _dt
+                if isinstance(mt, str):
+                    mt_str = mt.strip()
+                    try:
+                        parsed_time = _dt.strptime(mt_str, '%H:%M:%S')
+                        fixture_out['match_time'] = parsed_time.strftime('%H:%M')
+                    except Exception:
+                        try:
+                            parsed_time = _dt.strptime(mt_str, '%H:%M')
+                            fixture_out['match_time'] = parsed_time.strftime('%H:%M')
+                        except Exception:
+                            # leave as-is trimmed
+                            fixture_out['match_time'] = mt_str
+                else:
+                    # datetime/time-like
+                    try:
+                        fixture_out['match_time'] = mt.strftime('%H:%M')
+                    except Exception:
+                        fixture_out['match_time'] = str(mt)
+            except Exception:
+                fixture_out['match_time'] = str(mt)
+
+        organized[match_date][country_code][league_code]["fixtures"].append(fixture_out)
     
     # Ordina le date
     sorted_organized = {}
     for date_key in sorted(organized.keys()):
         sorted_organized[date_key] = {}
-        
-        # Ordina i paesi alfabeticamente
-        for country_key in sorted(organized[date_key].keys()):
-            sorted_organized[date_key][country_key] = {}
-            
+
+        # Ordina i country_code alfabeticamente
+        for country_code in sorted(organized[date_key].keys()):
+            sorted_organized[date_key][country_code] = {}
+
             # Ordina le leghe alfabeticamente
-            for league_key in sorted(organized[date_key][country_key].keys()):
-                league_data = organized[date_key][country_key][league_key]
-                
+            for league_key in sorted(organized[date_key][country_code].keys()):
+                league_data = organized[date_key][country_code][league_key]
+
                 # Ordina le fixture per orario se disponibile
                 fixtures_sorted = sorted(
-                    league_data["fixtures"], 
+                    league_data["fixtures"],
                     key=lambda x: (x.get('match_time') or '00:00', x.get('home_team', ''))
                 )
-                
-                sorted_organized[date_key][country_key][league_key] = {
+
+                sorted_organized[date_key][country_code][league_key] = {
                     "league_name": league_data["league_name"],
                     "country": league_data["country"],
                     "fixture_count": len(fixtures_sorted),
                     "fixtures": fixtures_sorted
                 }
-    
     return sorted_organized
 
 
@@ -821,7 +902,6 @@ def map_league_code_from_db(db: Session, country_name: str, league_name: str) ->
             return None
 
         # Cerca la lega nel database
-        # Cerca la lega all'interno di country.leagues
         league = next(
             (l for l in country.leagues if l.name.lower() == league_name.lower()), 
             None
@@ -830,7 +910,8 @@ def map_league_code_from_db(db: Session, country_name: str, league_name: str) ->
             logger.warning(f"Lega non trovata: {league_name} per paese {country_name}")
             return None
 
-        return league.code
+        # Restituisci il codice del paese invece del nome
+        return country.code
     except Exception as e:
-        logger.error(f"Errore nel recupero del codice lega: {e}")
+        logger.error(f"Errore nel recupero del codice paese: {e}")
         return None
