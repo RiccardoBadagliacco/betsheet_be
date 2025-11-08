@@ -12,7 +12,7 @@ from fastapi.responses import JSONResponse
 from fastapi.requests import Request
 from sqlalchemy.exc import IntegrityError
 from app.schemas.user import ErrorResponse
-
+import logging
 
 # --- CORS ---
 origins = [str(o).rstrip('/') for o in settings.CORS_ORIGINS]
@@ -47,5 +47,9 @@ async def global_exception_handler(request: Request, exc: Exception):
     return JSONResponse(status_code=500, content=ErrorResponse(success=False, message="Internal Server Error", error=str(exc)).dict())
 
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+)
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000, reload=True)

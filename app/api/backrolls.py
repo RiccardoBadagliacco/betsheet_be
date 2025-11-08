@@ -556,6 +556,256 @@ def delete_backroll(id: str, db: Session = Depends(get_db)):
 
 
 
+@router.get("/v2/stats", tags=["Backrolls"])
+def backrolls_stats_v2(
+    groupBy: str = Query("day", description="Raggruppa le statistiche per: day, week, month, year"),
+    type: str = Query("backroll", description="Tipo di dati: 'total' (solo date e total), 'backroll' (date + backrolls), 'profit' (profit bars)"),
+    db: Session = Depends(get_db)
+):
+    """Return stats in Recharts-compatible format based on type:
+    - type=total: [{date, total}, ...]
+    - type=backroll: [{date, backroll_1, backroll_2, ...}, ...]  
+    - type=profit: [{date, profit, positive, positiveBase, positiveHeight, negativeBase, negativeHeight, cumulativeTotal}, ...]
+    """
+    # Load all backrolls with their bets
+    brs = db.query(Backroll).options(joinedload(Backroll.bets)).all()
+
+    # Helper: parse date string -> date iso
+    def _parse_date_key(s) -> Optional[str]:
+        if not s:
+            return None
+        try:
+            dt = None
+            ss = str(s).strip()
+            try:
+                dt = datetime.fromisoformat(ss)
+            except Exception:
+                try:
+                    dt = datetime.strptime(ss, "%Y-%m-%d %H:%M:%S")
+                except Exception:
+                    try:
+                        dt = datetime.strptime(ss, "%Y-%m-%d")
+                    except Exception:
+                        dt = None
+            if dt:
+                return dt.date().isoformat()
+        except Exception:
+            return None
+        return None
+
+    # Helper: raggruppa la data secondo il groupBy richiesto
+    def _group_date(date_str: str) -> str:
+        from datetime import datetime
+        if not date_str:
+            return None
+        dt = datetime.fromisoformat(date_str)
+        if groupBy == "day":
+            return dt.date().isoformat()
+        elif groupBy == "week":
+            # ISO week: YYYY-Www
+            return f"{dt.isocalendar().year}-W{dt.isocalendar().week:02d}"
+        elif groupBy == "month":
+            return dt.strftime("%Y-%m")
+        elif groupBy == "year":
+            return dt.strftime("%Y")
+        else:
+            return dt.date().isoformat()
+
+    # collect all date keys present across bets
+    all_dates = set()
+
+    # per-backroll raw date->value map
+    per_br_dates: Dict[str, Dict[str, float]] = {}
+    backroll_names = {}
+
+    for br in brs:
+        starting = float(br.backroll or 0)
+        per_map: Dict[str, float] = {}
+        backroll_names[br.id] = br.name or f"Backroll {br.id[:8]}"
+        
+        # build history using running total (like list_backrolls)
+        raw_bets = list(getattr(br, "bets", []) or [])
+        parsed_bets = []
+        for b in raw_bets:
+            dt = None
+            date_raw = getattr(b, "data", None)
+            if date_raw:
+                s = str(date_raw).strip()
+                try:
+                    dt = datetime.fromisoformat(s)
+                except Exception:
+                    try:
+                        dt = datetime.strptime(s, "%Y-%m-%d %H:%M:%S")
+                    except Exception:
+                        dt = None
+            
+            # If we couldn't parse from data field, use created_at
+            if dt is None and hasattr(b, 'created_at') and b.created_at:
+                dt = b.created_at
+            
+            parsed_bets.append((b, dt))
+
+        parsed_bets.sort(key=lambda x: (x[1] is None, x[1] or datetime.min, getattr(x[0], 'created_at', None) or datetime.min))
+
+        running_total = float(br.backroll or 0)
+        for b, dt in parsed_bets:
+            # compute profit per bet
+            try:
+                profit_val = getattr(b, "profitto", None)
+                profit_amount = float(profit_val) if profit_val is not None else None
+            except Exception:
+                profit_amount = None
+            if profit_amount is None:
+                try:
+                    vincita = float(getattr(b, "vincita", 0) or 0)
+                    importo = float(getattr(b, "importo", 0) or 0)
+                    profit_amount = vincita - importo
+                except Exception:
+                    profit_amount = 0.0
+
+            running_total = round(running_total + float(profit_amount or 0), 2)
+
+            # determine date_key
+            date_key = None
+            if dt:
+                date_key = dt.date().isoformat()
+            else:
+                date_raw = getattr(b, "data", None)
+                if date_raw:
+                    ds = str(date_raw).strip()
+                    date_key = ds[:10]
+
+            if date_key:
+                group_key = _group_date(date_key)
+                per_map[group_key] = round(running_total, 2)
+                all_dates.add(group_key)
+
+        per_br_dates[br.id] = {"name": br.name, "starting": round(starting, 2), "dates": per_map}
+
+    if not all_dates:
+        return []
+
+    # build full sorted date list
+    sorted_dates = sorted(all_dates)
+    full_dates = sorted_dates
+    # Solo per day si può interpolare le date mancanti, per week/month/year si usano solo le chiavi presenti
+    if groupBy == "day" and sorted_dates:
+        min_date = datetime.fromisoformat(sorted_dates[0]).date()
+        max_date = datetime.fromisoformat(sorted_dates[-1]).date()
+        span = (max_date - min_date).days
+        full_dates = [(min_date + timedelta(days=i)).isoformat() for i in range(span + 1)]
+
+    # fill per-backroll series by carry-forward, starting from starting value
+    per_br_filled: Dict[str, Dict[str, float]] = {}
+    for br_id, info in per_br_dates.items():
+        filled = {}
+        # contribution starts from the starting value
+        prev = round(info.get("starting", 0.0), 2)
+        dates_map = info.get("dates", {})
+        for dk in full_dates:
+            if dk in dates_map:
+                prev = round(dates_map[dk], 2)
+            filled[dk] = prev
+        per_br_filled[br_id] = filled
+
+    # Build response based on type parameter
+    if type == "total":
+        # Return only date and total
+        result = []
+        for dk in full_dates:
+            total = 0.0
+            for br_id, series in per_br_filled.items():
+                total += float(series.get(dk, 0) or 0)
+            result.append({
+                "date": dk,
+                "total": round(total, 2)
+            })
+        return result
+    
+    elif type == "profit":
+        # Calculate daily profits for profit bars with start/end logic
+        from collections import defaultdict
+        profit_by_date = defaultdict(float)
+        
+        # Collect daily profits from bets
+        for br in brs:
+            for b in getattr(br, "bets", []) or []:
+                try:
+                    profit_val = getattr(b, "profitto", None)
+                    profit_amount = float(profit_val) if profit_val is not None else None
+                except Exception:
+                    profit_amount = None
+                if profit_amount is None:
+                    try:
+                        vincita = float(getattr(b, "vincita", 0) or 0)
+                        importo = float(getattr(b, "importo", 0) or 0)
+                        profit_amount = vincita - importo
+                    except Exception:
+                        profit_amount = 0.0
+
+                date_key = _parse_date_key(getattr(b, "data", None))
+                if date_key:
+                    group_key = _group_date(date_key)
+                    profit_by_date[group_key] = round(profit_by_date[group_key] + float(profit_amount or 0.0), 2)
+        
+        # Build profit structure with start/end logic like frontend
+        result = []
+        
+        # Calculate initial total (sum of all starting backrolls)
+        initial_total = 0.0
+        for br in brs:
+            initial_total = round(initial_total + float(br.backroll or 0), 2)
+        
+        # Track cumulative profit (starting from 0)
+        cumulative_profit = 0.0
+        
+        for i, dk in enumerate(full_dates):
+            daily_profit = round(float(profit_by_date.get(dk, 0.0) or 0.0), 2)
+            
+            if i == 0:
+                # First entry: show initial backroll total as starting point
+                cumulative_profit = round(cumulative_profit + daily_profit, 2)
+                current_total = round(initial_total + cumulative_profit, 2)
+                result.append({
+                    "date": dk,
+                    "start": round(initial_total, 2),
+                    "end": current_total,
+                    "value": round(initial_total, 2)  # Initial backroll value
+                })
+            else:
+                # Subsequent entries: delta logic for profit changes
+                start_total = round(initial_total + cumulative_profit, 2)
+                cumulative_profit = round(cumulative_profit + daily_profit, 2)
+                end_total = round(initial_total + cumulative_profit, 2)
+                
+                result.append({
+                    "date": dk,
+                    "delta": daily_profit,
+                    "start": start_total,
+                    "end": end_total
+                })
+        
+        return result
+    
+    else:  # type == "backroll" or default
+        # Return date + individual backrolls (original behavior)
+        result = []
+        for dk in full_dates:
+            entry = {"date": dk}
+            
+            # Add each backroll as a separate field
+            for br_id, series in per_br_filled.items():
+                br_value = round(float(series.get(dk, 0) or 0), 2)
+                # Use backroll name as key, fallback to ID if name is empty
+                key = backroll_names.get(br_id) or f"backroll_{br_id[:8]}"
+                # Sanitize key for JSON compatibility (remove spaces and special chars)
+                key = key.replace(" ", "_").replace("-", "_").replace(".", "_")
+                entry[key] = br_value
+            
+            result.append(entry)
+        return result
+
+
 @router.get("/total", tags=["Backrolls"])
 def total_backroll(db: Session = Depends(get_db)):
     """Return the total current backroll considering all backrolls (initial + bets profit)."""

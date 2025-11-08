@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     SQLALCHEMY_DATABASE_URL: str = "sqlite:///./data/bets.db"
     FOOTBALL_DATABASE_URL: str = "sqlite:///./data/football_dataset.db"
     # Comma-separated origins or list
-    CORS_ORIGINS: List[AnyHttpUrl] = ["http://localhost:4200", "http://127.0.0.1:8000"]
+    CORS_ORIGINS: List[AnyHttpUrl] = ["http://localhost:4200", "http://127.0.0.1:8000","http://localhost:3000"]
     SECRET_KEY: str = "replace-me"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7
 

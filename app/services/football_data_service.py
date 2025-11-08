@@ -14,6 +14,7 @@ import re
 from sqlalchemy import and_, or_
 
 logger = logging.getLogger(__name__)
+BATCH_SIZE = 500
 
 class FootballDataService:
     """Servizio per gestire i dati calcistici nel database"""
@@ -21,174 +22,6 @@ class FootballDataService:
     def __init__(self, db: Session):
         self.db = db
     
-    def get_or_create_country(self, country_name: str, country_code: str = None) -> Country:
-        """Ottieni o crea un paese"""
-        
-        # Genera codice paese se non fornito
-        if not country_code:
-            country_code = self._generate_country_code(country_name)
-        
-        # Cerca paese esistente
-        country = self.db.query(Country).filter(
-            or_(Country.name == country_name, Country.code == country_code)
-        ).first()
-        
-        if not country:
-            country = Country(
-                name=country_name,
-                code=country_code,
-                flag_url=self._get_flag_url(country_code)
-            )
-            self.db.add(country)
-            self.db.commit()
-            logger.info(f"✅ Created country: {country_name} ({country_code})")
-        
-        return country
-    
-    def get_or_create_league(self, league_code: str) -> League:
-        """Ottieni o crea una lega"""
-        
-        # Cerca lega esistente
-        league = self.db.query(League).filter(League.code == league_code).first()
-        
-        if not league:
-            # Ottieni info dalla configurazione
-            league_info = get_all_leagues('all').get(league_code, {})
-            league_name = league_info.get("name", f"Unknown League {league_code}")
-            country_name = league_info.get("country", "Unknown")
-            
-            # Crea o ottieni paese
-            country = self.get_or_create_country(country_name)
-            
-            # Determina tier dalla configurazione
-            tier = self._determine_league_tier(league_code, league_name)
-            
-            league = League(
-                code=league_code,
-                name=league_name,
-                country_id=country.id,
-                tier=tier,
-                logo_url=self._get_league_logo_url(league_code)
-            )
-            self.db.add(league)
-            self.db.commit()
-            logger.info(f"✅ Created league: {league_name} ({league_code})")
-        
-        return league
-    
-    def get_or_create_season(self, league_code: str, season_code: str, csv_file_path: str = None) -> Season:
-        """Ottieni o crea una stagione"""
-        
-        league = self.get_or_create_league(league_code)
-        
-        # Cerca stagione esistente
-        season = self.db.query(Season).filter(
-            and_(Season.league_id == league.id, Season.code == season_code)
-        ).first()
-        
-        if not season:
-            season_name = self._format_season_name(season_code)
-            
-            season = Season(
-                league_id=league.id,
-                name=season_name,
-                code=season_code,
-                csv_file_path=csv_file_path
-            )
-            self.db.add(season)
-            self.db.commit()
-            logger.info(f"✅ Created season: {league.name} {season_name}")
-        
-        return season
-    
-    def get_or_create_team(self, team_name: str, country_name: str = None) -> Team:
-        """Ottieni o crea una squadra"""
-        
-        normalized_name = self._normalize_team_name(team_name)
-        
-        # Cerca squadra esistente per nome normalizzato
-        team = self.db.query(Team).filter(Team.normalized_name == normalized_name).first()
-        
-        if not team:
-            country = None
-            if country_name:
-                country = self.get_or_create_country(country_name)
-            
-            team = Team(
-                name=team_name,
-                normalized_name=normalized_name,
-                country_id=country.id if country else None,
-                logo_url=self._get_team_logo_url(team_name)
-            )
-            self.db.add(team)
-            self.db.commit()
-            logger.info(f"✅ Created team: {team_name}")
-        
-        return team
-    
-    def process_csv_to_database(self, csv_file_path: str, league_code: str, season_code: str) -> Dict[str, Any]:
-        """Processa un file CSV e popola il database"""
-        
-        try:
-            # Leggi CSV
-            df = pd.read_csv(csv_file_path)
-            
-            # Ottieni o crea stagione
-            season = self.get_or_create_season(league_code, season_code, csv_file_path)
-            country_name = season.league.country.name
-            
-            matches_created = 0
-            matches_updated = 0
-            errors = []
-            
-            for index, row in df.iterrows():
-                try:
-                    # Estrai dati partita
-                    match_data = self._extract_match_data(row, index, country_name)
-                    
-                    if match_data:
-                        # Crea o aggiorna partita
-                        match = self._create_or_update_match(season, match_data)
-                        if match:
-                            matches_created += 1
-                    
-                except Exception as e:
-                        error_msg = f"Row {index}: {str(e)}"
-                        errors.append(error_msg)
-                        logger.warning(f"⚠️  {error_msg}")
-            
-            # Aggiorna statistiche stagione
-            season.processed_matches = matches_created
-            season.total_matches = len(df)
-            self.db.flush()
-            self.db.refresh(season)
-            # Calcola date inizio/fine stagione
-            self._update_season_dates(season)
-            
-            self.db.commit()
-            
-            result = {
-                "success": True,
-                "season_id": str(season.id),
-                "league": f"{season.league.name} ({league_code})",
-                "season": season.name,
-                "matches_processed": matches_created,
-                "total_rows": len(df),
-                "errors_count": len(errors),
-                "errors": errors[:10] if errors else []  # Prime 10 errori
-            }
-            
-            logger.info(f"✅ Processed {csv_file_path}: {matches_created}/{len(df)} matches")
-            return result
-            
-        except Exception as e:
-            logger.error(f"❌ Failed to process {csv_file_path}: {str(e)}")
-            return {
-                "success": False,
-                "error": str(e),
-                "league": league_code,
-                "season": season_code
-            }
     
     def _extract_match_data(self, row: pd.Series, row_index: int, country_name: str) -> Optional[Dict]:
         """Estrae i dati di una partita da una riga CSV"""
@@ -289,53 +122,214 @@ class FootballDataService:
 
         self.db.add(season)
     
-    def _is_season_completed(self, season: Season, latest_date: date, days_since_last: int) -> bool:
-
-        # ✅ Se c'è già una end_date, la stagione è completata
+    def is_season_completed(self, league_code: str, season_code: str) -> bool:
+        league = self.db.query(League).filter(League.code == league_code.upper()).first()
+        if not league:
+            return False
+        season = self.db.query(Season).filter(and_(Season.league_id==league.id, Season.code==season_code)).first()
+        if not season:
+            return False
         if season.end_date is not None:
             return True
-
+        # euristica corrente
         start_code = season.code.split("/")[0]
-        if len(start_code) == 2:
-            season_year = 2000 + int(start_code)
-        else:
-            season_year = int(start_code)
-
-        # Stagione più vecchia di 2 anni -> completata
-        if season_year < date.today().year - 2:
-            return True
-
+        try:
+            year = int(start_code) if len(start_code) == 4 else 2000 + int(start_code)
+        except Exception:
+            return False
         today = date.today()
-        current_year = today.year
-        current_month = today.month
-
-        # calcolo stagione calcistica corrente
-        if current_month >= 8:
-            current_football_year = current_year
-        else:
-            current_football_year = current_year - 1
-
-        # se la stagione è nel futuro → non completata
-        if season_year > current_football_year:
-            return False
-
-        # se la stagione è più vecchia di una prima dell'attuale → completata
-        if season_year < current_football_year - 1:
+        if year < today.year - 2:
             return True
-
-        # stagione corrente (in corso)
-        if season_year == current_football_year:
-            return False
-
-        # nessuna partita da 120 giorni → probabilmente finita
-        if days_since_last > 120:
+        if season.processed_matches and season.total_matches and season.processed_matches >= season.total_matches:
             return True
+        return bool(season.is_completed)
+    
+    def get_or_create_country(self, country_name: str, country_code: str = None) -> Country:
+        if not country_code:
+            country_code = self._cc(country_name)
+        c = self.db.query(Country).filter(or_(Country.name==country_name, Country.code==country_code)).first()
+        if not c:
+            c = Country(name=country_name, code=country_code, flag_url=f"https://flagcdn.com/w40/{country_code.lower()}.png")
+            self.db.add(c); self.db.commit()
+        return c
+    
+    def get_or_create_league(self, league_code: str) -> League:
+        l = self.db.query(League).filter(League.code==league_code).first()
+        if not l:
+            info = get_all_leagues('all').get(league_code, {})
+            name = info.get('name', f"Unknown League {league_code}")
+            country = self.get_or_create_country(info.get('country', 'Unknown'))
+            tier = 1 if league_code in {"E0","I1","D1","SP1","F1","N1","P1","SC0","T1","B1","BRA","ARG","CHN","DNK","IRL"} else (2 if ("2" in league_code or "Championship" in name or "Second" in name) else 1)
+            l = League(code=league_code, name=name, country_id=country.id, tier=tier, logo_url=f"https://example.com/logos/leagues/{league_code.lower()}.png")
+            self.db.add(l); self.db.commit()
+        return l
+    
+    def get_or_create_season(self, league_code: str, season_code: str, csv_file_path: Optional[str]=None) -> Season:
+        league = self.get_or_create_league(league_code)
+        s = self.db.query(Season).filter(and_(Season.league_id==league.id, Season.code==season_code)).first()
+        if not s:
+            name = self._format_season(season_code)
+            s = Season(league_id=league.id, name=name, code=season_code, csv_file_path=csv_file_path)
+            self.db.add(s); self.db.commit()
+        elif csv_file_path and s.csv_file_path != csv_file_path:
+            s.csv_file_path = csv_file_path; self.db.commit()
+        return s
+    
+    def get_or_create_team(self, team_name: str, country_name: Optional[str]) -> Team:
+        norm = self._norm(team_name)
+        t = self.db.query(Team).filter(Team.normalized_name==norm).first()
+        if not t:
+            country = self.get_or_create_country(country_name) if country_name else None
+            t = Team(name=team_name, normalized_name=norm, country_id=(country.id if country else None), logo_url=f"https://example.com/logos/teams/{norm.replace(' ', '_')}.png")
+            self.db.add(t); self.db.commit()
+        return t
+    
+    
+    
+    
+    def process_csv_to_database(self, csv_file_path: str, league_code: str, season_code: str) -> Dict[str, object]:
+        try:
+            df = pd.read_csv(csv_file_path)
+            season = self.get_or_create_season(league_code, season_code, csv_file_path)
+            country_name = season.league.country.name
 
-        # siamo nel periodo estivo e l'ultima partita è a giugno o prima → finita
-        if 6 <= current_month <= 8 and latest_date.month <= 6:
+
+            rows = []
+            errors: List[str] = []
+
+
+            for i, row in df.iterrows():
+                try:
+                    rec = self._row_to_match(row, i, country_name)
+                    if rec:
+                        rows.append(rec)
+                except Exception as e:
+                    errors.append(f"Row {i}: {e}")
+
+            created = 0
+            # batch upsert (semplice: cerca esistenti + aggiorna al volo; poi bulk per nuovi)
+            new_objs: List[Match] = []
+            for r in rows:
+                m = self._find_existing_match(season.id, r)
+                if m:
+                    for k, v in r.items():
+                        if k != 'match_date':
+                            setattr(m, k, v)
+                else:
+                    new_objs.append(Match(season_id=season.id, **r))
+                    
+                if len(new_objs) >= BATCH_SIZE:
+                    self.db.bulk_save_objects(new_objs)
+                    created += len(new_objs)
+                    new_objs.clear()
+                    
+            if new_objs:
+                self.db.bulk_save_objects(new_objs)
+                created += len(new_objs)
+
+
+            # update season stats & dates
+            season.processed_matches = created
+            season.total_matches = len(df)
+            self._update_season_dates(season)
+            self.db.commit()
+
+
+            return {
+                "success": True,
+                "season_id": str(season.id),
+                "league": f"{season.league.name} ({league_code})",
+                "season": season.name,
+                "matches_processed": created,
+                "total_rows": len(df),
+                "errors_count": len(errors),
+                "errors": errors[:10],
+            }
+        except Exception as e:
+            logger.exception("process_csv_to_database failed")
+            return {"success": False, "error": str(e), "league": league_code, "season": season_code}
+        
+        
+    def _row_to_match(self, row: pd.Series, idx: int, country_name: str):
+        if pd.isna(row.get('Date')) or pd.isna(row.get('HomeTeam')) or pd.isna(row.get('AwayTeam')):
+            return None
+        d = pd.to_datetime(row['Date'], dayfirst=True).date()
+        home = self.get_or_create_team(str(row['HomeTeam']).strip(), country_name)
+        away = self.get_or_create_team(str(row['AwayTeam']).strip(), country_name)
+        def s_int(v):
+            if pd.isna(v) or v == '' or v is None: return None
+            try: return int(float(v))
+            except: return None
+        def s_float(v):
+            if pd.isna(v) or v == '' or v is None: return None
+            try: return float(v)
+            except: return None
+        return {
+            'match_date': d,
+            'match_time': (str(row.get('Time', '')).strip() if not pd.isna(row.get('Time')) else None),
+            'home_team_id': home.id,
+            'away_team_id': away.id,
+            'home_goals_ft': s_int(row.get('FTHG')),
+            'away_goals_ft': s_int(row.get('FTAG')),
+            'home_goals_ht': s_int(row.get('HTHG')),
+            'away_goals_ht': s_int(row.get('HTAG')),
+            'home_shots': s_int(row.get('HS')),
+            'away_shots': s_int(row.get('AS')),
+            'home_shots_target': s_int(row.get('HST')),
+            'away_shots_target': s_int(row.get('AST')),
+            'avg_home_odds': s_float(row.get('AvgH')),
+            'avg_draw_odds': s_float(row.get('AvgD')),
+            'avg_away_odds': s_float(row.get('AvgA')),
+            'avg_over_25_odds': s_float(row.get('Avg>2.5')),
+            'avg_under_25_odds': s_float(row.get('Avg<2.5')),
+            'csv_row_number': idx,
+        }
+    
+    def _find_existing_match(self, season_id: str, r: dict) -> Optional[Match]:
+        return self.db.query(Match).filter(and_(
+            Match.season_id==season_id,
+            Match.match_date==r['match_date'],
+            Match.home_team_id==r['home_team_id'],
+            Match.away_team_id==r['away_team_id']
+            )).first()
+        
+    def _update_season_dates(self, season: Season):
+        matches = self.db.query(Match).filter(Match.season_id==season.id, Match.match_date.isnot(None)).all()
+        if not matches:
+            return
+        dates = [m.match_date for m in matches]
+        season.start_date = min(dates)
+        latest = max(dates)
+        season.is_completed = self._is_completed_heuristic(season, latest)
+        if season.is_completed:
+            season.end_date = latest
+        self.db.add(season)
+        
+    def _is_completed_heuristic(self, season: Season, latest_date: date) -> bool:
+        today = date.today()
+        days = (today - latest_date).days
+        # euristiche semplici
+        if season.end_date:
             return True
-
+        if days > 120:
+            return True
+        # estate e ultima partita <= giugno
+        if 6 <= today.month <= 8 and latest_date.month <= 6:
+            return True
         return False
+    
+    # utils
+    def _cc(self, country_name: str) -> str:
+        mapping = {"Italy":"ITA","England":"ENG","Germany":"GER","Spain":"ESP","France":"FRA","Netherlands":"NED","Belgium":"BEL","Portugal":"POR","Scotland":"SCO","Turkey":"TUR","Brazil":"BRA","Argentina":"ARG","China":"CHN","Denmark":"DNK","Ireland":"IRL"}
+        return mapping.get(country_name, country_name[:3].upper())
+    def _format_season(self, code: str) -> str:
+        if len(code)==4:
+            y1 = 1900+int(code[:2]) if int(code[:2])>=50 else 2000+int(code[:2])
+            return f"{y1}/{y1+1}"
+        return code
+    def _norm(self, s: str) -> str:
+        s = re.sub(r'[^\w\s]', '', s.lower().strip())
+        return re.sub(r'\s+', ' ', s)
 
 
     # Metodi di utilità

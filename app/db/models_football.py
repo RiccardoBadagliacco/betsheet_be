@@ -36,6 +36,7 @@ class League(FootballBase):
     country_id = Column(UUID(as_uuid=True), ForeignKey("countries.id"), nullable=False)
     tier = Column(Integer, nullable=True)  # 1 per serie A, 2 per serie B, etc.
     active = Column(Boolean, default=True)  # Se la lega è ancora attiva
+    is_favorite = Column(Boolean, default=False, nullable=False)  # Lega preferita
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     
     # Relazioni
@@ -73,6 +74,7 @@ class Team(FootballBase):
     country_id = Column(UUID(as_uuid=True), ForeignKey("countries.id"), nullable=True)
     logo_url = Column(String(255), nullable=True)
     founded_year = Column(Integer, nullable=True)
+    is_top = Column(Boolean, default=False, nullable=False)  # Squadra top
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     
     # Relazioni

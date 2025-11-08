@@ -87,9 +87,7 @@ def get_all_leagues(type='main') -> dict:
                 result[league["code"]] = {"name": league["name"], "country": country}
     return result
 
-
-# Oggetto statico COUNTRY_LEAGUE_STRUCTURE popolato manualmente
-COUNTRY_LEAGUE_STRUCTURE = {
+COUNTRY_LEAGUE_STRUCTURE= {
     "England": [
         {"league": {"main": True, "name": "Premier League", "code": "E0"}},
         {"league": {"main": True, "name": "Championship", "code": "E1"}}
