@@ -4,7 +4,7 @@ This module is compatible with both pydantic v1 and v2+ (which moved
 BaseSettings to the separate `pydantic-settings` package).
 """
 
-from typing import List
+from typing import List, Optional
 
 # BaseSettings moved to pydantic-settings in pydantic v2. Try to import
 # from there first, otherwise fall back to pydantic (v1).
@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     CORS_ORIGINS: List[AnyHttpUrl] = ["http://localhost:4200", "http://127.0.0.1:8000","http://localhost:3000"]
     SECRET_KEY: str = "replace-me"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7
+    # Telegram bot token (for local/dev). Can also be set via env var TELEGRAM_BOT_TOKEN
+    # NOTE: this embeds a token in source — remove before sharing publicly if needed.
+    TELEGRAM_BOT_TOKEN: Optional[str] = "8168882419:AAGJAutgGoERpvNV6x45DY3J1CjzUyYsiZI"
 
     class Config:
         env_file = ".env"

@@ -7,6 +7,7 @@ import uvicorn
 from app.db.database import engine
 from app.db.models import Base
 from app.core.settings import settings
+from app.bot import make_bot_lifespan
 from app.core.logging import setup_logging
 from fastapi.responses import JSONResponse
 from fastapi.requests import Request
@@ -17,7 +18,12 @@ import logging
 # --- CORS ---
 origins = [str(o).rstrip('/') for o in settings.CORS_ORIGINS]
 print(origins)
-app = FastAPI()
+
+# Build lifespan from bot token (if provided)
+lifespan = make_bot_lifespan(settings.TELEGRAM_BOT_TOKEN)
+
+# Create FastAPI app with optional bot lifespan
+app = FastAPI(lifespan=lifespan)
 
 # Setup logging
 setup_logging()

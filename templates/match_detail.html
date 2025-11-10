@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Match Detail - {{ match.match_id }}</title>
+  <style>
+    body{font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;line-height:1.4;color:#0f172a;background:#f8fafc;padding:24px}
+    .card{background:white;border-radius:8px;box-shadow:0 6px 18px rgba(15,23,42,0.06);max-width:900px;margin:0 auto;padding:20px}
+    .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .teams{display:flex;gap:24px;align-items:center}
+    .team{min-width:200px}
+    .team h2{margin:0;font-size:20px}
+    .meta{color:#475569}
+    .score{font-size:28px;font-weight:700}
+    .section{margin-top:18px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .chip{display:inline-block;background:#eef2ff;color:#3730a3;padding:6px 10px;border-radius:999px;font-weight:600}
+    pre{background:#0f172a;color:#fff;padding:12px;border-radius:6px;overflow:auto}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <div>
+        <div class="meta">League: {{ match.league.name }} <span style="opacity:.7">({{ match.league.code }})</span> • Country: {{ match.league.country }}</div>
+        <h1 style="margin:6px 0">{{ match.home_team.name }} <span class="score">vs</span> {{ match.away_team.name }}</h1>
+        <div class="meta">Date: {{ match.match_date }} • Time: {{ match.match_time }}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="chip">{{ match.season.name }}</div>
+        <div style="margin-top:8px;color:#64748b">ID: {{ match.match_id }}</div>
+      </div>
+    </div>
+
+    <div class="section grid">
+      <div>
+        <h3>Score</h3>
+        <div class="meta">Full time: {{ match.score.home_ft }} - {{ match.score.away_ft }}</div>
+        <div class="meta" style="margin-top:6px">Half time: {{ match.score.home_ht or '-' }} - {{ match.score.away_ht or '-' }}</div>
+      </div>
+      <div>
+        <h3>Odds</h3>
+        <div class="meta">Home: {{ match.odds.avg_home or '-' }}</div>
+        <div class="meta">Draw: {{ match.odds.avg_draw or '-' }}</div>
+        <div class="meta">Away: {{ match.odds.avg_away or '-' }}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Teams</h3>
+      <div class="grid">
+        <div>
+          <strong>{{ match.home_team.name }}</strong>
+          <div class="meta">ID: {{ match.home_team.id }}</div>
+        </div>
+        <div>
+          <strong>{{ match.away_team.name }}</strong>
+          <div class="meta">ID: {{ match.away_team.id }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Raw (for debugging)</h3>
+      <pre>{{ match | tojson(indent=2) }}</pre>
+    </div>
+  </div>
+</body>
+</html>

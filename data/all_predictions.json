@@ -1,7 +1,7 @@
 {
   "success": true,
   "fixtures_count": 131,
-  "generated_at": "2025-11-08T14:59:03.925080",
+  "generated_at": "2025-11-09T11:42:08.003299",
   "models": {
     "over_under": "OverModelV1_patch7",
     "ai_multigol": "MGModelV1_baseline",
@@ -11,6 +11,7 @@
     {
       "fixture_id": "321a32f6-f4da-44b4-b1d3-fb7f91110289",
       "match_date": "2025-11-07",
+      "match_time": "19:45",
       "home_team": "Dender",
       "away_team": "Waregem",
       "league_code": "B1",
@@ -62,6 +63,7 @@
     {
       "fixture_id": "a832e4c4-11da-440b-960d-a4c380aca5f3",
       "match_date": "2025-11-08",
+      "match_time": "15:00",
       "home_team": "Cercle Brugge",
       "away_team": "Oud-Heverlee Leuven",
       "league_code": "B1",
@@ -113,6 +115,7 @@
     {
       "fixture_id": "4a209f18-3e2f-43c0-8fd6-424a4f73fb9e",
       "match_date": "2025-11-08",
+      "match_time": "17:15",
       "home_team": "Charleroi",
       "away_team": "Westerlo",
       "league_code": "B1",
@@ -174,6 +177,7 @@
     {
       "fixture_id": "3e2916a7-58d1-4304-9507-0b03b1e40ce9",
       "match_date": "2025-11-09",
+      "match_time": "12:30",
       "home_team": "Anderlecht",
       "away_team": "Club Brugge",
       "league_code": "B1",
@@ -235,6 +239,7 @@
     {
       "fixture_id": "8375e064-8d49-48c5-8fe2-64294961d746",
       "match_date": "2025-11-09",
+      "match_time": "15:00",
       "home_team": "St Truiden",
       "away_team": "Standard",
       "league_code": "B1",
@@ -286,6 +291,7 @@
     {
       "fixture_id": "5cceea41-a75b-4eb4-8a15-ff1f055475f2",
       "match_date": "2025-11-09",
+      "match_time": "17:30",
       "home_team": "Gent",
       "away_team": "Genk",
       "league_code": "B1",
@@ -347,6 +353,7 @@
     {
       "fixture_id": "3b880324-d350-453c-b684-38716dfe4235",
       "match_date": "2025-11-09",
+      "match_time": "18:15",
       "home_team": "Mechelen",
       "away_team": "St. Gilloise",
       "league_code": "B1",
@@ -441,6 +448,7 @@
     {
       "fixture_id": "5bfc21fb-c567-495d-9f20-2eb9d5c15f53",
       "match_date": "2025-11-07",
+      "match_time": "19:30",
       "home_team": "Werder Bremen",
       "away_team": "Wolfsburg",
       "league_code": "D1",
@@ -502,6 +510,7 @@
     {
       "fixture_id": "90eeac63-0174-408a-ab90-48bbdf61999d",
       "match_date": "2025-11-08",
+      "match_time": "14:30",
       "home_team": "Hamburg",
       "away_team": "Dortmund",
       "league_code": "D1",
@@ -596,6 +605,7 @@
     {
       "fixture_id": "2dbf451c-c05c-41e6-9e65-a272f99891c7",
       "match_date": "2025-11-08",
+      "match_time": "14:30",
       "home_team": "Hoffenheim",
       "away_team": "RB Leipzig",
       "league_code": "D1",
@@ -657,6 +667,7 @@
     {
       "fixture_id": "8f9dd1ad-91ee-4f53-99f8-74af58d94ebf",
       "match_date": "2025-11-08",
+      "match_time": "14:30",
       "home_team": "Leverkusen",
       "away_team": "Heidenheim",
       "league_code": "D1",
@@ -751,6 +762,7 @@
     {
       "fixture_id": "4b62532b-2874-4099-b2fa-bb7d80e091ea",
       "match_date": "2025-11-08",
+      "match_time": "14:30",
       "home_team": "Union Berlin",
       "away_team": "Bayern Munich",
       "league_code": "D1",
@@ -845,6 +857,7 @@
     {
       "fixture_id": "013cec98-143c-4016-b2e9-c8ffb48c8629",
       "match_date": "2025-11-08",
+      "match_time": "17:30",
       "home_team": "M'gladbach",
       "away_team": "FC Koln",
       "league_code": "D1",
@@ -906,6 +919,7 @@
     {
       "fixture_id": "6b997ee5-a11d-428c-9f9f-bcd1c58f3f6b",
       "match_date": "2025-11-09",
+      "match_time": "16:30",
       "home_team": "Stuttgart",
       "away_team": "Augsburg",
       "league_code": "D1",
@@ -1000,6 +1014,7 @@
     {
       "fixture_id": "edd3d965-c3a5-4240-b7a3-be782af40fcb",
       "match_date": "2025-11-09",
+      "match_time": "18:30",
       "home_team": "Ein Frankfurt",
       "away_team": "Mainz",
       "league_code": "D1",
@@ -1061,6 +1076,7 @@
     {
       "fixture_id": "e847e63e-1902-4655-9d74-ac453b6c2770",
       "match_date": "2025-11-07",
+      "match_time": "17:30",
       "home_team": "Dresden",
       "away_team": "Nurnberg",
       "league_code": "D2",
@@ -1122,6 +1138,7 @@
     {
       "fixture_id": "1a958e89-fd99-4348-80fe-7dd994f9180b",
       "match_date": "2025-11-07",
+      "match_time": "17:30",
       "home_team": "Greuther Furth",
       "away_team": "Preu\u00dfen M\u00fcnster",
       "league_code": "D2",
@@ -1183,6 +1200,7 @@
     {
       "fixture_id": "8aeed33b-180c-4b95-8f4e-f8989a8a0ac4",
       "match_date": "2025-11-08",
+      "match_time": "12:00",
       "home_team": "Bielefeld",
       "away_team": "Karlsruhe",
       "league_code": "D2",
@@ -1244,6 +1262,7 @@
     {
       "fixture_id": "77cdd2b1-be2e-4766-b41d-cd22fddea360",
       "match_date": "2025-11-08",
+      "match_time": "12:00",
       "home_team": "Hannover",
       "away_team": "Darmstadt",
       "league_code": "D2",
@@ -1305,6 +1324,7 @@
     {
       "fixture_id": "ca9587a6-51e4-44ee-a6f4-5250605e5f73",
       "match_date": "2025-11-08",
+      "match_time": "12:00",
       "home_team": "Schalke 04",
       "away_team": "Elversberg",
       "league_code": "D2",
@@ -1366,6 +1386,7 @@
     {
       "fixture_id": "6709f0e9-67d1-42d3-ab66-d08527ce3c9a",
       "match_date": "2025-11-08",
+      "match_time": "19:30",
       "home_team": "Kaiserslautern",
       "away_team": "Hertha",
       "league_code": "D2",
@@ -1427,6 +1448,7 @@
     {
       "fixture_id": "84f21cd7-4502-44a6-9260-f6b3fe948305",
       "match_date": "2025-11-09",
+      "match_time": "12:30",
       "home_team": "Braunschweig",
       "away_team": "Bochum",
       "league_code": "D2",
@@ -1488,6 +1510,7 @@
     {
       "fixture_id": "bb3b0145-dbeb-498a-bc6e-11a0877bcbcb",
       "match_date": "2025-11-09",
+      "match_time": "12:30",
       "home_team": "Holstein Kiel",
       "away_team": "Fortuna Dusseldorf",
       "league_code": "D2",
@@ -1549,6 +1572,7 @@
     {
       "fixture_id": "c2d043fd-4ba0-471b-a25f-48a3b9706f99",
       "match_date": "2025-11-09",
+      "match_time": "12:30",
       "home_team": "Magdeburg",
       "away_team": "Paderborn",
       "league_code": "D2",
@@ -1610,6 +1634,7 @@
     {
       "fixture_id": "5a86d549-760f-4768-9420-553e6af5d4c3",
       "match_date": "2025-11-08",
+      "match_time": "12:30",
       "home_team": "Tottenham",
       "away_team": "Man United",
       "league_code": "E0",
@@ -1671,6 +1696,7 @@
     {
       "fixture_id": "c50c5cd7-bd1d-4f81-8943-19e66f94f91a",
       "match_date": "2025-11-08",
+      "match_time": "15:00",
       "home_team": "West Ham",
       "away_team": "Burnley",
       "league_code": "E0",
@@ -1722,6 +1748,7 @@
     {
       "fixture_id": "a4dc15f8-4712-4b3f-960f-b2d7c982248d",
       "match_date": "2025-11-08",
+      "match_time": "17:30",
       "home_team": "Sunderland",
       "away_team": "Arsenal",
       "league_code": "E0",
@@ -1806,6 +1833,7 @@
     {
       "fixture_id": "e1c08bea-5d3f-45fe-a0de-98f43ae3a015",
       "match_date": "2025-11-08",
+      "match_time": "20:00",
       "home_team": "Chelsea",
       "away_team": "Wolves",
       "league_code": "E0",
@@ -1900,6 +1928,7 @@
     {
       "fixture_id": "d6ed2adc-3a2f-46ce-bd03-6debac225d54",
       "match_date": "2025-11-09",
+      "match_time": "14:00",
       "home_team": "Aston Villa",
       "away_team": "Bournemouth",
       "league_code": "E0",
@@ -1956,6 +1985,7 @@
     {
       "fixture_id": "51fae5b7-232e-4baa-b98c-7e270a99a795",
       "match_date": "2025-11-09",
+      "match_time": "14:00",
       "home_team": "Brentford",
       "away_team": "Newcastle",
       "league_code": "E0",
@@ -2012,6 +2042,7 @@
     {
       "fixture_id": "95e4367b-a2c6-45e4-8e13-3c25f7dd5633",
       "match_date": "2025-11-09",
+      "match_time": "14:00",
       "home_team": "Crystal Palace",
       "away_team": "Brighton",
       "league_code": "E0",
@@ -2073,6 +2104,7 @@
     {
       "fixture_id": "e8dcd145-4ad6-4f2e-b608-3039dc9c5396",
       "match_date": "2025-11-09",
+      "match_time": "14:00",
       "home_team": "Nott'm Forest",
       "away_team": "Leeds",
       "league_code": "E0",
@@ -2124,6 +2156,7 @@
     {
       "fixture_id": "ab4d3798-3f30-4773-9725-bd9249dc05ff",
       "match_date": "2025-11-09",
+      "match_time": "16:30",
       "home_team": "Man City",
       "away_team": "Liverpool",
       "league_code": "E0",
@@ -2185,6 +2218,7 @@
     {
       "fixture_id": "27fd450d-e02d-49af-b8d5-8cdac3ed6dab",
       "match_date": "2025-11-07",
+      "match_time": "20:00",
       "home_team": "Watford",
       "away_team": "Bristol City",
       "league_code": "E1",
@@ -2236,6 +2270,7 @@
     {
       "fixture_id": "452d2bb5-7b8b-45d0-b197-fd30fac7cc0b",
       "match_date": "2025-11-08",
+      "match_time": "12:30",
       "home_team": "Blackburn",
       "away_team": "Derby",
       "league_code": "E1",
@@ -2287,6 +2322,7 @@
     {
       "fixture_id": "ffcb4eb6-9952-40ba-8e4a-03475ceb0d05",
       "match_date": "2025-11-08",
+      "match_time": "12:30",
       "home_team": "Hull",
       "away_team": "Portsmouth",
       "league_code": "E1",
@@ -2343,6 +2379,7 @@
     {
       "fixture_id": "c373c566-3213-4bd1-a963-b0ea4a6e69b8",
       "match_date": "2025-11-08",
+      "match_time": "12:30",
       "home_team": "Millwall",
       "away_team": "Preston",
       "league_code": "E1",
@@ -2394,6 +2431,7 @@
     {
       "fixture_id": "8e49d59c-acd8-4c5a-af4c-fa0063c15a76",
       "match_date": "2025-11-08",
+      "match_time": "15:00",
       "home_team": "Middlesbrough",
       "away_team": "Birmingham",
       "league_code": "E1",
@@ -2445,6 +2483,7 @@
     {
       "fixture_id": "6d2fa650-7e49-4a5e-895a-dd0723d32ee8",
       "match_date": "2025-11-08",
+      "match_time": "15:00",
       "home_team": "Norwich",
       "away_team": "Leicester",
       "league_code": "E1",
@@ -2501,6 +2540,7 @@
     {
       "fixture_id": "2e082ee9-a81d-4264-b631-5dcea5b597b9",
       "match_date": "2025-11-08",
+      "match_time": "15:00",
       "home_team": "Sheffield United",
       "away_team": "QPR",
       "league_code": "E1",
@@ -2552,6 +2592,7 @@
     {
       "fixture_id": "a257095f-eb1c-4a6d-85e0-1945bce52f50",
       "match_date": "2025-11-08",
+      "match_time": "15:00",
       "home_team": "Southampton",
       "away_team": "Sheffield Weds",
       "league_code": "E1",
@@ -2646,6 +2687,7 @@
     {
       "fixture_id": "906d664d-6fe7-4826-b8c7-58b206f33167",
       "match_date": "2025-11-08",
+      "match_time": "15:00",
       "home_team": "Stoke",
       "away_team": "Coventry",
       "league_code": "E1",
@@ -2702,6 +2744,7 @@
     {
       "fixture_id": "7d482ce0-e1ec-476c-b9d0-39fbd28cb792",
       "match_date": "2025-11-08",
+      "match_time": "15:00",
       "home_team": "Swansea",
       "away_team": "Ipswich",
       "league_code": "E1",
@@ -2753,6 +2796,7 @@
     {
       "fixture_id": "e780c4c4-8bc4-4b59-a1d0-b2f976c7934b",
       "match_date": "2025-11-08",
+      "match_time": "15:00",
       "home_team": "West Brom",
       "away_team": "Oxford",
       "league_code": "E1",
@@ -2815,6 +2859,7 @@
     {
       "fixture_id": "cbf57bce-6c85-4086-bca7-8c94e2a69e3f",
       "match_date": "2025-11-08",
+      "match_time": "15:00",
       "home_team": "Wrexham",
       "away_team": "Charlton",
       "league_code": "E1",
@@ -2866,6 +2911,7 @@
     {
       "fixture_id": "0e485291-b0ec-4cba-a655-add5edf19313",
       "match_date": "2025-11-07",
+      "match_time": "19:45",
       "home_team": "Paris FC",
       "away_team": "Rennes",
       "league_code": "F1",
@@ -2927,6 +2973,7 @@
     {
       "fixture_id": "eb96102b-7a52-4707-a4de-ee7969d21b9d",
       "match_date": "2025-11-08",
+      "match_time": "16:00",
       "home_team": "Marseille",
       "away_team": "Brest",
       "league_code": "F1",
@@ -3021,6 +3068,7 @@
     {
       "fixture_id": "f6e4bc2b-1fc5-4429-ad4b-67871147986e",
       "match_date": "2025-11-08",
+      "match_time": "18:00",
       "home_team": "Le Havre",
       "away_team": "Nantes",
       "league_code": "F1",
@@ -3072,6 +3120,7 @@
     {
       "fixture_id": "70a35b85-dfd3-48be-9973-73e3ed024dfc",
       "match_date": "2025-11-08",
+      "match_time": "20:05",
       "home_team": "Monaco",
       "away_team": "Lens",
       "league_code": "F1",
@@ -3133,6 +3182,7 @@
     {
       "fixture_id": "b48ee03e-b32e-40b0-a421-6f82dc754b19",
       "match_date": "2025-11-09",
+      "match_time": "14:00",
       "home_team": "Lorient",
       "away_team": "Toulouse",
       "league_code": "F1",
@@ -3184,6 +3234,7 @@
     {
       "fixture_id": "ffa5b2b2-0574-4eee-ae6d-3fc01f461fb3",
       "match_date": "2025-11-09",
+      "match_time": "16:15",
       "home_team": "Angers",
       "away_team": "Auxerre",
       "league_code": "F1",
@@ -3235,6 +3286,7 @@
     {
       "fixture_id": "b945f654-9bba-4016-bde9-2ba51b0fea34",
       "match_date": "2025-11-09",
+      "match_time": "16:15",
       "home_team": "Metz",
       "away_team": "Nice",
       "league_code": "F1",
@@ -3296,6 +3348,7 @@
     {
       "fixture_id": "3690f2ea-bead-4b32-8771-fe0751622d88",
       "match_date": "2025-11-09",
+      "match_time": "16:15",
       "home_team": "Strasbourg",
       "away_team": "Lille",
       "league_code": "F1",
@@ -3357,6 +3410,7 @@
     {
       "fixture_id": "542508f1-b278-4e51-b100-17d6b492f637",
       "match_date": "2025-11-09",
+      "match_time": "19:45",
       "home_team": "Lyon",
       "away_team": "Paris SG",
       "league_code": "F1",
@@ -3451,6 +3505,7 @@
     {
       "fixture_id": "29125d7b-7a8a-4a6d-9506-eb348c2d37e5",
       "match_date": "2025-11-07",
+      "match_time": "19:00",
       "home_team": "Clermont",
       "away_team": "Amiens",
       "league_code": "F2",
@@ -3502,6 +3557,7 @@
     {
       "fixture_id": "a8602cd4-c698-41e5-92b1-7fc0836ac155",
       "match_date": "2025-11-07",
+      "match_time": "19:00",
       "home_team": "Dunkerque",
       "away_team": "Boulogne",
       "league_code": "F2",
@@ -3586,6 +3642,7 @@
     {
       "fixture_id": "760555dd-890e-467d-b1d8-e0f5ba971b9b",
       "match_date": "2025-11-07",
+      "match_time": "19:00",
       "home_team": "Grenoble",
       "away_team": "Rodez",
       "league_code": "F2",
@@ -3637,6 +3694,7 @@
     {
       "fixture_id": "0272bf54-e0a0-4649-9fd0-dd3ec7d3a646",
       "match_date": "2025-11-07",
+      "match_time": "19:00",
       "home_team": "Montpellier",
       "away_team": "Annecy",
       "league_code": "F2",
@@ -3699,6 +3757,7 @@
     {
       "fixture_id": "34a89586-16d7-4393-9ba3-e6fdfd1c6846",
       "match_date": "2025-11-08",
+      "match_time": "13:00",
       "home_team": "Guingamp",
       "away_team": "Pau FC",
       "league_code": "F2",
@@ -3750,6 +3809,7 @@
     {
       "fixture_id": "82686f9d-7829-49a1-b84d-afd8c3f5a6cd",
       "match_date": "2025-11-08",
+      "match_time": "19:00",
       "home_team": "Troyes",
       "away_team": "St Etienne",
       "league_code": "F2",
@@ -3806,6 +3866,7 @@
     {
       "fixture_id": "9fcaa77a-dc27-452f-b8dd-02023bc74bdd",
       "match_date": "2025-11-08",
+      "match_time": "14:00",
       "home_team": "Como",
       "away_team": "Cagliari",
       "league_code": "I1",
@@ -3890,6 +3951,7 @@
     {
       "fixture_id": "b5990c80-af67-447d-9811-ca09525a7a40",
       "match_date": "2025-11-08",
+      "match_time": "17:00",
       "home_team": "Juventus",
       "away_team": "Torino",
       "league_code": "I1",
@@ -3974,6 +4036,7 @@
     {
       "fixture_id": "5e76418c-e14f-4cb1-ab5c-528bfbc9638f",
       "match_date": "2025-11-08",
+      "match_time": "19:45",
       "home_team": "Parma",
       "away_team": "Milan",
       "league_code": "I1",
@@ -4058,6 +4121,7 @@
     {
       "fixture_id": "66d61cb2-b73f-41a3-b15a-9aac945571d8",
       "match_date": "2025-11-09",
+      "match_time": "11:30",
       "home_team": "Atalanta",
       "away_team": "Sassuolo",
       "league_code": "I1",
@@ -4152,6 +4216,7 @@
     {
       "fixture_id": "ba23bf58-c570-431b-89da-565fb833fe79",
       "match_date": "2025-11-09",
+      "match_time": "17:00",
       "home_team": "Roma",
       "away_team": "Udinese",
       "league_code": "I1",
@@ -4236,6 +4301,7 @@
     {
       "fixture_id": "6cce68dd-dab3-4cff-b449-2af207e3865e",
       "match_date": "2025-11-09",
+      "match_time": "19:45",
       "home_team": "Inter",
       "away_team": "Lazio",
       "league_code": "I1",
@@ -4330,6 +4396,7 @@
     {
       "fixture_id": "4216ca90-e35a-4140-b769-49bcc0b91c36",
       "match_date": "2025-11-08",
+      "match_time": "14:00",
       "home_team": "Frosinone",
       "away_team": "Modena",
       "league_code": "I2",
@@ -4381,6 +4448,7 @@
     {
       "fixture_id": "13886ace-501d-47bb-ab67-17147085020a",
       "match_date": "2025-11-08",
+      "match_time": "14:00",
       "home_team": "Mantova",
       "away_team": "Padova",
       "league_code": "I2",
@@ -4432,6 +4500,7 @@
     {
       "fixture_id": "a5fa6e4b-2406-4d2f-a9d8-77f0b9dbef98",
       "match_date": "2025-11-08",
+      "match_time": "18:30",
       "home_team": "Venezia",
       "away_team": "Sampdoria",
       "league_code": "I2",
@@ -4516,6 +4585,7 @@
     {
       "fixture_id": "91c9fc11-46fc-48d8-9a6b-521095306edc",
       "match_date": "2025-11-09",
+      "match_time": "14:00",
       "home_team": "Cesena",
       "away_team": "Avellino",
       "league_code": "I2",
@@ -4567,6 +4637,7 @@
     {
       "fixture_id": "203afc83-8cf7-448e-b4aa-5b51c50cfc28",
       "match_date": "2025-11-09",
+      "match_time": "16:15",
       "home_team": "Pescara",
       "away_team": "Monza",
       "league_code": "I2",
@@ -4645,6 +4716,7 @@
     {
       "fixture_id": "9bb5688c-0f41-4a67-b816-13cb0bcc10a7",
       "match_date": "2025-11-07",
+      "match_time": "19:00",
       "home_team": "Twente",
       "away_team": "Telstar",
       "league_code": "N1",
@@ -4739,6 +4811,7 @@
     {
       "fixture_id": "6c4b9368-e385-4484-9f29-44cbed8b6eb3",
       "match_date": "2025-11-08",
+      "match_time": "15:30",
       "home_team": "Excelsior",
       "away_team": "Heracles",
       "league_code": "N1",
@@ -4800,6 +4873,7 @@
     {
       "fixture_id": "8e2391d1-4a9e-4116-bbf5-64f57e68a187",
       "match_date": "2025-11-08",
+      "match_time": "17:45",
       "home_team": "Volendam",
       "away_team": "NAC Breda",
       "league_code": "N1",
@@ -4861,6 +4935,7 @@
     {
       "fixture_id": "e9407431-2a98-4651-a9d2-cb3b2eb37103",
       "match_date": "2025-11-08",
+      "match_time": "19:00",
       "home_team": "For Sittard",
       "away_team": "Heerenveen",
       "league_code": "N1",
@@ -4922,6 +4997,7 @@
     {
       "fixture_id": "958e73c5-68e4-47f6-8440-ae7017844e76",
       "match_date": "2025-11-08",
+      "match_time": "20:00",
       "home_team": "Zwolle",
       "away_team": "Sparta Rotterdam",
       "league_code": "N1",
@@ -4983,6 +5059,7 @@
     {
       "fixture_id": "d49b0341-183f-49bc-99d6-0551dac96dbc",
       "match_date": "2025-11-09",
+      "match_time": "11:15",
       "home_team": "Utrecht",
       "away_team": "Ajax",
       "league_code": "N1",
@@ -5044,6 +5121,7 @@
     {
       "fixture_id": "35963bdf-5507-4282-8d44-0bd499afeeb7",
       "match_date": "2025-11-09",
+      "match_time": "13:30",
       "home_team": "Nijmegen",
       "away_team": "Groningen",
       "league_code": "N1",
@@ -5105,6 +5183,7 @@
     {
       "fixture_id": "ee457e4d-ded8-4125-8497-de7bb3296796",
       "match_date": "2025-11-09",
+      "match_time": "15:45",
       "home_team": "AZ Alkmaar",
       "away_team": "PSV Eindhoven",
       "league_code": "N1",
@@ -5166,6 +5245,7 @@
     {
       "fixture_id": "31cf5231-f21d-444d-913d-c9830a63b27c",
       "match_date": "2025-11-09",
+      "match_time": "19:00",
       "home_team": "Go Ahead Eagles",
       "away_team": "Feyenoord",
       "league_code": "N1",
@@ -5260,6 +5340,7 @@
     {
       "fixture_id": "8f09fce4-cbf6-4332-b0a3-b7579349388f",
       "match_date": "2025-11-07",
+      "match_time": "20:15",
       "home_team": "Estoril",
       "away_team": "Arouca",
       "league_code": "P1",
@@ -5316,6 +5397,7 @@
     {
       "fixture_id": "5b4d055e-c683-4761-936d-dbd911023679",
       "match_date": "2025-11-08",
+      "match_time": "15:30",
       "home_team": "Alverca",
       "away_team": "Rio Ave",
       "league_code": "P1",
@@ -5367,6 +5449,7 @@
     {
       "fixture_id": "9e17c2ec-cf7b-4784-9ae0-27b6835a29fa",
       "match_date": "2025-11-08",
+      "match_time": "20:30",
       "home_team": "Santa Clara",
       "away_team": "Sp Lisbon",
       "league_code": "P1",
@@ -5451,6 +5534,7 @@
     {
       "fixture_id": "de6f3a48-d047-49ff-9e4e-9cd8dc6fd8b1",
       "match_date": "2025-11-09",
+      "match_time": "15:30",
       "home_team": "AVS",
       "away_team": "Gil Vicente",
       "league_code": "P1",
@@ -5535,6 +5619,7 @@
     {
       "fixture_id": "0476c3ba-32f3-41eb-9846-5e29d725904c",
       "match_date": "2025-11-09",
+      "match_time": "15:30",
       "home_team": "Estrela",
       "away_team": "Nacional",
       "league_code": "P1",
@@ -5586,6 +5671,7 @@
     {
       "fixture_id": "dcaa7d73-cba0-4613-9b12-5e5848603ccf",
       "match_date": "2025-11-09",
+      "match_time": "18:00",
       "home_team": "Famalicao",
       "away_team": "Porto",
       "league_code": "P1",
@@ -5670,6 +5756,7 @@
     {
       "fixture_id": "7aafa318-a251-4359-9c90-fc26f3e692a4",
       "match_date": "2025-11-09",
+      "match_time": "20:30",
       "home_team": "Benfica",
       "away_team": "Casa Pia",
       "league_code": "P1",
@@ -5764,6 +5851,7 @@
     {
       "fixture_id": "b6a682e8-b895-47b4-ad9e-91d450ab0593",
       "match_date": "2025-11-09",
+      "match_time": "20:30",
       "home_team": "Sp Braga",
       "away_team": "Moreirense",
       "league_code": "P1",
@@ -5858,6 +5946,7 @@
     {
       "fixture_id": "9d24c259-05c5-466b-bc0a-8494ef926f75",
       "match_date": "2025-11-08",
+      "match_time": "15:00",
       "home_team": "Falkirk",
       "away_team": "Livingston",
       "league_code": "SC0",
@@ -5919,6 +6008,7 @@
     {
       "fixture_id": "af5e49c0-3a75-470b-8409-f7fc93c40f83",
       "match_date": "2025-11-08",
+      "match_time": "17:45",
       "home_team": "St Mirren",
       "away_team": "Hibernian",
       "league_code": "SC0",
@@ -5975,6 +6065,7 @@
     {
       "fixture_id": "28dd0ae5-a3da-4fcc-b074-815bfc4e0632",
       "match_date": "2025-11-09",
+      "match_time": "15:00",
       "home_team": "Aberdeen",
       "away_team": "Motherwell",
       "league_code": "SC0",
@@ -6036,6 +6127,7 @@
     {
       "fixture_id": "757461f6-b6c4-4e40-ae66-e2c92c98ef70",
       "match_date": "2025-11-09",
+      "match_time": "15:00",
       "home_team": "Dundee",
       "away_team": "Rangers",
       "league_code": "SC0",
@@ -6130,6 +6222,7 @@
     {
       "fixture_id": "ef6fab99-5594-4406-99fb-06c0fc19eeb3",
       "match_date": "2025-11-09",
+      "match_time": "15:00",
       "home_team": "Hearts",
       "away_team": "Dundee United",
       "league_code": "SC0",
@@ -6224,6 +6317,7 @@
     {
       "fixture_id": "ec05f827-da61-488d-9352-c362a54df138",
       "match_date": "2025-11-09",
+      "match_time": "16:00",
       "home_team": "Celtic",
       "away_team": "Kilmarnock",
       "league_code": "SC0",
@@ -6318,6 +6412,7 @@
     {
       "fixture_id": "da1fb46b-5da6-439f-8b3a-8fb5b604e423",
       "match_date": "2025-11-07",
+      "match_time": "20:00",
       "home_team": "Elche",
       "away_team": "Sociedad",
       "league_code": "SP1",
@@ -6369,6 +6464,7 @@
     {
       "fixture_id": "f569a879-7fbf-48ef-827d-8fe5e7f71b93",
       "match_date": "2025-11-08",
+      "match_time": "13:00",
       "home_team": "Girona",
       "away_team": "Alaves",
       "league_code": "SP1",
@@ -6420,6 +6516,7 @@
     {
       "fixture_id": "b1924fb9-35c5-4a40-bc3e-0390baaef2cd",
       "match_date": "2025-11-08",
+      "match_time": "15:15",
       "home_team": "Sevilla",
       "away_team": "Osasuna",
       "league_code": "SP1",
@@ -6471,6 +6568,7 @@
     {
       "fixture_id": "c737bb01-9fe0-45a7-bfbd-e6b4e63c37c9",
       "match_date": "2025-11-08",
+      "match_time": "17:30",
       "home_team": "Ath Madrid",
       "away_team": "Levante",
       "league_code": "SP1",
@@ -6565,6 +6663,7 @@
     {
       "fixture_id": "3e8bd4aa-4a5c-4315-af53-0de625bfce33",
       "match_date": "2025-11-08",
+      "match_time": "20:00",
       "home_team": "Espanol",
       "away_team": "Villarreal",
       "league_code": "SP1",
@@ -6621,6 +6720,7 @@
     {
       "fixture_id": "33e48b8c-17f3-4f83-8a04-5aec6fc9db8e",
       "match_date": "2025-11-09",
+      "match_time": "13:00",
       "home_team": "Ath Bilbao",
       "away_team": "Oviedo",
       "league_code": "SP1",
@@ -6705,6 +6805,7 @@
     {
       "fixture_id": "301d3ed0-0a52-4e66-96b3-2ed7df583274",
       "match_date": "2025-11-09",
+      "match_time": "15:15",
       "home_team": "Vallecano",
       "away_team": "Real Madrid",
       "league_code": "SP1",
@@ -6799,6 +6900,7 @@
     {
       "fixture_id": "fd7877da-0928-4541-8423-bfb17cbbd246",
       "match_date": "2025-11-09",
+      "match_time": "17:30",
       "home_team": "Valencia",
       "away_team": "Betis",
       "league_code": "SP1",
@@ -6855,6 +6957,7 @@
     {
       "fixture_id": "f34e3240-d398-44cd-bdd2-46f08408e3f0",
       "match_date": "2025-11-09",
+      "match_time": "20:00",
       "home_team": "Celta",
       "away_team": "Barcelona",
       "league_code": "SP1",
@@ -6949,6 +7052,7 @@
     {
       "fixture_id": "b7f120be-e99f-4d16-82d0-5a02cb63c941",
       "match_date": "2025-11-08",
+      "match_time": "15:15",
       "home_team": "Eibar",
       "away_team": "Albacete",
       "league_code": "SP2",
@@ -7000,6 +7104,7 @@
     {
       "fixture_id": "ce198b6f-793d-4011-a0a6-92ccaa610f2b",
       "match_date": "2025-11-08",
+      "match_time": "17:30",
       "home_team": "La Coruna",
       "away_team": "Cultural Leonesa",
       "league_code": "SP2",
@@ -7094,6 +7199,7 @@
     {
       "fixture_id": "2e291fd2-67d3-4676-bb54-66ef9650c9e3",
       "match_date": "2025-11-08",
+      "match_time": "20:00",
       "home_team": "Malaga",
       "away_team": "Cordoba",
       "league_code": "SP2",
@@ -7150,6 +7256,7 @@
     {
       "fixture_id": "8f2f7197-4415-441e-855c-8cbfbb3817b2",
       "match_date": "2025-11-09",
+      "match_time": "13:00",
       "home_team": "Las Palmas",
       "away_team": "Santander",
       "league_code": "SP2",
@@ -7211,6 +7318,7 @@
     {
       "fixture_id": "57641e82-b222-41d4-9a64-ed605fb0f285",
       "match_date": "2025-11-09",
+      "match_time": "15:15",
       "home_team": "Ceuta",
       "away_team": "Almeria",
       "league_code": "SP2",
@@ -7272,6 +7380,7 @@
     {
       "fixture_id": "c2d5dda1-0ea5-4bc0-a453-9d0ec647fbda",
       "match_date": "2025-11-10",
+      "match_time": "19:30",
       "home_team": "Burgos",
       "away_team": "Castellon",
       "league_code": "SP2",
@@ -7323,6 +7432,7 @@
     {
       "fixture_id": "9abb98e1-c3af-4b77-95f3-9124feca0885",
       "match_date": "2025-11-07",
+      "match_time": "17:00",
       "home_team": "Genclerbirligi",
       "away_team": "Buyuksehyr",
       "league_code": "T1",
@@ -7374,6 +7484,7 @@
     {
       "fixture_id": "dbdb09cd-01e2-4336-aa74-473589baced9",
       "match_date": "2025-11-08",
+      "match_time": "11:30",
       "home_team": "Gaziantep",
       "away_team": "Rizespor",
       "league_code": "T1",
@@ -7425,6 +7536,7 @@
     {
       "fixture_id": "35fd21f4-fb83-4f03-a46c-437389256b9d",
       "match_date": "2025-11-08",
+      "match_time": "14:00",
       "home_team": "Trabzonspor",
       "away_team": "Alanyaspor",
       "league_code": "T1",
@@ -7509,6 +7621,7 @@
     {
       "fixture_id": "a69a95c0-aa91-4032-826b-40bb8ae0f44e",
       "match_date": "2025-11-08",
+      "match_time": "17:00",
       "home_team": "Antalyaspor",
       "away_team": "Besiktas",
       "league_code": "T1",
@@ -7598,6 +7711,7 @@
     {
       "fixture_id": "cdccd645-46c4-421a-a292-4a87e7f36730",
       "match_date": "2025-11-08",
+      "match_time": "17:00",
       "home_team": "Kasimpasa",
       "away_team": "Goztep",
       "league_code": "T1",
@@ -7649,6 +7763,7 @@
     {
       "fixture_id": "8d5104c8-a7a5-4b41-bf96-f356bc7a173a",
       "match_date": "2025-11-09",
+      "match_time": "11:30",
       "home_team": "Karagumruk",
       "away_team": "Konyaspor",
       "league_code": "T1",
@@ -7700,6 +7815,7 @@
     {
       "fixture_id": "06630193-f2e8-4f24-9ad3-25dc92198272",
       "match_date": "2025-11-09",
+      "match_time": "14:00",
       "home_team": "Kocaelispor",
       "away_team": "Galatasaray",
       "league_code": "T1",
@@ -7794,6 +7910,7 @@
     {
       "fixture_id": "d0a9e227-28ba-499b-9093-acb9328bdbd5",
       "match_date": "2025-11-09",
+      "match_time": "17:00",
       "home_team": "Fenerbahce",
       "away_team": "Kayserispor",
       "league_code": "T1",
@@ -7888,6 +8005,7 @@
     {
       "fixture_id": "104f6841-0b68-4625-9f33-e758989913ac",
       "match_date": "2025-11-09",
+      "match_time": "17:00",
       "home_team": "Samsunspor",
       "away_team": "Eyupspor",
       "league_code": "T1",
@@ -7950,12 +8068,13 @@
     {
       "fixture_id": "50cbd6df-c133-409b-a42a-4b81a7a86b8d",
       "match_date": "2025-11-09",
+      "match_time": "13:00",
       "home_team": "Vejle",
       "away_team": "FC Copenhagen",
       "league_code": "DNK",
       "is_favorite_league": false,
       "home_team_is_top": false,
-      "away_team_is_top": false,
+      "away_team_is_top": true,
       "odds": {
         "home": 5.61,
         "draw": 4.15,
@@ -8017,6 +8136,7 @@
     {
       "fixture_id": "d92c459a-21d3-4bf9-9f22-80ca7f0efa93",
       "match_date": "2025-11-09",
+      "match_time": "15:00",
       "home_team": "Randers FC",
       "away_team": "Midtjylland",
       "league_code": "DNK",
@@ -8084,6 +8204,7 @@
     {
       "fixture_id": "5378327d-eb04-417d-b151-312549dc2e3d",
       "match_date": "2025-11-09",
+      "match_time": "17:00",
       "home_team": "Aarhus",
       "away_team": "Sonderjyske",
       "league_code": "DNK",
@@ -8151,6 +8272,7 @@
     {
       "fixture_id": "8826be20-2b37-4a32-841a-6bd6b1203dc6",
       "match_date": "2025-11-09",
+      "match_time": "13:00",
       "home_team": "SJK",
       "away_team": "Gnistan",
       "league_code": "FIN",
@@ -8218,6 +8340,7 @@
     {
       "fixture_id": "a46a8c7d-57e4-4de9-9293-27cef35b8ffe",
       "match_date": "2025-11-08",
+      "match_time": "17:00",
       "home_team": "Viking",
       "away_team": "Ham-Kam",
       "league_code": "NOR",
@@ -8285,6 +8408,7 @@
     {
       "fixture_id": "f5084838-1967-4758-81eb-d2e9ec84098f",
       "match_date": "2025-11-09",
+      "match_time": "16:00",
       "home_team": "Bodo/Glimt",
       "away_team": "Bryne",
       "league_code": "NOR",
@@ -8352,6 +8476,7 @@
     {
       "fixture_id": "ee310347-febf-4e0d-b443-716d89da151a",
       "match_date": "2025-11-09",
+      "match_time": "16:00",
       "home_team": "Brann",
       "away_team": "KFUM Oslo",
       "league_code": "NOR",
@@ -8419,6 +8544,7 @@
     {
       "fixture_id": "c144d202-802c-4807-95b1-94eee76f0843",
       "match_date": "2025-11-09",
+      "match_time": "18:15",
       "home_team": "Haugesund",
       "away_team": "Molde",
       "league_code": "NOR",
@@ -8486,6 +8612,7 @@
     {
       "fixture_id": "8f1d07b4-9f7f-4acc-9316-1ef5750d2bb6",
       "match_date": "2025-11-09",
+      "match_time": "14:00",
       "home_team": "AIK",
       "away_team": "Halmstad",
       "league_code": "SWE",
@@ -8553,6 +8680,7 @@
     {
       "fixture_id": "fb34de93-907e-4525-96d3-1ce638590547",
       "match_date": "2025-11-09",
+      "match_time": "14:00",
       "home_team": "Goteborg",
       "away_team": "Norrkoping",
       "league_code": "SWE",
@@ -8620,6 +8748,7 @@
     {
       "fixture_id": "ef5521f2-fae9-457a-99f0-205487608208",
       "match_date": "2025-11-09",
+      "match_time": "14:00",
       "home_team": "Hammarby",
       "away_team": "Elfsborg",
       "league_code": "SWE",
@@ -8687,6 +8816,7 @@
     {
       "fixture_id": "e929494b-42b0-436f-bf64-e42591400b04",
       "match_date": "2025-11-09",
+      "match_time": "14:00",
       "home_team": "Mjallby",
       "away_team": "Hacken",
       "league_code": "SWE",
@@ -8754,6 +8884,7 @@
     {
       "fixture_id": "60e76433-417c-4d16-9cc0-4555ed5273f5",
       "match_date": "2025-11-09",
+      "match_time": "14:00",
       "home_team": "Sirius",
       "away_team": "Varnamo",
       "league_code": "SWE",

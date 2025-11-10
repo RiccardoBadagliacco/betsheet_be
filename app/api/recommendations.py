@@ -118,6 +118,8 @@ async def generate_recommendations(save: bool = True) -> Dict[str, Any]:
                 results.append({
                     "fixture_id": str(f.id),
                     "match_date": f.match_date.isoformat() if f.match_date else None,
+                    # match_time: prefer isoformat (for time/datetime), fallback to str()
+                    "match_time": (lambda mt: (mt.isoformat() if hasattr(mt, "isoformat") else str(mt)) if mt else None)(getattr(f, 'match_time', None)),
                     "home_team": f.home_team.name if f.home_team else None,
                     "away_team": f.away_team.name if f.away_team else None,
                     "league_code": f.league_code,
