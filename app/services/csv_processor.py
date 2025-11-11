@@ -38,7 +38,6 @@ def filter_csv_bytes(csv_bytes: bytes) -> bytes:
     logger.debug("Inizio filtraggio CSV (size: %.1f KB)", len(csv_bytes) / 1024)
     try:
         df = pd.read_csv(io.BytesIO(csv_bytes), usecols=lambda c: True, low_memory=False)
-        logger.info("Colonne disponibili: %s", list(df.columns))
     except Exception as e:
         logger.error("Errore durante la lettura CSV: %s", e)
         raise
@@ -55,7 +54,6 @@ def filter_csv_bytes(csv_bytes: bytes) -> bytes:
         else:
             out[target] = pd.Series([None] * len(df))
     filtered = pd.DataFrame(out)[REQUIRED_COLUMNS]
-    logger.info("CSV filtrato (%d righe, %d colonne)", len(filtered), len(filtered.columns))
 
     return filtered.to_csv(index=False).encode('utf-8')
 

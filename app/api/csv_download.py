@@ -56,7 +56,8 @@ async def download_all_leagues_centralized(
                 continue
             db_res = service.process_csv_to_database(path, code, season_code) if populate_db else None
             out["main"].append({"league": code, "season": season_code, "file": path, "success": db_res.get("success", True) if db_res else True})
-    for code in other.keys():
+    
+        """ for code in other.keys():
         res = results[idx]; idx += 1
         if isinstance(res, Exception):
             out["other"].append({"league": code, "success": False, "error": str(res)})
@@ -67,7 +68,7 @@ async def download_all_leagues_centralized(
                 db_res = service.process_csv_to_database(path, code, season_key)
                 logger.info("[%s %s] ✅ %d partite importate", code, season_code, db_res.get("matches_processed", 0))
 
-            out["other"].append({"league": code, "season": season_key, "file": path, "success": True})
+            out["other"].append({"league": code, "season": season_key, "file": path, "success": True}) """
             
     logger.info("🏁 Processo completato in %.2fs", asyncio.get_running_loop().time() - start)
 

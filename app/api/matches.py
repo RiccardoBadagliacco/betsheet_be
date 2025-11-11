@@ -1,15 +1,19 @@
 from fastapi import APIRouter, HTTPException, Query, Depends
-from typing import Dict, List
+from typing import Dict, List, Optional
 from datetime import datetime, date
 from sqlalchemy.orm import Session, joinedload
+import logging
 
 from app.db.database_football import get_football_db
 from app.db.models_football import Match, Season, League
-from app.services.picchetto_tecnico import calcola_picchetto
-
+from app.analytics.get_team_stats_service import get_team_stats
+from app.analytics.picchetto_tecnico import calcola_picchetto_structured
+from app.analytics.metrics import get_metrics
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
+from uuid import UUID
 @router.get("/matches")
 async def get_matches_by_date(
     match_date: str = Query(None, description="Date in YYYY-MM-DD. If omitted returns today's date."),
@@ -43,6 +47,35 @@ async def get_matches_by_date(
 
         leagues: Dict[str, Dict] = {}
 
+        def build_structured_stats(team_id: str, side: str, match_obj: Match) -> Optional[Dict]:
+            try:
+                stats = get_team_stats(
+                    db,
+                    team_id,
+                    side,
+                    season_id=match_obj.season_id,
+                    n=5,
+                    match_date=match_obj.match_date,
+                )
+                data = stats.get("1_x_2", {})
+                return {
+                    "stats_1_x_2": {
+                        "totali": {"label": "Totale stagione", "stats": data.get("total_stats", {})},
+                        "recenti": {"label": "Ultime 5 partite", "stats": data.get("last_n_stats", {})},
+                        "totali_side": {
+                            "label": f"Totale {side.upper()}",
+                            "stats": data.get("total_stats_side", {}) or {},
+                        },
+                        "recenti_side": {
+                            "label": f"Ultime 5 partite {side.upper()}",
+                            "stats": data.get("last_n_stats_side", {}) or {},
+                        },
+                    }
+                }
+            except Exception as exc:
+                logger.warning("Impossibile calcolare le stats %s per match %s: %s", side, match_obj.id, exc)
+                return None
+
         for m in matches:
             try:
                 season = m.season
@@ -66,6 +99,33 @@ async def get_matches_by_date(
                         "fixtures": []
                     }
 
+                result_ft = {
+                    "FT_casa": m.home_goals_ft,
+                    "FT_trasferta": m.away_goals_ft,
+                }
+
+                picchetto_data = None
+                metrics_data = None
+                stats_home = build_structured_stats(m.home_team_id, "home", m)
+                stats_away = build_structured_stats(m.away_team_id, "away", m)
+                if stats_home and stats_away:
+                    try:
+                        odds_payload = {
+                            "1": m.avg_home_odds,
+                            "X": m.avg_draw_odds,
+                            "2": m.avg_away_odds,
+                        }
+                        match_payload = {
+                            "odds": odds_payload,
+                            "stats_home": stats_home,
+                            "stats_away": stats_away,
+                        }
+                        picchetto_data = calcola_picchetto_structured(match_payload)
+                        picchetto_map = {"1X2": picchetto_data}
+                        metrics_data = get_metrics(picchetto_map)
+                    except Exception as picchetto_exc:
+                        logger.warning("Picchetto tecnico fallito per match %s: %s", m.id, picchetto_exc)
+
                 fixture_out = {
                     "fixture_id": str(m.id),
                     "match_date": m.match_date.isoformat() if m.match_date else None,
@@ -73,6 +133,9 @@ async def get_matches_by_date(
                     "home_team": getattr(m.home_team, "name", None),
                     "away_team": getattr(m.away_team, "name", None),
                     "league_code": league_code,
+                    "risultato": result_ft,
+                    "picchetto_tecnico_1X2": picchetto_data,
+                    "metrics": metrics_data,
                 }
 
                 leagues[league_code]["fixtures"].append(fixture_out)
@@ -93,6 +156,52 @@ async def get_matches_by_date(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+    def flatten_stats(s: Dict) -> Dict:
+        """Map the merged service output to the flat shape expected by picchetto.
+
+        This helper is backward-compatible: it accepts metrics either as raw
+        ints (legacy) or as {value,label} objects (new format) and returns
+        integer values for consumption by `calcola_picchetto`.
+        """
+        def val(d, k, default=0):
+            if not isinstance(d, dict):
+                return default
+            v = d.get(k, default)
+            # new format: {"value": X, "label": "..."}
+            if isinstance(v, dict) and "value" in v:
+                return v.get("value", default)
+            # legacy format: direct int
+            if isinstance(v, (int, float)):
+                return v
+            return default
+
+        total = s.get("totali", {}).get("stats", {})
+        recent = s.get("recenti", {}).get("stats", {})
+        home_tot = s.get("totali_home_away", {}).get("stats", {}).get("home", {})
+        away_tot = s.get("totali_home_away", {}).get("stats", {}).get("away", {})
+        home_rec = s.get("recenti_home_away", {}).get("stats", {}).get("home", {})
+        away_rec = s.get("recenti_home_away", {}).get("stats", {}).get("away", {})
+
+        return {
+            "vittorie_totali": val(total, "vittorie"),
+            "sconfitte_totali": val(total, "sconfitte"),
+            "partite_totali": val(total, "partite"),
+            "vittorie_recenti": val(recent, "vittorie"),
+            "sconfitte_recenti": val(recent, "sconfitte"),
+            "partite_recenti": val(recent, "partite"),
+            "vittorie_casa": val(home_tot, "vittorie"),
+            "sconfitte_casa": val(home_tot, "sconfitte"),
+            "partite_casa": val(home_tot, "partite"),
+            "vittorie_casa_recenti": val(home_rec, "vittorie"),
+            "sconfitte_casa_recenti": val(home_rec, "sconfitte"),
+            "partite_casa_recenti": val(home_rec, "partite"),
+            "vittorie_trasferta": val(away_tot, "vittorie"),
+            "sconfitte_trasferta": val(away_tot, "sconfitte"),
+            "partite_trasferta": val(away_tot, "partite"),
+            "vittorie_trasferta_recenti": val(away_rec, "vittorie"),
+            "sconfitte_trasferta_recenti": val(away_rec, "sconfitte"),
+            "partite_trasferta_recenti": val(away_rec, "partite"),
+        }
 from uuid import UUID
 
 @router.get("/matches/{match_id}")
@@ -145,115 +254,59 @@ async def get_match_detail(match_id: str, db: Session = Depends(get_football_db)
         },
     }
 
-    # 3️⃣ Calcolo statistiche strutturate
+    # 3️⃣ Use the shared service to compute team stats
     def compute_team_stats(team_id: str, side: str) -> Dict:
-        matches = (
-            db.query(Match)
-            .filter(Match.season_id == m.season_id)
-            .filter((Match.home_team_id == team_id) | (Match.away_team_id == team_id))
-            .order_by(Match.match_date.desc(), Match.match_time.desc())
-            .all()
-        )
+        """
+        Build the structured stats object by calling `get_team_stats` for the
+        requested side and returning the small wrapper shape expected by the
+        rest of this endpoint (it contains `stats_1_x_2` with totali/recenti).
+        """
+        # call service for the requested side (service returns {"1_x_2": {...}})
+        stats = get_team_stats(db, team_id, side, season_id=m.season_id, n=5, match_date=m.match_date)
 
-        finished = [mm for mm in matches if mm.home_goals_ft is not None and mm.away_goals_ft is not None]
-        recent = finished[:5]
+        a = stats.get("1_x_2", {})
 
-        def count_results(ms):
-            w = l = d = 0
-            for mm in ms:
-                if mm.home_goals_ft == mm.away_goals_ft:
-                    d += 1
-                elif (mm.home_team_id == team_id and mm.home_goals_ft > mm.away_goals_ft) or (
-                    mm.away_team_id == team_id and mm.away_goals_ft > mm.home_goals_ft
-                ):
-                    w += 1
-                else:
-                    l += 1
-            return {"partite": len(ms), "vittorie": w, "pareggi": d, "sconfitte": l}
-
-        # Blocchi specifici per casa o trasferta
-        if side == "home":
-            tot_side_list = [mm for mm in finished if mm.home_team_id == team_id]
-            rec_side_list = tot_side_list[:5]
-            totali_home_away = {"home": count_results(tot_side_list)}
-            recenti_home_away = {"home": count_results(rec_side_list)}
-        else:
-            tot_side_list = [mm for mm in finished if mm.away_team_id == team_id]
-            rec_side_list = tot_side_list[:5]
-            totali_home_away = {"away": count_results(tot_side_list)}
-            recenti_home_away = {"away": count_results(rec_side_list)}
-
-        # ✅ Nuovo formato con "label" e "stats"
-        return {
-            "totali": {
-                "label": "Totale stagione",
-                "stats": count_results(finished),
-            },
-            "recenti": {
-                "label": "Ultime 5 partite",
-                "stats": count_results(recent),
-            },
-            "totali_home_away": {
-                "label": "Totale H/A",
-                "stats": totali_home_away,
-            },
-            "recenti_home_away": {
-                "label": "Ultime 5 H/A",
-                "stats": recenti_home_away,
-            },
+        combined = {
+            "stats_1_x_2": {
+                "totali": {"label": "Totale stagione", "stats": a.get("total_stats", {})},
+                "recenti": {"label": f"Ultime {5} partite", "stats": a.get("last_n_stats", {})},
+                "totali_side": {
+                    "label": f"Totale {side.upper()}",
+                    "stats": a.get("total_stats_side", {}) or {},
+                },
+                "recenti_side": {
+                    "label": f"Ultime {5} partite {side.upper()}",
+                    "stats": a.get("last_n_stats_side", {}) or {},
+                },
+            }
         }
 
-    stats_home = compute_team_stats(m.home_team_id, "home")
-    stats_away = compute_team_stats(m.away_team_id, "away")
+        return combined
 
-    # 4️⃣ Flatten per il picchetto tecnico
-    def flatten_stats(s: Dict) -> Dict:
-        def g(d, k, default=0):
-            return d.get(k, default) if isinstance(d, dict) else default
-
-        home_tot = s["totali_home_away"]["stats"].get("home", {})
-        away_tot = s["totali_home_away"]["stats"].get("away", {})
-        home_rec = s["recenti_home_away"]["stats"].get("home", {})
-        away_rec = s["recenti_home_away"]["stats"].get("away", {})
-
-        return {
-            "vittorie_totali": s["totali"]["stats"]["vittorie"],
-            "sconfitte_totali": s["totali"]["stats"]["sconfitte"],
-            "partite_totali": s["totali"]["stats"]["partite"],
-            "vittorie_recenti": s["recenti"]["stats"]["vittorie"],
-            "sconfitte_recenti": s["recenti"]["stats"]["sconfitte"],
-            "partite_recenti": s["recenti"]["stats"]["partite"],
-            "vittorie_casa": g(home_tot, "vittorie"),
-            "sconfitte_casa": g(home_tot, "sconfitte"),
-            "partite_casa": g(home_tot, "partite"),
-            "vittorie_casa_recenti": g(home_rec, "vittorie"),
-            "sconfitte_casa_recenti": g(home_rec, "sconfitte"),
-            "partite_casa_recenti": g(home_rec, "partite"),
-            "vittorie_trasferta": g(away_tot, "vittorie"),
-            "sconfitte_trasferta": g(away_tot, "sconfitte"),
-            "partite_trasferta": g(away_tot, "partite"),
-            "vittorie_trasferta_recenti": g(away_rec, "vittorie"),
-            "sconfitte_trasferta_recenti": g(away_rec, "sconfitte"),
-            "partite_trasferta_recenti": g(away_rec, "partite"),
-        }
-
-    flat_home = flatten_stats(stats_home)
-    flat_away = flatten_stats(stats_away)
-
+    stats_home = compute_team_stats(m.home_team_id, 'home')
+    stats_away = compute_team_stats(m.away_team_id, 'away')
     match_payload = {
-        "odds": {"1": m.avg_home_odds, "X": m.avg_draw_odds, "2": m.avg_away_odds},
-        "stats_home": flat_home,
-        "stats_away": flat_away,
+        "home_name": m.home_team.name,
+        "away_name": m.away_team.name,
+        "odds": {
+            "1": m.avg_home_odds,
+            "X": m.avg_draw_odds,
+            "2": m.avg_away_odds,
+        },
+        "stats_home": stats_home,
+        "stats_away": stats_away,
     }
 
-    try:
-        picchetto = calcola_picchetto(match_payload)
-    except Exception as e:
-        picchetto = {"error": str(e)}
+    picchetti = {
+        "1X2": calcola_picchetto_structured(match_payload)
+    }
+    metrics = get_metrics(picchetti)
 
+ 
     return {
         "success": True,
         "match": base_info,
         "stats": {"home": stats_home, "away": stats_away},
-        "picchetto_tecnico": picchetto,
+        "picchetti": picchetti,
+        "metrics": metrics,
     }

@@ -189,13 +189,23 @@ class FootballDataService:
     
     def process_csv_to_database(self, csv_file_path: str, league_code: str, season_code: str) -> Dict[str, object]:
         try:
+            print(f"Processing CSV for league {league_code}, season {season_code} from {csv_file_path}" )
             df = pd.read_csv(csv_file_path)
             season = self.get_or_create_season(league_code, season_code, csv_file_path)
             country_name = season.league.country.name
 
-
             rows = []
             errors: List[str] = []
+            team_name_cache: Dict[str, str] = {}
+
+            def team_name(team_id) -> str:
+                key = str(team_id)
+                if key in team_name_cache:
+                    return team_name_cache[key]
+                team = self.db.query(Team).filter(Team.id == team_id).first()
+                name = team.name if team else f"Team {team_id}"
+                team_name_cache[key] = name
+                return name
 
 
             for i, row in df.iterrows():
@@ -207,6 +217,7 @@ class FootballDataService:
                     errors.append(f"Row {i}: {e}")
 
             created = 0
+            updated = 0
             # batch upsert (semplice: cerca esistenti + aggiorna al volo; poi bulk per nuovi)
             new_objs: List[Match] = []
             for r in rows:
@@ -215,17 +226,53 @@ class FootballDataService:
                     for k, v in r.items():
                         if k != 'match_date':
                             setattr(m, k, v)
+                    updated += 1
+                    logger.debug(
+                        "[%s %s] Aggiornata partita home_id=%s away_id=%s data=%s",
+                        league_code,
+                        season_code,
+                        r["home_team_id"],
+                        r["away_team_id"],
+                        r["match_date"],
+                    )
                 else:
                     new_objs.append(Match(season_id=season.id, **r))
+                    desc = f"{r['match_date']} - {team_name(r['home_team_id'])} vs {team_name(r['away_team_id'])} (row {r.get('csv_row_number')})"
+                    logger.info(
+                        "[%s %s] Nuova partita da inserire: %s",
+                        league_code,
+                        season_code,
+                        desc,
+                    )
+                    logger.debug(
+                        "[%s %s] Pianificata nuova partita home_id=%s away_id=%s data=%s per inserimento",
+                        league_code,
+                        season_code,
+                        r["home_team_id"],
+                        r["away_team_id"],
+                        r["match_date"],
+                    )
                     
                 if len(new_objs) >= BATCH_SIZE:
                     self.db.bulk_save_objects(new_objs)
                     created += len(new_objs)
+                    logger.info(
+                        "[%s %s] Inserite %d nuove partite (batch)",
+                        league_code,
+                        season_code,
+                        len(new_objs),
+                    )
                     new_objs.clear()
                     
             if new_objs:
                 self.db.bulk_save_objects(new_objs)
                 created += len(new_objs)
+                logger.info(
+                    "[%s %s] Inserite %d nuove partite (batch finale)",
+                    league_code,
+                    season_code,
+                    len(new_objs),
+                )
 
 
             # update season stats & dates
@@ -234,6 +281,15 @@ class FootballDataService:
             self._update_season_dates(season)
             self.db.commit()
 
+
+            logger.info(
+                "[%s %s] Completato import CSV: nuove=%d, aggiornate=%d, righe=%d",
+                league_code,
+                season_code,
+                created,
+                updated,
+                len(df),
+            )
 
             return {
                 "success": True,
