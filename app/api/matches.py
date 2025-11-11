@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query, Depends
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 from datetime import datetime, date
 from sqlalchemy.orm import Session, joinedload
 import logging
@@ -7,13 +7,99 @@ import logging
 from app.db.database_football import get_football_db
 from app.db.models_football import Match, Season, League
 from app.analytics.get_team_stats_service import get_team_stats
-from app.analytics.picchetto_tecnico import calcola_picchetto_structured
+from app.analytics.picchetto_tecnico import calcola_picchetto_1X2, calcola_picchetto_ou25_structured
 from app.analytics.metrics import get_metrics
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
 from uuid import UUID
+
+
+def format_stats_for_side(stats: Dict[str, Any], side: str, last_n: int = 5) -> Dict[str, Any]:
+    """Normalize the stats service output into the structured blocks expected by the API."""
+    data = stats.get("1_x_2", {})
+    suffix = "home" if side == "home" else "away"
+    label_side = suffix.upper()
+
+    def wrap(label: str, payload: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+        return {"label": label, "stats": payload or {}}
+
+    formatted: Dict[str, Any] = {
+        "1X2": {
+            "type": "1X2",
+            "totali": wrap("Totale stagione", data.get("total_stats", {}) or {}),
+            "recenti": wrap(f"Ultime {last_n} partite", data.get("last_n_stats", {}) or {}),
+            f"totali_{suffix}": wrap(f"Totale {label_side}", data.get("total_stats_side", {}) or {}),
+            f"recenti_{suffix}": wrap(
+                f"Ultime {last_n} partite {label_side}", data.get("last_n_stats_side", {}) or {}
+            ),
+        }
+    }
+
+    ou_data = stats.get("ou_25", {}) or {}
+
+    def build_stats(entry: Optional[Dict[str, Any]], allowed_keys: List[str]) -> Dict[str, Any]:
+        if not isinstance(entry, dict):
+            return {}
+        stats: Dict[str, Any] = {}
+        for key in allowed_keys:
+            if entry.get(key) is not None:
+                stats[key] = entry.get(key)
+        return stats
+
+    if ou_data:
+        formatted["OU25"] = {
+            "type": "OU 2.5",
+            "totali": wrap("Totale stagione", build_stats(ou_data.get("total_stats"), ["partite", "under", "over"])),
+            "recenti": wrap(
+                f"Ultime {last_n} partite", build_stats(ou_data.get("last_n_stats"), ["partite", "under", "over"])
+            ),
+            f"totali_{suffix}": wrap(
+                f"Totale {label_side}", build_stats(ou_data.get("total_stats_side"), ["partite", "under", "over"])
+            ),
+            f"recenti_{suffix}": wrap(
+                f"Ultime {last_n} partite {label_side}",
+                build_stats(ou_data.get("last_n_stats_side"), ["partite", "under", "over"]),
+            ),
+        }
+
+    ou15_data = stats.get("ou_15", {}) or {}
+    if ou15_data:
+        formatted["OU15"] = {
+            "type": "OU 1.5",
+            "totali": wrap("Totale stagione", build_stats(ou15_data.get("total_stats"), ["partite", "under", "over"])),
+            "recenti": wrap(
+                f"Ultime {last_n} partite", build_stats(ou15_data.get("last_n_stats"), ["partite", "under", "over"])
+            ),
+            f"totali_{suffix}": wrap(
+                f"Totale {label_side}", build_stats(ou15_data.get("total_stats_side"), ["partite", "under", "over"])
+            ),
+            f"recenti_{suffix}": wrap(
+                f"Ultime {last_n} partite {label_side}",
+                build_stats(ou15_data.get("last_n_stats_side"), ["partite", "under", "over"]),
+            ),
+        }
+
+    gng_data = stats.get("goal_no_goal", {}) or {}
+    if gng_data:
+        formatted["GNG"] = {
+            "type": "Goal / No Goal",
+            "totali": wrap("Totale stagione", build_stats(gng_data.get("total_stats"), ["partite", "goal", "no_goal"])),
+            "recenti": wrap(
+                f"Ultime {last_n} partite", build_stats(gng_data.get("last_n_stats"), ["partite", "goal", "no_goal"])
+            ),
+            f"totali_{suffix}": wrap(
+                f"Totale {label_side}", build_stats(gng_data.get("total_stats_side"), ["partite", "goal", "no_goal"])
+            ),
+            f"recenti_{suffix}": wrap(
+                f"Ultime {last_n} partite {label_side}",
+                build_stats(gng_data.get("last_n_stats_side"), ["partite", "goal", "no_goal"]),
+            ),
+        }
+
+    return formatted
+
 @router.get("/matches")
 async def get_matches_by_date(
     match_date: str = Query(None, description="Date in YYYY-MM-DD. If omitted returns today's date."),
@@ -47,7 +133,7 @@ async def get_matches_by_date(
 
         leagues: Dict[str, Dict] = {}
 
-        def build_structured_stats(team_id: str, side: str, match_obj: Match) -> Optional[Dict]:
+        def build_structured_stats(team_id: str, side: str, match_obj: Match) -> Optional[Dict[str, Any]]:
             try:
                 stats = get_team_stats(
                     db,
@@ -57,21 +143,7 @@ async def get_matches_by_date(
                     n=5,
                     match_date=match_obj.match_date,
                 )
-                data = stats.get("1_x_2", {})
-                return {
-                    "stats_1_x_2": {
-                        "totali": {"label": "Totale stagione", "stats": data.get("total_stats", {})},
-                        "recenti": {"label": "Ultime 5 partite", "stats": data.get("last_n_stats", {})},
-                        "totali_side": {
-                            "label": f"Totale {side.upper()}",
-                            "stats": data.get("total_stats_side", {}) or {},
-                        },
-                        "recenti_side": {
-                            "label": f"Ultime 5 partite {side.upper()}",
-                            "stats": data.get("last_n_stats_side", {}) or {},
-                        },
-                    }
-                }
+                return format_stats_for_side(stats, side)
             except Exception as exc:
                 logger.warning("Impossibile calcolare le stats %s per match %s: %s", side, match_obj.id, exc)
                 return None
@@ -104,8 +176,13 @@ async def get_matches_by_date(
                     "FT_trasferta": m.away_goals_ft,
                 }
 
-                picchetto_data = None
+                picchetto_1x2 = None
+                picchetto_ou25 = None
                 metrics_data = None
+                odds_ou_payload = {
+                    "U2.5": m.avg_under_25_odds,
+                    "O2.5": m.avg_over_25_odds,
+                }
                 stats_home = build_structured_stats(m.home_team_id, "home", m)
                 stats_away = build_structured_stats(m.away_team_id, "away", m)
                 if stats_home and stats_away:
@@ -116,13 +193,22 @@ async def get_matches_by_date(
                             "2": m.avg_away_odds,
                         }
                         match_payload = {
+                            "home_name": getattr(m.home_team, "name", "Casa"),
+                            "away_name": getattr(m.away_team, "name", "Trasferta"),
                             "odds": odds_payload,
+                            "odds_ou": odds_ou_payload,
                             "stats_home": stats_home,
                             "stats_away": stats_away,
                         }
-                        picchetto_data = calcola_picchetto_structured(match_payload)
-                        picchetto_map = {"1X2": picchetto_data}
-                        metrics_data = get_metrics(picchetto_map)
+                        picchetto_1x2 = calcola_picchetto_1X2(match_payload)
+                        picchetto_ou25 = calcola_picchetto_ou25_structured(match_payload)
+                        picchetto_map = {}
+                        if picchetto_1x2:
+                            picchetto_map["1X2"] = picchetto_1x2
+                        if picchetto_ou25:
+                            picchetto_map["OU25"] = picchetto_ou25
+                        if picchetto_map:
+                            metrics_data = get_metrics(picchetto_map)
                     except Exception as picchetto_exc:
                         logger.warning("Picchetto tecnico fallito per match %s: %s", m.id, picchetto_exc)
 
@@ -134,7 +220,9 @@ async def get_matches_by_date(
                     "away_team": getattr(m.away_team, "name", None),
                     "league_code": league_code,
                     "risultato": result_ft,
-                    "picchetto_tecnico_1X2": picchetto_data,
+                    "odds_ou_25": odds_ou_payload,
+                    "picchetto_tecnico_1X2": picchetto_1x2,
+                    "picchetto_tecnico_OU25": picchetto_ou25,
                     "metrics": metrics_data,
                 }
 
@@ -155,54 +243,6 @@ async def get_matches_by_date(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-    def flatten_stats(s: Dict) -> Dict:
-        """Map the merged service output to the flat shape expected by picchetto.
-
-        This helper is backward-compatible: it accepts metrics either as raw
-        ints (legacy) or as {value,label} objects (new format) and returns
-        integer values for consumption by `calcola_picchetto`.
-        """
-        def val(d, k, default=0):
-            if not isinstance(d, dict):
-                return default
-            v = d.get(k, default)
-            # new format: {"value": X, "label": "..."}
-            if isinstance(v, dict) and "value" in v:
-                return v.get("value", default)
-            # legacy format: direct int
-            if isinstance(v, (int, float)):
-                return v
-            return default
-
-        total = s.get("totali", {}).get("stats", {})
-        recent = s.get("recenti", {}).get("stats", {})
-        home_tot = s.get("totali_home_away", {}).get("stats", {}).get("home", {})
-        away_tot = s.get("totali_home_away", {}).get("stats", {}).get("away", {})
-        home_rec = s.get("recenti_home_away", {}).get("stats", {}).get("home", {})
-        away_rec = s.get("recenti_home_away", {}).get("stats", {}).get("away", {})
-
-        return {
-            "vittorie_totali": val(total, "vittorie"),
-            "sconfitte_totali": val(total, "sconfitte"),
-            "partite_totali": val(total, "partite"),
-            "vittorie_recenti": val(recent, "vittorie"),
-            "sconfitte_recenti": val(recent, "sconfitte"),
-            "partite_recenti": val(recent, "partite"),
-            "vittorie_casa": val(home_tot, "vittorie"),
-            "sconfitte_casa": val(home_tot, "sconfitte"),
-            "partite_casa": val(home_tot, "partite"),
-            "vittorie_casa_recenti": val(home_rec, "vittorie"),
-            "sconfitte_casa_recenti": val(home_rec, "sconfitte"),
-            "partite_casa_recenti": val(home_rec, "partite"),
-            "vittorie_trasferta": val(away_tot, "vittorie"),
-            "sconfitte_trasferta": val(away_tot, "sconfitte"),
-            "partite_trasferta": val(away_tot, "partite"),
-            "vittorie_trasferta_recenti": val(away_rec, "vittorie"),
-            "sconfitte_trasferta_recenti": val(away_rec, "sconfitte"),
-            "partite_trasferta_recenti": val(away_rec, "partite"),
-        }
-from uuid import UUID
 
 @router.get("/matches/{match_id}")
 async def get_match_detail(match_id: str, db: Session = Depends(get_football_db)) -> Dict:
@@ -236,52 +276,36 @@ async def get_match_detail(match_id: str, db: Session = Depends(get_football_db)
     country = getattr(league, "country", None)
 
     base_info = {
-        "match_id": str(m.id),
-        "data": m.match_date.isoformat() if m.match_date else None,
-        "ora": m.match_time,
-        "casa": {"id": str(m.home_team.id), "nome": m.home_team.name},
-        "trasferta": {"id": str(m.away_team.id), "nome": m.away_team.name},
-        "risultato": {"FT_casa": m.home_goals_ft, "FT_trasferta": m.away_goals_ft},
-        "quote": {"1": m.avg_home_odds, "X": m.avg_draw_odds, "2": m.avg_away_odds},
-        "lega": {
-            "codice": getattr(league, "code", None),
-            "nome": getattr(league, "name", None),
-            "paese": getattr(country, "code", None),
+        "id": str(m.id),
+        "date": m.match_date.isoformat() if m.match_date else None,
+        "time": m.match_time,
+        "home_team": {
+            "id": str(getattr(m.home_team, "id", "")),
+            "name": getattr(m.home_team, "name", None),
         },
-        "stagione": {
+        "away_team": {
+            "id": str(getattr(m.away_team, "id", "")),
+            "name": getattr(m.away_team, "name", None),
+        },
+        "result": {"home_ft": m.home_goals_ft, "away_ft": m.away_goals_ft},
+        "odds": {"1": m.avg_home_odds, "X": m.avg_draw_odds, "2": m.avg_away_odds},
+        "odds_ou_25": {"U2.5": m.avg_under_25_odds, "O2.5": m.avg_over_25_odds},
+        "league": {
+            "code": getattr(league, "code", None),
+            "name": getattr(league, "name", None),
+            "country": getattr(country, "code", None),
+        },
+        "season": {
             "id": str(getattr(m.season, "id", "")),
-            "nome": getattr(m.season, "name", None),
+            "name": getattr(m.season, "name", None),
         },
     }
 
     # 3️⃣ Use the shared service to compute team stats
-    def compute_team_stats(team_id: str, side: str) -> Dict:
-        """
-        Build the structured stats object by calling `get_team_stats` for the
-        requested side and returning the small wrapper shape expected by the
-        rest of this endpoint (it contains `stats_1_x_2` with totali/recenti).
-        """
-        # call service for the requested side (service returns {"1_x_2": {...}})
+    def compute_team_stats(team_id: str, side: str) -> Dict[str, Any]:
+        """Fetch and format stats for the requested side."""
         stats = get_team_stats(db, team_id, side, season_id=m.season_id, n=5, match_date=m.match_date)
-
-        a = stats.get("1_x_2", {})
-
-        combined = {
-            "stats_1_x_2": {
-                "totali": {"label": "Totale stagione", "stats": a.get("total_stats", {})},
-                "recenti": {"label": f"Ultime {5} partite", "stats": a.get("last_n_stats", {})},
-                "totali_side": {
-                    "label": f"Totale {side.upper()}",
-                    "stats": a.get("total_stats_side", {}) or {},
-                },
-                "recenti_side": {
-                    "label": f"Ultime {5} partite {side.upper()}",
-                    "stats": a.get("last_n_stats_side", {}) or {},
-                },
-            }
-        }
-
-        return combined
+        return format_stats_for_side(stats, side)
 
     stats_home = compute_team_stats(m.home_team_id, 'home')
     stats_away = compute_team_stats(m.away_team_id, 'away')
@@ -293,13 +317,19 @@ async def get_match_detail(match_id: str, db: Session = Depends(get_football_db)
             "X": m.avg_draw_odds,
             "2": m.avg_away_odds,
         },
+        "odds_ou": {
+            "U2.5": m.avg_under_25_odds,
+            "O2.5": m.avg_over_25_odds,
+        },
         "stats_home": stats_home,
         "stats_away": stats_away,
     }
 
-    picchetti = {
-        "1X2": calcola_picchetto_structured(match_payload)
-    }
+    picchetto_1x2 = calcola_picchetto_1X2(match_payload)
+    picchetto_ou25 = calcola_picchetto_ou25_structured(match_payload)
+    picchetti = {"1X2": picchetto_1x2}
+    if picchetto_ou25:
+        picchetti["OU25"] = picchetto_ou25
     metrics = get_metrics(picchetti)
 
  
