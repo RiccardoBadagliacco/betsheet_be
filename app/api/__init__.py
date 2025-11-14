@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from . import users, auth, backrolls, health, bets, csv_download, leagues_seasons, fixtures, seasons,recommendations,countries, matches
+from . import matches, users, auth, backrolls, health, bets, csv_download, leagues_seasons, fixtures, seasons,countries
 
 # Istanza di router principale dell'API
 api_router = APIRouter()
@@ -13,7 +13,6 @@ api_router.include_router(bets.router, prefix="/bets", tags=["Bets"])
 api_router.include_router(csv_download.router, prefix="/csv", tags=["CSV Download"])
 api_router.include_router(leagues_seasons.router, prefix="/api/v1", tags=["Leagues & Seasons"])
 api_router.include_router(fixtures.router, prefix="/api/v1", tags=["Fixtures"])
-api_router.include_router(matches.router, prefix="/api/v1", tags=["Matches"])
 api_router.include_router(seasons.router, prefix="/api/v1", tags=["Seasons Management"])
-api_router.include_router(recommendations.router, prefix="/api/v1/recommendations", tags=["Recommendations"])
 api_router.include_router(countries.router, prefix="/api/v1", tags=["Countries"])
+api_router.include_router(matches.router, prefix="/api/v1", tags=["Model Predict"])

@@ -14,7 +14,6 @@ from app.db.models_football import Fixture, Team
 import logging
 import json
 import os
-from app.api.recommendations import generate_recommendations
 from app.constants.leagues import get_league_name_from_code
 import logging
 import pandas as pd
@@ -42,7 +41,7 @@ async def generate_all_predictions_and_save(save: bool = True):
             logger.info("🔄 Generazione previsioni Over...")
 
             # ✅ chiamiamo direttamente la nuova API
-            result = await generate_recommendations(save=True)
+            result = None
 
             result["generated_at"] = datetime.utcnow().isoformat()
             result["generated_by"] = "cron_fixtures_over"
@@ -337,7 +336,7 @@ async def download_fixtures(db: Session = Depends(get_football_db)):
 
         # 5️⃣ Genera raccomandazioni (attende completamento)
         logger.info("🧠 Avvio generazione raccomandazioni...")
-        rec_result = await generate_recommendations(save=True)
+        rec_result = None
         logger.info("✅ Raccomandazioni completate")
 
         # 6️⃣ Risposta finale
