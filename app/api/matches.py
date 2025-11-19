@@ -1,209 +1,196 @@
-from fastapi import APIRouter, HTTPException, Depends,Query
+from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy.orm import Session, joinedload
 from uuid import UUID
-from typing import Any, Dict, List, Optional
+from typing import Dict
 
 from app.db.database_football import get_football_db
-from app.db.models_football import Match, Season, League
-from app.ml.correlazioni_affini.cluster_predictor import predict_cluster_and_profile
-from datetime import datetime, date
+from app.db.models import Match, Season
+from datetime import datetime
 
 router = APIRouter()
 
+import pandas as pd
+from pathlib import Path
 
-@router.get("/matches/{match_id}")
-def predict_match_model(match_id: str, db: Session = Depends(get_football_db)):
+# Runtime pipeline
+
+
+APP_DIR = Path(__file__).resolve().parents[1]
+AFFINI_DIR = APP_DIR / "ml" / "correlazioni_affini_v2"
+DATA_DIR = AFFINI_DIR / "data"
+
+SLIM_PATH = DATA_DIR / "step4b_affini_index_slim_v2.parquet"
+WIDE_PATH = DATA_DIR / "step4a_affini_index_wide_v2.parquet"
+
+@router.get("/matches/by_date")
+async def get_matches_by_date(
+    match_date: str = Query(None, description="YYYY-MM-DD"),
+    db: Session = Depends(get_football_db),
+):
     """
-    Restituisce:
-      • info match (team, lega, odds, risultato se presente)
-      • cluster predetto
-      • profilo statistico del cluster
+    Ritorna le partite per una certa data, raggruppate per league.
     """
-    # -------------------------------------------------------
-    # 1) Validate UUID
-    # -------------------------------------------------------
+    if match_date is None:
+        match_date = datetime.now().date().isoformat()
+
     try:
-        match_uuid = UUID(match_id)
-    except ValueError:
-        raise HTTPException(status_code=400, detail="match_id non valido (UUID)")
+        date_obj = datetime.strptime(match_date, "%Y-%m-%d").date()
+    except Exception:
+        raise HTTPException(400, "match_date must be YYYY-MM-DD")
 
-    # -------------------------------------------------------
-    # 2) Query match
-    # -------------------------------------------------------
-    m = (
+    q = (
         db.query(Match)
         .options(
             joinedload(Match.home_team),
             joinedload(Match.away_team),
-            joinedload(Match.season).joinedload(Season.league)
+            joinedload(Match.season).joinedload(Season.league),
         )
-        .filter(Match.id == match_uuid)
-        .one_or_none()
+        .filter(Match.match_date == date_obj)
     )
 
-    if not m:
-        raise HTTPException(status_code=404, detail="Match non trovato")
+    matches = q.all()
+    leagues: Dict[str, Dict] = {}
 
-    # -------------------------------------------------------
-    # 3) Ricostruzione feature per il GMM (solo quote fornite)
-    #
-    #  Questi nomi devono combaciare con feature_cols usate in training:
-    #       bk_p1, bk_px, bk_p2, bk_pO25, bk_pU25
-    #
-    #  Tutte le altre feature mancanti verranno riempite automaticamente
-    #  con la media di colonna dal ClusterEngine.
-    # -------------------------------------------------------
+    for m in matches:
+        season = m.season
+        league = season.league if season else None
+        code = getattr(league, "code", "UNKNOWN")
 
-    row = {
-        "bk_p1": 1 / m.avg_home_odds if m.avg_home_odds else None,
-        "bk_px": 1 / m.avg_draw_odds if m.avg_draw_odds else None,
-        "bk_p2": 1 / m.avg_away_odds if m.avg_away_odds else None,
-        "bk_pO25": 1 / m.avg_over_25_odds if m.avg_over_25_odds else None,
-        "bk_pU25": 1 / m.avg_under_25_odds if m.avg_under_25_odds else None,
-        # in futuro puoi aggiungere elo, poisson, forma ecc.
-    }
+        if code not in leagues:
+            leagues[code] = {
+                "league_name": getattr(league, "name", code),
+                "fixtures": [],
+            }
 
-    # -------------------------------------------------------
-    # 4) Predict cluster + profilo
-    # -------------------------------------------------------
-    cluster_id, profile = predict_cluster_and_profile(row)
-
-    # -------------------------------------------------------
-    # 5) Preparo output info match
-    # -------------------------------------------------------
-    league = m.season.league if m.season else None
-
-    match_info = {
-        "id": str(m.id),
-        "date": m.match_date.isoformat() if m.match_date else None,
-        "time": m.match_time,
-        "home_team": {
-            "id": str(m.home_team.id) if m.home_team else None,
-            "name": m.home_team.name if m.home_team else None,
-        },
-        "away_team": {
-            "id": str(m.away_team.id) if m.away_team else None,
-            "name": m.away_team.name if m.away_team else None,
-        },
-        "result_ft": {
-            "home": m.home_goals_ft,
-            "away": m.away_goals_ft,
-        },
-        "odds": {
-            "1": m.avg_home_odds,
-            "X": m.avg_draw_odds,
-            "2": m.avg_away_odds,
-            "O2.5": m.avg_over_25_odds,
-            "U2.5": m.avg_under_25_odds,
-        },
-        "league": {
-            "code": getattr(league, "code", None),
-            "name": getattr(league, "name", None),
-            "country": getattr(league.country, "code", None) if league and league.country else None,
-        },
-        "season": {
-            "id": str(m.season.id) if m.season else None,
-            "name": m.season.name if m.season else None,
-        },
-    }
-
-    # -------------------------------------------------------
-    # 6) Response finale
-    # -------------------------------------------------------
-    return {
-        "success": True,
-        "match": match_info,
-        "cluster": cluster_id,
-        "profile": profile,   # intero profilo cluster: 1x2, OU, GG, MG, top scores...
-    }
-
-# -------------------------------------------------------
-@router.get("/matches")
-async def get_matches_by_date(
-    match_date: str = Query(None, description="Date in YYYY-MM-DD. If omitted returns today's date."),
-    db: Session = Depends(get_football_db),
-) -> Dict:
-    """Return all matches for a given date grouped by league and sorted by time.
-
-    Reads from the football DB `matches` table.
-    """
-    try:
-        if match_date is None:
-            match_date = datetime.now().date().isoformat()
-        # validate date format
-        try:
-            date_obj = datetime.strptime(match_date, "%Y-%m-%d").date()
-        except Exception:
-            raise HTTPException(status_code=400, detail="match_date must be in YYYY-MM-DD format")
-
-        # Query DB for matches on that date, eager-load teams and season->league
-        q = (
-            db.query(Match)
-            .options(
-                joinedload(Match.home_team),
-                joinedload(Match.away_team),
-                joinedload(Match.season).joinedload(Season.league),
-            )
-            .filter(Match.match_date == date_obj)
+        leagues[code]["fixtures"].append(
+            {
+                "fixture_id": str(m.id),
+                "home_team": m.home_team.name,
+                "away_team": m.away_team.name,
+                "match_time": m.match_time,
+          
+                "home_ft": m.home_goals_ft,
+                "away_ft": m.away_goals_ft
+                
+            }
         )
 
-        matches = q.all()
+    return {"success": True, "date": match_date, "leagues": leagues}
+#
 
-        leagues: Dict[str, Dict] = {}
 
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.orm import Session, joinedload
+from app.ml.correlazioni_affini_v2.common.soft_engine_api_v2 import (
+    run_soft_engine_api,
+)
+from app.ml.correlazioni_affini_v2.common.soft_engine_postprocess import full_postprocess
+from app.ml.correlazioni_affini_v2.common.load_affini_indexes import load_affini_indexes
+@router.get("/matches/{match_id}")
+async def analyze_match(
+    match_id: str,
+    top_n: int = Query(80, ge=10, le=200),
+    min_neighbors: int = Query(30, ge=5, le=100),
+    db: Session = Depends(get_football_db),
+):
+    print("Analyzing match_id:", match_id)
 
-        for m in matches:
-            try:
-                season = m.season
-                league = season.league if season is not None else None
-                league_code = getattr(league, "code", "UNKNOWN") if league else "UNKNOWN"
-                league_name = getattr(league, "name", None) or league_code
+    # --------------------------------------
+    # 1) MATCH DAL DB
+    # --------------------------------------
+    try:
+        match_uuid = UUID(match_id)
+    except ValueError:
+        raise HTTPException(400, "match_id must be a valid UUID")
 
-                if league_code not in leagues:
-                    # try to extract country code from league relationship if present
-                    country_code = None
-                    try:
-                        country_obj = getattr(league, 'country', None)
-                        if country_obj is not None:
-                            country_code = getattr(country_obj, 'code', None)
-                    except Exception:
-                        country_code = None
+    m: Match | None = (
+        db.query(Match)
+        .options(
+            joinedload(Match.season).joinedload(Season.league),
+            joinedload(Match.home_team),
+            joinedload(Match.away_team),
+        )
+        .filter(Match.id == match_uuid)
+        .first()
+    )
 
-                    leagues[league_code] = {
-                        "league_name": league_name,
-                        "country": country_code,
-                        "fixtures": []
-                    }
+    if m is None:
+        raise HTTPException(404, "Match non trovato")
 
-                result_ft = {
-                    "FT_casa": m.home_goals_ft,
-                    "FT_trasferta": m.away_goals_ft,
-                }
+    league = m.season.league if m.season else None
 
-                fixture_out = {
-                    "fixture_id": str(m.id),
-                    "match_date": m.match_date.isoformat() if m.match_date else None,
-                    "match_time": m.match_time,
-                    "home_team": getattr(m.home_team, "name", None),
-                    "away_team": getattr(m.away_team, "name", None),
-                    "league_code": league_code,
-                    "risultato": result_ft,
-                }
+    # --------------------------------------
+    # 2) META INFO
+    # --------------------------------------
+    meta = {
+        "match_id": str(m.id),
+        "home_team": m.home_team.name,
+        "away_team": m.away_team.name,
+        "league_name": league.name if league else None,
+        "league_code": league.code if league else None,
+        "match_date": m.match_date.isoformat() if m.match_date else None,
+        "match_time": str(m.match_time) if getattr(m, "match_time", None) else None,
+        "odds": {
+            "avg_home_odds": m.avg_home_odds,
+            "avg_draw_odds": m.avg_draw_odds,
+            "avg_away_odds": m.avg_away_odds,
+            "avg_over_25_odds": m.avg_over_25_odds,
+            "avg_under_25_odds": m.avg_under_25_odds,
+        },
+        "result": {
+            "home_ft": m.home_goals_ft,
+            "away_ft": m.away_goals_ft
+        },
+    }
 
-                leagues[league_code]["fixtures"].append(fixture_out)
-            except Exception:
-                continue
+    # --------------------------------------
+    # 3) CARICO INDICI AFFINI (SLIM + WIDE)
+    # --------------------------------------
+    slim_index, wide_index = load_affini_indexes()
 
-        # sort fixtures within each league by match_time then home_team
-        for lc, info in leagues.items():
-            info["fixtures"] = sorted(
-                info["fixtures"],
-                key=lambda x: ((x.get("match_time") or "00:00"), x.get("home_team") or "")
-            )
+    # --------------------------------------
+    # 4) SOFT ENGINE (USANDO IL MATCH STORICO)
+    # --------------------------------------
+    soft_model = run_soft_engine_api(
+        target_row=None,                      # per match storico non serve
+        target_match_id=str(m.id),            # match da cercare in SLIM
+        slim=slim_index,
+        wide=wide_index,
+        top_n=top_n,
+        min_neighbors=min_neighbors,
+    )
 
-        return {"success": True, "date": match_date, "leagues": leagues}
+    if soft_model["status"] != "ok":
+        return {
+            "success": False,
+            "meta": meta,
+            "reason": soft_model.get("reason", "soft_engine_failed"),
+            "debug": soft_model,
+        }
 
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    # --------------------------------------
+    # 5) POSTPROCESS (GG/NG, PMF, multigoal)
+    # --------------------------------------
+    analytics = full_postprocess({
+        "meta": meta,
+        "clusters": soft_model["clusters"],
+        "soft_probs": soft_model["soft_probs"],
+        "affini_stats": soft_model["affini_stats"],
+        "affini_list": soft_model["affini_list"],   # FONDAMENTALE
+    })
+
+    # --------------------------------------
+    # 6) OUTPUT FINALE
+    # --------------------------------------
+    return {
+        "success": True,
+        "meta": meta,
+        "model": {
+            "status": "ok",
+            "clusters": soft_model["clusters"],
+            "soft_probs": soft_model["soft_probs"],
+            "affini_stats": soft_model["affini_stats"],
+            "config_used": soft_model["config_used"],
+        },
+        "analytics": analytics,
+    }

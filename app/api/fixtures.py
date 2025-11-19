@@ -7,6 +7,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import delete
+from fastapi import Query
 import pandas as pd
 from datetime import datetime
 from app.db.database_football import get_football_db
@@ -25,10 +26,19 @@ logger = logging.getLogger(__name__)
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
+import json
+from datetime import datetime
+from typing import Dict
+import os
+import pandas as pd
+from sqlalchemy.orm import Session
+from app.db.models_football import Fixture,Season
+from uuid import UUID
+from sqlalchemy.orm import joinedload
+
 # URL fisso del CSV fixtures
 FIXTURES_CSV_URL = "https://www.football-data.co.uk/fixtures.csv"
 FIXTURES_CSV_OTHER_URL = "https://www.football-data.co.uk/new_league_fixtures.csv"
-
 
 
 async def generate_all_predictions_and_save(save: bool = True):
@@ -427,3 +437,118 @@ async def clear_fixtures():
     except Exception as e:
         logger.error(f"Errore nella cancellazione fixtures: {e}")
         raise HTTPException(status_code=500, detail=f"Errore: {str(e)}")
+    
+
+
+import pandas as pd
+
+from fastapi import APIRouter, HTTPException, Query, Depends
+from sqlalchemy.orm import Session, joinedload
+
+
+@router.get("/{fixture_id}")
+async def analyze_fixture(
+    fixture_id: str,
+    top_n: int = Query(80, ge=10, le=200),
+    min_neighbors: int = Query(20, ge=5, le=100),
+    db: Session = Depends(get_football_db),
+):
+    """
+    Analizza una fixture futura e restituisce probabilità basate sugli Affini Soft.
+    """
+
+    try:
+        fixture_uuid = UUID(fixture_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="fixture_id must be a valid UUID")
+
+    # 1) Carico fixture
+    f: Fixture | None = (
+        db.query(Fixture)
+        .options(
+            joinedload(Fixture.season).joinedload(Season.league),
+            joinedload(Fixture.home_team),
+            joinedload(Fixture.away_team),
+        )
+        .filter(Fixture.id == fixture_uuid)
+        .first()
+    )
+    if f is None:
+        raise HTTPException(status_code=404, detail="Fixture non trovata")
+
+    league = f.season.league if f.season else None
+
+    meta = {
+        "fixture_id": f.id,
+        "home_team": f.home_team.name,
+        "away_team": f.away_team.name,
+        "league_name": league.name if league else None,
+        "league_code": league.code if league else None,
+        "match_date": f.match_date.isoformat() if f.match_date else None,
+        "match_time": str(f.match_time),
+        "odds": f.odds or {},
+    }
+
+    # 2) Carico storico partite reali per forma + elo runtime
+    df_history = load_matches_history(db)
+
+    # 3) Carico picchetto_stats (fit dello step2a)
+    import joblib
+    pic_stats = joblib.load(
+        "app/ml/correlazioni_affini_v2/models/picchetto_stats_fix.pkl"
+    )
+
+    # 4) Costruisco riga target runtime per la fixture
+    target_row = build_runtime_target_row_for_fixture(
+        fixture=f,
+        df_history=df_history,
+        picchetto_stats=pic_stats,
+    )
+
+    # 5) Assegno cluster runtime
+    clusters = runtime_assign_clusters(target_row)
+
+    # 6) Carico indici affini (step4)
+    slim_index, wide_index = load_affini_indexes()
+
+    # 7) Soft Engine su fixture (target non presente nello SLIM)
+    soft_model = run_soft_engine_for_fixture(
+        target_row=target_row,
+        clusters=clusters,
+        slim_index=slim_index,
+        wide_index=wide_index,
+        top_n=top_n,
+        min_neighbors=min_neighbors,
+    )
+
+    if soft_model["status"] != "ok":
+        return {
+            "success": False,
+            "meta": meta,
+            "reason": soft_model.get("reason"),
+            "debug": soft_model,
+        }
+
+    # 8) Postprocess (stima gol, GG/NG, multigoal, score)
+    analytics = full_postprocess({
+        "meta": meta,
+        "soft_probs": soft_model["soft_probs"],
+        "affini_stats": soft_model["affini_stats"],
+    })
+
+    # 9) Risposta finale API
+    return {
+        "success": True,
+        "meta": meta,
+        "model": {
+            "status": "ok",
+            "clusters": clusters,
+            "soft_probs": soft_model["soft_probs"],
+            "affini_stats": {
+                "n_affini_soft": soft_model["affini_stats"]["n_affini_soft"],
+                "avg_distance": soft_model["affini_stats"]["avg_distance"],
+            },
+            "config_used": soft_model["config_used"],
+        },
+        "analytics": analytics,
+    }
