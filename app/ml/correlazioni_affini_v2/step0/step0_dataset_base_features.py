@@ -29,6 +29,9 @@ import numpy as np
 import pandas as pd
 from sqlalchemy.orm import Session
 
+import os
+INCLUDE_FIXTURES = os.getenv("INCLUDE_FIXTURES", "0") == "1"
+
 # ------------------------------------------------------------
 # FIX PATH: aggiunge la root del progetto per importare "app."
 # ------------------------------------------------------------
@@ -36,7 +39,7 @@ ROOT_DIR = Path(__file__).resolve().parents[4]
 sys.path.append(str(ROOT_DIR))
 
 from app.db.database_football import get_football_db
-from app.db.models_football import Match, Season, League
+from app.db.models_football import Match, Fixture, Season, League  # <-- aggiunto Fixture
 
 
 # ------------------------------------------------------------
@@ -143,10 +146,15 @@ def detect_fav_1x2(p1: Optional[float], px: Optional[float], p2: Optional[float]
 def build_step0_dataset() -> pd.DataFrame:
     """
     Legge i match dal DB e costruisce dataset base tecnico v2.
+    Ora include anche le FIXTURE (senza risultato),
+    mantenendo esattamente lo stesso schema di colonne.
     """
     session: Session = next(get_football_db())
     rows = []
 
+    # --------------------------------------------------------
+    # 1) MATCH STORICI (CODICE INVARIATO)
+    # --------------------------------------------------------
     print("📥 Lettura MATCH dal database…")
 
     q = (
@@ -161,7 +169,6 @@ def build_step0_dataset() -> pd.DataFrame:
     for m in matches:
         league: League = m.season.league if m.season else None
         country = getattr(league, "country", None)
-
         # ----------------------------------------------------
         # 1X2 — PROBABILITÀ IMPLICITE E OVERROUND
         # ----------------------------------------------------
@@ -175,10 +182,12 @@ def build_step0_dataset() -> pd.DataFrame:
 
         # Richiediamo almeno quote 1X2 valide
         if p1_raw is None or px_raw is None or p2_raw is None:
+            print(f"⚠️ Skipping match {m.id} senza quote 1X2 complete")
             continue
 
         bk_p1, bk_px, bk_p2, bk_sum_1x2_raw = normalize_three(p1_raw, px_raw, p2_raw)
         if bk_p1 is None:
+            print(f"⚠️ Skipping match {m.id} con quote 1X2 non normalizzabili")
             continue
 
         bk_overround_1x2 = bk_sum_1x2_raw - 1.0 if bk_sum_1x2_raw is not None else None
@@ -220,6 +229,7 @@ def build_step0_dataset() -> pd.DataFrame:
 
         # se mancano i gol, saltiamo (perché clustering affini userà solo match chiusi)
         if home_ft is None or away_ft is None:
+            print(f"⚠️ Skipping match {m.id} senza risultato FT")
             continue
 
         total_goals = float(home_ft) + float(away_ft)
@@ -307,8 +317,171 @@ def build_step0_dataset() -> pd.DataFrame:
             }
         )
 
+    # --------------------------------------------------------
+    # 2) FIXTURE FUTURE (SOLO MERCATO, RISULTATI NULL)
+    #    → stessa struttura, NESSUNA colonna nuova
+    # --------------------------------------------------------
+    if INCLUDE_FIXTURES or True:
+        print("📥 Lettura FIXTURE dal database…")
+
+        fq = (
+            session.query(Fixture)
+            .outerjoin(Season, Fixture.season_id == Season.id)
+            .outerjoin(League, Season.league_id == League.id)
+        )
+        fixtures: List[Fixture] = fq.all()
+        print(f"   → Trovate {len(fixtures)} fixture nel DB")
+
+        for f in fixtures:
+            league: League = f.season.league if f.season else None
+            country = getattr(league, "country", None)
+
+            avg_home_odds = f.avg_home_odds
+            avg_draw_odds = f.avg_draw_odds
+            avg_away_odds = f.avg_away_odds
+
+            # Richiediamo almeno quote 1X2 valide anche per fixture
+            p1_raw = safe_div_odds_to_prob(avg_home_odds)
+            px_raw = safe_div_odds_to_prob(avg_draw_odds)
+            p2_raw = safe_div_odds_to_prob(avg_away_odds)
+
+            if p1_raw is None or px_raw is None or p2_raw is None:
+                print(f"⚠️ Skipping fixture {f.id} senza quote 1X2 complete")
+                continue
+
+            bk_p1, bk_px, bk_p2, bk_sum_1x2_raw = normalize_three(p1_raw, px_raw, p2_raw)
+            if bk_p1 is None:
+                print(f"⚠️ Skipping fixture {f.id} con quote 1X2 non normalizzabili")
+                continue
+
+            bk_overround_1x2 = bk_sum_1x2_raw - 1.0 if bk_sum_1x2_raw is not None else None
+
+            fair_home_odds = 1.0 / bk_p1 if bk_p1 and bk_p1 > 0 else None
+            fair_draw_odds = 1.0 / bk_px if bk_px and bk_px > 0 else None
+            fair_away_odds = 1.0 / bk_p2 if bk_p2 and bk_p2 > 0 else None
+
+            entropy_1x2 = entropy_probs([bk_p1, bk_px, bk_p2])
+            fav_side_1x2, fav_prob_1x2 = detect_fav_1x2(bk_p1, bk_px, bk_p2)
+
+            is_big_fav_home = 1 if (fav_side_1x2 == "home" and fav_prob_1x2 is not None and fav_prob_1x2 >= 0.60) else 0
+            is_big_fav_away = 1 if (fav_side_1x2 == "away" and fav_prob_1x2 is not None and fav_prob_1x2 >= 0.60) else 0
+
+            # OU 2.5 — stesso schema
+            avg_over_25_odds = f.avg_over_25_odds
+            avg_under_25_odds = f.avg_under_25_odds
+
+            pO25_raw = safe_div_odds_to_prob(avg_over_25_odds)
+            pU25_raw = safe_div_odds_to_prob(avg_under_25_odds)
+
+            bk_pO25 = bk_pU25 = bk_sum_ou25_raw = bk_overround_ou25 = None
+            entropy_ou25 = None
+
+            if pO25_raw is not None and pU25_raw is not None:
+                bk_pO25, bk_pU25, bk_sum_ou25_raw = normalize_two(pO25_raw, pU25_raw)
+                if bk_sum_ou25_raw is not None:
+                    bk_overround_ou25 = bk_sum_ou25_raw - 1.0
+                entropy_ou25 = entropy_probs([bk_pO25, bk_pU25])
+
+            # Risultato: per fixture NON facciamo il check "se mancano i gol, saltiamo"
+            home_ft = f.home_goals_ft
+            away_ft = f.away_goals_ft
+
+            if home_ft is not None and away_ft is not None:
+                total_goals = float(home_ft) + float(away_ft)
+                is_home_win = int(home_ft > away_ft)
+                is_draw = int(home_ft == away_ft)
+                is_away_win = int(home_ft < away_ft)
+
+                is_over05 = int(total_goals >= 1)
+                is_over15 = int(total_goals >= 2)
+                is_over25 = int(total_goals >= 3)
+                is_over35 = int(total_goals >= 4)
+                is_under25 = int(total_goals < 3)
+            else:
+                total_goals = None
+                is_home_win = None
+                is_draw = None
+                is_away_win = None
+                is_over05 = None
+                is_over15 = None
+                is_over25 = None
+                is_over35 = None
+                is_under25 = None
+
+            rows.append(
+                {
+                    # ------------------
+                    # Metadati (stesso schema)
+                    # ------------------
+                    "match_id": str(f.id),
+                    "date": str(f.match_date) if f.match_date is not None else None,
+                    "league": getattr(league, "code", None),
+                    "country": getattr(country, "code", None),
+                    "season": normalize_season(getattr(f.season, "name", None)) if f.season else None,
+                    "home_team": f.home_team.name if f.home_team else None,
+                    "away_team": f.away_team.name if f.away_team else None,
+
+                    # ------------------
+                    # Quote 1X2 raw
+                    # ------------------
+                    "avg_home_odds": float(avg_home_odds) if avg_home_odds is not None else None,
+                    "avg_draw_odds": float(avg_draw_odds) if avg_draw_odds is not None else None,
+                    "avg_away_odds": float(avg_away_odds) if avg_away_odds is not None else None,
+
+                    "p1_raw": p1_raw,
+                    "px_raw": px_raw,
+                    "p2_raw": p2_raw,
+                    "bk_sum_1x2_raw": bk_sum_1x2_raw,
+                    "bk_overround_1x2": bk_overround_1x2,
+
+                    "bk_p1": bk_p1,
+                    "bk_px": bk_px,
+                    "bk_p2": bk_p2,
+
+                    "fair_home_odds": fair_home_odds,
+                    "fair_draw_odds": fair_draw_odds,
+                    "fair_away_odds": fair_away_odds,
+
+                    "entropy_bk_1x2": entropy_1x2,
+                    "fav_side_1x2": fav_side_1x2,
+                    "fav_prob_1x2": fav_prob_1x2,
+                    "is_big_fav_home": is_big_fav_home,
+                    "is_big_fav_away": is_big_fav_away,
+
+                    # ------------------
+                    # OU 2.5 (se presenti)
+                    # ------------------
+                    "avg_over_25_odds": float(avg_over_25_odds) if avg_over_25_odds is not None else None,
+                    "avg_under_25_odds": float(avg_under_25_odds) if avg_under_25_odds is not None else None,
+                    "pO25_raw": pO25_raw,
+                    "pU25_raw": pU25_raw,
+                    "bk_sum_ou25_raw": bk_sum_ou25_raw,
+                    "bk_overround_ou25": bk_overround_ou25,
+                    "bk_pO25": bk_pO25,
+                    "bk_pU25": bk_pU25,
+                    "entropy_bk_ou25": entropy_ou25,
+
+                    # ------------------
+                    # Risultato reale (fixture → di solito None)
+                    # ------------------
+                    "home_ft": float(home_ft) if home_ft is not None else None,
+                    "away_ft": float(away_ft) if away_ft is not None else None,
+                    "total_goals": total_goals,
+
+                    "is_home_win": is_home_win,
+                    "is_draw": is_draw,
+                    "is_away_win": is_away_win,
+
+                    "is_over05": is_over05,
+                    "is_over15": is_over15,
+                    "is_over25": is_over25,
+                    "is_over35": is_over35,
+                    "is_under25": is_under25,
+                }
+            )
+
     df = pd.DataFrame(rows)
-    print("📊 Dataset base tecnico creato:", df.shape)
+    print("📊 Dataset base tecnico creato (match + fixture):", df.shape)
 
     return df
 

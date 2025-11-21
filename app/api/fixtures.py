@@ -489,66 +489,10 @@ async def analyze_fixture(
         "odds": f.odds or {},
     }
 
-    # 2) Carico storico partite reali per forma + elo runtime
-    df_history = load_matches_history(db)
 
-    # 3) Carico picchetto_stats (fit dello step2a)
-    import joblib
-    pic_stats = joblib.load(
-        "app/ml/correlazioni_affini_v2/models/picchetto_stats_fix.pkl"
-    )
-
-    # 4) Costruisco riga target runtime per la fixture
-    target_row = build_runtime_target_row_for_fixture(
-        fixture=f,
-        df_history=df_history,
-        picchetto_stats=pic_stats,
-    )
-
-    # 5) Assegno cluster runtime
-    clusters = runtime_assign_clusters(target_row)
-
-    # 6) Carico indici affini (step4)
-    slim_index, wide_index = load_affini_indexes()
-
-    # 7) Soft Engine su fixture (target non presente nello SLIM)
-    soft_model = run_soft_engine_for_fixture(
-        target_row=target_row,
-        clusters=clusters,
-        slim_index=slim_index,
-        wide_index=wide_index,
-        top_n=top_n,
-        min_neighbors=min_neighbors,
-    )
-
-    if soft_model["status"] != "ok":
-        return {
-            "success": False,
-            "meta": meta,
-            "reason": soft_model.get("reason"),
-            "debug": soft_model,
-        }
-
-    # 8) Postprocess (stima gol, GG/NG, multigoal, score)
-    analytics = full_postprocess({
-        "meta": meta,
-        "soft_probs": soft_model["soft_probs"],
-        "affini_stats": soft_model["affini_stats"],
-    })
 
     # 9) Risposta finale API
     return {
         "success": True,
         "meta": meta,
-        "model": {
-            "status": "ok",
-            "clusters": clusters,
-            "soft_probs": soft_model["soft_probs"],
-            "affini_stats": {
-                "n_affini_soft": soft_model["affini_stats"]["n_affini_soft"],
-                "avg_distance": soft_model["affini_stats"]["avg_distance"],
-            },
-            "config_used": soft_model["config_used"],
-        },
-        "analytics": analytics,
     }

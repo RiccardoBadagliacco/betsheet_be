@@ -50,8 +50,19 @@ def compute_pmf_from_affini(affini, max_goals=5):
         return {"home": uniform, "away": uniform}
 
     w = np.array([float(a.get("weight", 1.0)) for a in affini])
-    gh = np.array([int(a.get("home_ft", 0)) for a in affini])
-    ga = np.array([int(a.get("away_ft", 0)) for a in affini])
+
+    def safe_int(val):
+        try:
+            if val is None:
+                return 0
+            if isinstance(val, float) and (math.isnan(val) or math.isinf(val)):
+                return 0
+            return int(val)
+        except:
+            return 0
+
+    gh = np.array([safe_int(a.get("home_ft", 0)) for a in affini])
+    ga = np.array([safe_int(a.get("away_ft", 0)) for a in affini])
 
     def _pmf(goals):
         pmf = {}

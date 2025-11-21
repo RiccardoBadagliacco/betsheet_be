@@ -159,3 +159,59 @@ def compute_form_lastN(df_step0: pd.DataFrame, last_n: int = DEFAULT_LAST_N) -> 
         })
 
     return pd.DataFrame(rows).sort_values("match_id")
+
+
+def compute_fixture_form(df_form: pd.DataFrame, home: str, away: str, date_fixture):
+    """
+    Calcola la forma (pts, gf, ga, win_rate) per una FIXTURE
+    usando SOLO match con data < data_fixture.
+    """
+    df_form = df_form.copy()
+    date_fixture = pd.to_datetime(date_fixture)
+
+    # HOME
+    f_home = df_form[
+        ((df_form["home_form_matches_lastN"].notna()) | (df_form["away_form_matches_lastN"].notna()))
+        &
+        ((df_form["match_id"].notna()))  # safe
+    ]
+
+    # Trova tutte le righe di form dove home o away == team_home
+    hist_home = f_home[
+        (f_home["home_team"] == home) & (f_home["date"] < date_fixture)
+    ].sort_values("date")
+
+    if hist_home.empty:
+        home_pts = home_gf = home_ga = home_win = 0.0
+    else:
+        last = hist_home.iloc[-1]
+        home_pts = last["home_form_pts_avg_lastN"]
+        home_gf  = last["home_form_gf_avg_lastN"]
+        home_ga  = last["home_form_ga_avg_lastN"]
+        home_win = last["home_form_win_rate_lastN"]
+
+    # AWAY
+    hist_away = f_home[
+        (f_home["away_team"] == away) & (f_home["date"] < date_fixture)
+    ].sort_values("date")
+
+    if hist_away.empty:
+        away_pts = away_gf = away_ga = away_win = 0.0
+    else:
+        last = hist_away.iloc[-1]
+        away_pts = last["away_form_pts_avg_lastN"]
+        away_gf  = last["away_form_gf_avg_lastN"]
+        away_ga  = last["away_form_ga_avg_lastN"]
+        away_win = last["away_form_win_rate_lastN"]
+
+    return {
+        "home_form_pts_avg_lastN": home_pts,
+        "home_form_gf_avg_lastN": home_gf,
+        "home_form_ga_avg_lastN": home_ga,
+        "home_form_win_rate_lastN": home_win,
+
+        "away_form_pts_avg_lastN": away_pts,
+        "away_form_gf_avg_lastN": away_gf,
+        "away_form_ga_avg_lastN": away_ga,
+        "away_form_win_rate_lastN": away_win,
+    }

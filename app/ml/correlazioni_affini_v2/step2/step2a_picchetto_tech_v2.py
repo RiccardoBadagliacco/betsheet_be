@@ -29,7 +29,10 @@ def build_picchetto_raw_features_fix(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
 
     # --- ELO POST ---
-    df["elo_diff_raw"] = df["elo_home_post"] - df["elo_away_post"]
+    
+    df["elo_diff_raw"] = df["elo_home_post"].fillna(df["elo_home_pre"]) - \
+                     df["elo_away_post"].fillna(df["elo_away_pre"])
+
 
     # --- FORMA SMOOTHATA SE DISPONIBILE ---
     def choose(raw_col, smooth_col):

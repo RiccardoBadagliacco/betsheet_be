@@ -1,53 +1,157 @@
-# ============================================================
-# soft_engine_api_v2.py  — VERSIONE API STABILE
-# ============================================================
-# Funzione principale: run_soft_engine_api(target_row, slim, wide)
-# Restituisce clusters, soft_probs, affini_stats, affini_list
-# Compatibile con API /matches/{id} e /fixtures/{id}
-# ============================================================
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+soft_engine_api_v2.py — Soft Engine V2 potenziato (con OU soft)
+
+Funzione principale:
+    run_soft_engine_api(
+        target_row=None,
+        target_match_id=None,
+        slim=None,
+        wide=None,
+        top_n=80,
+        min_neighbors=30,
+    )
+
+- Se target_match_id è passato → cerca nel SLIM index.
+- Se target_row è passato → usa la riga (per fixture future).
+- Usa:
+    * cluster_1x2 (sempre)
+    * cluster_ou25 / cluster_ou15 con tolleranza (distanza cluster <= k)
+    * elo_diff, lambda_total_form, season_recency, tightness_index
+    * eventuali delta_* / entropy_* / market_sharpness se presenti
+- Restituisce:
+    {
+      status,
+      clusters,
+      soft_probs,
+      affini_stats,
+      affini_list,
+      config_used
+    }
+"""
 
 import numpy as np
 import pandas as pd
-
+from app.ml.correlazioni_affini_v2.common.betting_rules.index import evaluate_all_rules
 
 # ============================================================
-# 1. DISTANZA NORMALIZZATA (EUCLIDEA Z-SCORE)
+# 1. DISTANZA BLOCK-WEIGHTED
 # ============================================================
-def compute_scaled_distances(df_candidates: pd.DataFrame,
-                             target_row: pd.Series,
-                             key_cols: list[str]) -> np.ndarray:
+def compute_block_weighted_distances(
+    df_candidates: pd.DataFrame,
+    target_row: pd.Series,
+) -> np.ndarray:
+    """
+    Distanza soft potenziata a blocchi, con pesi diversi per:
+      - struttura tecnica
+      - market vs tecnico (delta)
+      - shape del mercato
+      - meta / tempo
 
-    key_cols = [c for c in key_cols if c in df_candidates.columns and c in target_row.index]
-    if not key_cols:
-        raise RuntimeError("❌ Nessuna colonna chiave per distanza soft!")
+    Usa solo le colonne effettivamente presenti in df_candidates & target_row.
+    Se un blocco non ha colonne disponibili viene ignorato.
+    """
 
-    X = df_candidates[key_cols].astype(float).values
-    t = target_row[key_cols].astype(float).values
+    BLOCKS = {
+        "structure": {
+            "cols": [
+                "elo_diff",
+                "lambda_total_form",
+                "lambda_total_market_ou25",
+                "goal_supremacy_form",
+                "goal_supremacy_market_ou25",
+            ],
+            "weight": 1.0,
+        },
+        "market_vs_tech": {
+            "cols": [
+                "delta_p1", "delta_p2",
+                "delta_O25", "delta_U25",
+                "delta_1x2_abs_sum",
+                "delta_ou25_market_vs_form",
+            ],
+            "weight": 1.3,
+        },
+        "shape": {
+            "cols": [
+                "tightness_index",
+                "entropy_bk_1x2", "entropy_pic_1x2",
+                "entropy_bk_ou25", "entropy_pic_ou25",
+            ],
+            "weight": 0.8,
+        },
+        "meta": {
+            "cols": [
+                "season_recency",
+            ],
+            "weight": 0.5,
+        },
+    }
 
-    # NaN → media colonna
-    col_means = np.nanmean(X, axis=0)
-    col_means = np.where(np.isnan(col_means), 0.0, col_means)
+    n = len(df_candidates)
+    if n == 0:
+        return np.array([], dtype=float)
 
-    X = np.where(np.isnan(X), col_means, X)
-    t = np.where(np.isnan(t), col_means, t)
+    dist_total = np.zeros(n, dtype=float)
+    used_any_block = False
 
-    # Normalizzazione
-    col_std = np.nanstd(X, axis=0)
-    col_std = np.where(col_std < 1e-6, 1.0, col_std)
+    for block_name, block in BLOCKS.items():
+        cols = [
+            c for c in block["cols"]
+            if c in df_candidates.columns and c in target_row.index
+        ]
+        if not cols:
+            continue
 
-    Xz = (X - col_means) / col_std
-    tz = (t - col_means) / col_std
+        used_any_block = True
+        w = float(block["weight"])
 
-    diff = Xz - tz
-    return np.sqrt(np.sum(diff * diff, axis=1))
+        X = df_candidates[cols].astype(float).values
+        t = target_row[cols].astype(float).values
+
+        # imputazione NaN
+        col_means = np.nanmean(X, axis=0)
+        # 👉 se TUTTO è NaN per questo blocco → lo skippiamo
+        if np.isnan(col_means).all():
+            continue
+        
+        col_means = np.where(np.isnan(col_means), 0.0, col_means)
+
+        X = np.where(np.isnan(X), col_means, X)
+        t = np.where(np.isnan(t), col_means, t)
+
+        col_std = np.nanstd(X, axis=0)
+        col_std = np.where(col_std < 1e-6, 1.0, col_std)
+
+        Xz = (X - col_means) / col_std
+        tz = (t - col_means) / col_std
+
+        diff = Xz - tz
+        dist_block = np.sqrt(np.sum(diff * diff, axis=1))
+
+        # accumula blocco con peso
+        dist_total += (w * dist_block) ** 2
+
+    if not used_any_block:
+        # fallback: distanza nulla (tutti equivalenti)
+        return np.zeros(n, dtype=float)
+
+    return np.sqrt(dist_total)
 
 
 # ============================================================
 # 2. PESI (KERNEL ESPONENZIALE)
 # ============================================================
 def distances_to_weights(d: np.ndarray, alpha: float = 2.0) -> np.ndarray:
-    if len(d) == 0:
-        return np.array([])
+    """
+    Converte distanze in pesi tramite kernel esponenziale.
+    - scala le distanze col percentile 90 per robustezza
+    """
+    d = np.asarray(d, dtype=float)
+    if d.size == 0:
+        return d
 
     if np.all(d == 0):
         return np.ones_like(d)
@@ -58,28 +162,42 @@ def distances_to_weights(d: np.ndarray, alpha: float = 2.0) -> np.ndarray:
     else:
         d_scaled = d / p90
 
-    return np.exp(-alpha * d_scaled)
+    w = np.exp(-alpha * d_scaled)
+    return w
 
 
 # ============================================================
 # 3. ENGINE PRINCIPALE — API
 # ============================================================
 def run_soft_engine_api(
-    target_row=None,
-    target_match_id=None,
-    slim=None,
-    wide=None,
-    top_n=80,
-    min_neighbors=30,
+    target_row: pd.Series | None = None,
+    target_match_id: str | None = None,
+    slim: pd.DataFrame | None = None,
+    wide: pd.DataFrame | None = None,
+    top_n: int = 80,
+    min_neighbors: int = 30,
 ):
     """
-    Soft Engine API V2
-    - Se target_match_id è presente → cerca la riga nel SLIM index
-    - Se target_row è presente → usa quello (fixture future)
+    Soft Engine V2 (potenziato, block-weighted + OU soft).
+
+    Parametri
+    ---------
+    target_row : Series opzionale
+        Riga "tipo slim" per fixture future (stesse colonne dello SLIM).
+    target_match_id : str opzionale
+        match_id già presente nello SLIM.
+    slim : DataFrame
+        Indice SLIM (step4b_affini_index_slim_v2.parquet).
+    wide : DataFrame
+        Indice WIDE (step4a_affini_index_wide_v2.parquet).
+    top_n : int
+        Numero massimo di affini soft usati per le probabilità.
+    min_neighbors : int
+        Minimo di affini richiesti dopo hard-filter.
     """
 
     if slim is None or wide is None:
-        raise RuntimeError("slim e wide index richiesti")
+        raise RuntimeError("❌ run_soft_engine_api richiede 'slim' e 'wide' non nulli")
 
     # =====================================================
     # 1) Determina la riga target
@@ -87,149 +205,300 @@ def run_soft_engine_api(
     if target_match_id is not None:
         rows = slim.loc[slim["match_id"] == target_match_id]
         if rows.empty:
-            return {"status": "error", "reason": "match_not_found_in_slim"}
+            return {
+                "status": "error",
+                "reason": "match_not_found_in_slim",
+                "target_match_id": target_match_id,
+            }
         t0 = rows.iloc[0]
     else:
         if target_row is None:
-            return {"status": "error", "reason": "missing_target_row"}
+            return {
+                "status": "error",
+                "reason": "missing_target_row",
+            }
         t0 = target_row
 
-    # estrai cluster e feature principali
+    # =====================================================
+    # 2) Estrai cluster e driver principali
+    # =====================================================
     c1  = t0.get("cluster_1x2", np.nan)
     c25 = t0.get("cluster_ou25", np.nan)
     c15 = t0.get("cluster_ou15", np.nan)
 
     elo_t = t0.get("elo_diff", np.nan)
     lam_t = t0.get("lambda_total_form", np.nan)
-    ms_t  = t0.get("market_sharpness", np.nan)
+    rec_t = t0.get("season_recency", np.nan)
+    ms_t  = t0.get("market_sharpness", np.nan) if "market_sharpness" in t0.index else np.nan
+
+    # cluster 1X2 è obbligatorio per logica affini
+    if pd.isna(c1):
+        return {
+            "status": "error",
+            "reason": "missing_cluster_1x2",
+        }
 
     # =====================================================
-    # 2) FILTRI HARD PROGRESSIVI
+    # 3) HARD FILTER PROGRESSIVO (con OU soft)
     # =====================================================
+    # Ogni config allenta progressivamente i vincoli
     attempts = [
-        dict(use_ou=True, widen=1.0, use_ms=True),
-        dict(use_ou=True, widen=1.5, use_ms=True),
-        dict(use_ou=True, widen=2.0, use_ms=True),
-        dict(use_ou=False, widen=1.5, use_ms=True),
-        dict(use_ou=False, widen=2.0, use_ms=False),
-        dict(use_ou=False, widen=3.0, use_ms=False),
+        # 1) Molto stretto: OU identici, finestre standard
+        dict(
+            name="strict_all",
+            use_ou=True,
+            ou25_tol=0,
+            ou15_tol=0,
+            use_rec=True,
+            use_ms=True,
+            elo_w=1.0,
+            lam_w=1.0,
+            rec_w=1.0,
+        ),
+        # 2) OU +/- 1, recency meno importante
+        dict(
+            name="ou_tol1",
+            use_ou=True,
+            ou25_tol=1,
+            ou15_tol=1,
+            use_rec=False,
+            use_ms=True,
+            elo_w=1.0,
+            lam_w=1.2,
+            rec_w=1.0,
+        ),
+        # 3) OU +/- 2, elo/lambda più larghi
+        dict(
+            name="ou_tol2_wider_elo_lam",
+            use_ou=True,
+            ou25_tol=2,
+            ou15_tol=2,
+            use_rec=False,
+            use_ms=True,
+            elo_w=1.5,
+            lam_w=1.5,
+            rec_w=1.0,
+        ),
+        # 4) senza OU, mantengo ms + elo/lambda larghi
+        dict(
+            name="no_ou_keep_ms",
+            use_ou=False,
+            ou25_tol=None,
+            ou15_tol=None,
+            use_rec=False,
+            use_ms=True,
+            elo_w=1.5,
+            lam_w=1.5,
+            rec_w=1.2,
+        ),
+        # 5) solo cluster 1x2 + elo/lambda molto larghi
+        dict(
+            name="no_ou_no_ms",
+            use_ou=False,
+            ou25_tol=None,
+            ou15_tol=None,
+            use_rec=False,
+            use_ms=False,
+            elo_w=2.0,
+            lam_w=2.0,
+            rec_w=1.5,
+        ),
     ]
+
+    # finestre base (prima di moltiplicare per *w)
+    ELO_BASE = 25.0
+    LAM_BASE = 0.40
+    REC_BASE = 0.15
+    MS_BASE  = 0.04
 
     def apply_filters(cfg):
         mask = (slim["cluster_1x2"] == c1)
 
+        # --- OU SOFT ---------------------------------------
         if cfg["use_ou"]:
-            if "cluster_ou25" in slim.columns:
-                mask &= (slim["cluster_ou25"] == c25)
-            if "cluster_ou15" in slim.columns:
-                mask &= (slim["cluster_ou15"] == c15)
+            # OU2.5
+            if "cluster_ou25" in slim.columns and not pd.isna(c25):
+                tol25 = cfg.get("ou25_tol", 0)
+                if tol25 is None or tol25 <= 0:
+                    mask &= (slim["cluster_ou25"] == c25)
+                else:
+                    mask &= slim["cluster_ou25"].between(c25 - tol25, c25 + tol25)
+            # OU1.5
+            if "cluster_ou15" in slim.columns and not pd.isna(c15):
+                tol15 = cfg.get("ou15_tol", 0)
+                if tol15 is None or tol15 <= 0:
+                    mask &= (slim["cluster_ou15"] == c15)
+                else:
+                    mask &= slim["cluster_ou15"].between(c15 - tol15, c15 + tol15)
 
-        if not pd.isna(elo_t):
-            d = 25 * cfg["widen"]
+        # elo_diff
+        if not pd.isna(elo_t) and "elo_diff" in slim.columns:
+            d = ELO_BASE * cfg["elo_w"]
             mask &= slim["elo_diff"].between(elo_t - d, elo_t + d)
 
-        if not pd.isna(lam_t):
-            d = 0.40 * cfg["widen"]
+        # lambda_total_form
+        if not pd.isna(lam_t) and "lambda_total_form" in slim.columns:
+            d = LAM_BASE * cfg["lam_w"]
             mask &= slim["lambda_total_form"].between(lam_t - d, lam_t + d)
 
-        if cfg["use_ms"] and not pd.isna(ms_t):
-            d = 0.04 * cfg["widen"]
+        # season_recency
+        if cfg["use_rec"] and (not pd.isna(rec_t)) and "season_recency" in slim.columns:
+            d = REC_BASE * cfg["rec_w"]
+            mask &= slim["season_recency"].between(rec_t - d, rec_t + d)
+
+        # market_sharpness (solo se esiste nel SLIM)
+        if cfg["use_ms"] and (not pd.isna(ms_t)) and "market_sharpness" in slim.columns:
+            d = MS_BASE
             mask &= slim["market_sharpness"].between(ms_t - d, ms_t + d)
 
         cands = slim[mask].copy()
-        if target_match_id is not None:
+
+        # escludi il match stesso, se storico
+        if target_match_id is not None and "match_id" in cands.columns:
             cands = cands[cands["match_id"] != target_match_id]
+
         return cands
 
     candidates = None
     chosen_cfg = None
 
     for cfg in attempts:
-        c = apply_filters(cfg)
-        if len(c) >= min_neighbors:
-            candidates = c
+        cands = apply_filters(cfg)
+        if len(cands) >= min_neighbors:
+            candidates = cands
             chosen_cfg = cfg
             break
 
+    # fallback: tutti i match dello stesso cluster 1x2
     if candidates is None:
-        candidates = slim[slim["cluster_1x2"] == c1].copy()
-        if target_match_id is not None:
+        mask = (slim["cluster_1x2"] == c1)
+        candidates = slim[mask].copy()
+        if target_match_id is not None and "match_id" in candidates.columns:
             candidates = candidates[candidates["match_id"] != target_match_id]
-        chosen_cfg = {"use_ou": False, "widen": 999, "use_ms": False}
+        chosen_cfg = {
+            "name": "fallback_cluster_only",
+            "use_ou": False,
+            "ou25_tol": None,
+            "ou15_tol": None,
+            "use_rec": False,
+            "use_ms": False,
+            "elo_w": None,
+            "lam_w": None,
+            "rec_w": None,
+        }
+
+    if candidates.empty:
+        return {
+            "status": "error",
+            "reason": "no_candidates_found",
+            "config_used": chosen_cfg,
+        }
 
     # =====================================================
-    # 3) DISTANZA SOFT
+    # 4) DISTANZA SOFT + PESI
     # =====================================================
-    key_cols = [
-        "elo_diff",
-        "lambda_total_form",
-        "tightness_index",           # 👈 NEW: entra nella distanza soft
-
-        # se in futuro le rimetti nello SLIM, verranno usate automaticamente
-        "market_sharpness",
-        "delta_p1", "delta_p2",
-        "delta_O25", "delta_U25",
-    ]
-    key_cols = [c for c in key_cols if c in slim.columns]
-
-    dists = compute_scaled_distances(candidates, t0, key_cols)
-    print('Dist', dists)
+    dists = compute_block_weighted_distances(candidates, t0)
+    candidates = candidates.copy()
     candidates["distance_soft"] = dists
 
-    candidates = candidates.sort_values("distance_soft").head(top_n).copy()
+    # ordina per distanza e prendi top_n
+    candidates = candidates.sort_values("distance_soft", ascending=True).head(top_n)
 
-    # -----------------------------------------------------
-    # PESI
     weights = distances_to_weights(candidates["distance_soft"].values)
     if weights.sum() <= 0:
         weights = np.ones_like(weights)
     candidates["weight"] = weights
 
     # =====================================================
-    # 4) UNIONE CON WIDE PER OUTCOME REALI
+    # 5) UNIONE CON WIDE (per risultati reali)
     # =====================================================
+    if "match_id" not in candidates.columns:
+        return {
+            "status": "error",
+            "reason": "candidates_missing_match_id",
+        }
+
     wide_aff = wide.merge(
         candidates[["match_id", "weight", "distance_soft"]],
         on="match_id",
         how="inner",
     )
 
+    if wide_aff.empty or "home_ft" not in wide_aff.columns or "away_ft" not in wide_aff.columns:
+        return {
+            "status": "error",
+            "reason": "wide_missing_results_or_empty",
+        }
+
     gh = wide_aff["home_ft"].values.astype(float)
     ga = wide_aff["away_ft"].values.astype(float)
     w  = wide_aff["weight"].values.astype(float)
     W  = w.sum()
 
-    p1  = (w * (gh > ga)).sum() / W
-    px  = (w * (gh == ga)).sum() / W
-    p2  = (w * (gh < ga)).sum() / W
+    if W <= 0:
+        W = 1.0
 
-    pO15 = (w * ((gh + ga) >= 2)).sum() / W
-    pU15 = 1 - pO15
+    # 1X2
+    p1 = (w * (gh > ga)).sum() / W
+    px = (w * (gh == ga)).sum() / W
+    p2 = (w * (gh < ga)).sum() / W
 
-    pO25 = (w * ((gh + ga) >= 3)).sum() / W
-    pU25 = 1 - pO25
+    # O/U 1.5
+    goals = gh + ga
+    pO15 = (w * (goals >= 2)).sum() / W
+    pU15 = 1.0 - pO15
 
-    # OUTPUT
+    # O/U 2.5
+    pO25 = (w * (goals >= 3)).sum() / W
+    pU25 = 1.0 - pO25
+
+    # =====================================================
+    # 6) COSTRUZIONE OUTPUT
+    # =====================================================
+    clusters_out = {
+        "cluster_1x2": int(c1) if not pd.isna(c1) else None,
+        "cluster_ou25": int(c25) if (not pd.isna(c25)) else None,
+        "cluster_ou15": int(c15) if (not pd.isna(c15)) else None,
+    }
+
+    soft_probs = {
+        "p1": float(p1),
+        "px": float(px),
+        "p2": float(p2),
+        "pO15": float(pO15),
+        "pU15": float(pU15),
+        "pO25": float(pO25),
+        "pU25": float(pU25),
+    }
+
+    affini_stats = {
+        "n_affini_soft": int(len(candidates)),
+        "avg_distance": float(candidates["distance_soft"].mean()),
+        "min_distance": float(candidates["distance_soft"].min()),
+        "max_distance": float(candidates["distance_soft"].max()),
+    }
+
+    # affini_list: unione candidati + risultato finale
+    affini_df = candidates.merge(
+        wide[["match_id", "home_ft", "away_ft"]],
+        on="match_id",
+        how="left",
+    )
+
+    affini_list = affini_df.to_dict(orient="records")
+
+    ctx = {
+        "clusters": clusters_out,
+        "soft_probs": soft_probs,
+        # in futuro puoi aggiungere altre info di contesto qui
+    }
+
     return {
         "status": "ok",
-        "clusters": {
-            "cluster_1x2": int(c1) if not pd.isna(c1) else None,
-            "cluster_ou25": int(c25) if not pd.isna(c25) else None,
-            "cluster_ou15": int(c15) if not pd.isna(c15) else None,
-        },
-        "soft_probs": {
-            "p1": p1, "px": px, "p2": p2,
-            "pO15": pO15, "pU15": pU15,
-            "pO25": pO25, "pU25": pU25,
-        },
-        "affini_stats": {
-            "n_affini_soft": len(candidates),
-            "avg_distance": float(candidates["distance_soft"].mean()),
-        },
-        "affini_list": candidates.merge(
-            wide[["match_id", "home_ft", "away_ft"]],
-            on="match_id",
-            how="left",
-        ).to_dict(orient="records"),
+        "clusters": clusters_out,
+        "soft_probs": soft_probs,
+        "affini_stats": affini_stats,
+        "affini_list": affini_list,
         "config_used": chosen_cfg,
+        "alerts": evaluate_all_rules(t0, ctx)
     }

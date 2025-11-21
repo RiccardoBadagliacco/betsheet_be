@@ -2,30 +2,21 @@
 # -*- coding: utf-8 -*-
 
 """
-STEP4A — AFFINI INDEX WIDE V2
+STEP4A — AFFINI INDEX WIDE V2 (VERSIONE DEFINITIVA E ROBUSTA)
 
-Costruisce un indice "wide" per le correlazioni affini, pensato per:
-    - analisi offline
-    - diagnostica
-    - sviluppo di nuove metriche
-
-Input:
-    - step1c_dataset_with_elo_form.parquet         (master: target + elo + form)
-    - step2b_1x2_features_v2.parquet               (feature avanzate 1X2)
-    - step2b_ou25_features_v2.parquet              (feature avanzate OU2.5)
-    - step2b_ou15_features_v2.parquet              (feature avanzate OU1.5)
-    - step3a_1x2_clusters_v2.parquet               (cluster_1x2)
-    - step3b_ou25_clusters_v2.parquet              (cluster_ou25)
-    - step3c_ou15_clusters_v2.parquet              (cluster_ou15)
-
-Output:
-    - step4a_affini_index_wide_v2.parquet
+- Merge di master + feature 1X2 / OU25 / OU15 + cluster
+- Eliminazione sicura delle colonne duplicate
+- Fix completo tightness_index
+- Nessuna regressione nei merge
 """
 
 import pandas as pd
 from pathlib import Path
 import sys
 
+# ------------------------------------------------------------------
+# PATH SETUP
+# ------------------------------------------------------------------
 REPO_ROOT = Path(__file__).resolve().parents[4]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
@@ -45,114 +36,139 @@ CLUST_OU15_FILE   = DATA_DIR / "step3c_ou15_clusters_v2.parquet"
 OUT_WIDE_FILE     = DATA_DIR / "step4a_affini_index_wide_v2.parquet"
 
 
+# ------------------------------------------------------------------
+# UTILS
+# ------------------------------------------------------------------
+
+def clean_features(df_feat: pd.DataFrame, master_cols: set) -> pd.DataFrame:
+    """
+    Rimuove colonne duplicate del master MAI rimuovendo i picchetti.
+    """
+    ALWAYS_KEEP = [
+        "pic_p1", "pic_px", "pic_p2",
+        "pic_pO25", "pic_pU25",
+        "pic_pO15", "pic_pU15",
+        "pic_pO05", "pic_pU05"
+    ]
+
+    cols = ["match_id"]
+
+    for c in df_feat.columns:
+        if c == "match_id":
+            continue
+        if c in ALWAYS_KEEP:
+            cols.append(c)
+            continue
+        if c not in master_cols:
+            cols.append(c)
+
+    return df_feat[cols]
+
+def fix_tightness(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Normalizza tightness_index dopo merge multipli.
+    Mantiene solo tightness_index pulita.
+    """
+    cols = [c for c in df.columns if c.startswith("tightness_index")]
+    if cols == ["tightness_index"]:
+        return df
+
+    df["tightness_index"] = df[cols].mean(axis=1)
+
+    for c in cols:
+        if c != "tightness_index":
+            df = df.drop(columns=c)
+
+    return df
+
+
+# ------------------------------------------------------------------
+# MAIN
+# ------------------------------------------------------------------
+
 def main():
     print("====================================================")
-    print("🚀 STEP4A — AFFINI INDEX WIDE V2")
+    print("🚀 STEP4A — AFFINI INDEX WIDE (VERSIONE DEFINITIVA)")
     print("====================================================")
-    print(f"📥 MASTER     : {MASTER_FILE}")
-    print(f"📥 FEAT 1X2   : {FEAT_1X2_FILE}")
-    print(f"📥 FEAT OU2.5 : {FEAT_OU25_FILE}")
-    print(f"📥 FEAT OU1.5 : {FEAT_OU15_FILE}")
-    print(f"📥 CLUST 1X2  : {CLUST_1X2_FILE}")
-    print(f"📥 CLUST OU2.5: {CLUST_OU25_FILE}")
-    print(f"📥 CLUST OU1.5: {CLUST_OU15_FILE}")
-    print(f"💾 OUT WIDE   : {OUT_WIDE_FILE}")
 
-    # -------------------------
-    # 1) Carico tutto
-    # -------------------------
-    master = pd.read_parquet(MASTER_FILE)
+    # --------------------------------------------------
+    # Caricamento dataset
+    # --------------------------------------------------
+    master = pd.read_parquet(MASTER_FILE).drop_duplicates("match_id")
     f1x2   = pd.read_parquet(FEAT_1X2_FILE)
     fou25  = pd.read_parquet(FEAT_OU25_FILE)
     fou15  = pd.read_parquet(FEAT_OU15_FILE)
 
-    c1x2   = pd.read_parquet(CLUST_1X2_FILE)
-    cou25  = pd.read_parquet(CLUST_OU25_FILE)
-    cou15  = pd.read_parquet(CLUST_OU15_FILE)
+    c1x2   = pd.read_parquet(CLUST_1X2_FILE)[["match_id", "cluster_1x2"]]
+    cou25  = pd.read_parquet(CLUST_OU25_FILE)[["match_id", "cluster_ou25"]]
+    cou15  = pd.read_parquet(CLUST_OU15_FILE)[["match_id", "cluster_ou15"]]
 
-    print(f"📏 master : {master.shape}")
-    print(f"📏 f1x2   : {f1x2.shape}")
-    print(f"📏 fou25  : {fou25.shape}")
-    print(f"📏 fou15  : {fou15.shape}")
-    print(f"📏 c1x2   : {c1x2.shape}")
-    print(f"📏 cou25  : {cou25.shape}")
-    print(f"📏 cou15  : {cou15.shape}")
+    print(f"📏 master: {master.shape}")
+    print(f"📏 feat1x2: {f1x2.shape}")
+    print(f"📏ou25: {fou25.shape}")
+    print(f"📏ou15: {fou15.shape}")
+    print(f"📏c1x2: {c1x2.shape}  | c25: {cou25.shape}  | c15: {cou15.shape}")
 
-    # -------------------------
-    # 2) Preparazione cluster
-    #    (ci interessa solo match_id + cluster_*)
-    # -------------------------
-    c1x2 = c1x2[["match_id", "cluster_1x2"]].drop_duplicates("match_id")
-    if "cluster_label" in c1x2.columns:
-        # eventuale label auto → la teniamo come extra
-        pass
+    # --------------------------------------------------
+    # Pulizia feature (drop colonne già presenti nel master)
+    # --------------------------------------------------
+    master_cols = set(master.columns)
 
-    # cou25 può avere solo sottoinsieme di match (senza OU2.5)
-    cou25 = cou25[["match_id", "cluster_ou25"]].drop_duplicates("match_id")
-    cou15 = cou15[["match_id", "cluster_ou15"]].drop_duplicates("match_id")
+    f1x2_clean  = clean_features(f1x2, master_cols)
+    fou25_clean = clean_features(fou25, master_cols)
+    fou15_clean = clean_features(fou15, master_cols)
 
-    # -------------------------
-    # 3) Pulizia feature per evitare duplicati meta
-    # -------------------------
-    meta_cols = ["match_id", "date", "season", "league", "home_team", "away_team"]
+    # --------------------------------------------------
+    # MERGE FINALE
+    # --------------------------------------------------
+    df = master
 
-    def drop_meta(df: pd.DataFrame) -> pd.DataFrame:
-        cols = [c for c in df.columns if c not in meta_cols]
-        return df[["match_id"] + [c for c in cols if c != "match_id"]]
-
-    f1x2_clean  = drop_meta(f1x2)
-    fou25_clean = drop_meta(fou25)
-    fou15_clean = drop_meta(fou15)
-
-    # -------------------------
-    # 4) Merge, partendo dal master
-    # -------------------------
-    # Ci assicuriamo che master abbia match_id univoco
-    master = master.drop_duplicates("match_id")
-
-    df = master.merge(f1x2_clean, on="match_id", how="left", suffixes=("", "_f1x2"))
-    df = df.merge(fou25_clean, on="match_id", how="left", suffixes=("", "_ou25"))
-    df = df.merge(fou15_clean, on="match_id", how="left", suffixes=("", "_ou15"))
+    df = df.merge(f1x2_clean,  on="match_id", how="left")
+    df = df.merge(fou25_clean, on="match_id", how="left")
+    df = df.merge(fou15_clean, on="match_id", how="left")
 
     df = df.merge(c1x2,  on="match_id", how="left")
     df = df.merge(cou25, on="match_id", how="left")
     df = df.merge(cou15, on="match_id", how="left")
 
-    print(f"📏 Shape dopo merge WIDE: {df.shape}")
+    print(f"📏 Shape dopo merge: {df.shape}")
 
-    # -------------------------
-    # 5) Flag utility
-    # -------------------------
-    # NaN → niente mercato OU2.5
+    # --------------------------------------------------
+    # FIX tightness_index
+    # --------------------------------------------------
+    df = fix_tightness(df)
+
+    # --------------------------------------------------
+    # Flag mercati disponibili
+    # --------------------------------------------------
     df["has_ou25"] = df["cluster_ou25"].notna().astype(int)
     df["has_ou15"] = df["cluster_ou15"].notna().astype(int)
 
-    # -------------------------
-    # 6) Check target principali (solo log, non forzo)
-    # -------------------------
-    target_cols = [
-        "is_home_win",
-        "is_away_win",
-        "is_draw",
-        "is_over25",
-        "is_over15",
+    # --------------------------------------------------
+    # Verifica colonne critiche per SLIM
+    # --------------------------------------------------
+    print("🔍 Check colonne chiave per SLIM:")
+    key_cols = [
+        "bk_p1", "bk_px", "bk_p2",
+        "bk_pO25", "bk_pU25",
+        "pic_pO15", "pic_pU15",
+        "elo_home_pre", "elo_away_pre", "elo_diff",
+        "cluster_1x2", "cluster_ou25", "cluster_ou15",
+        "tightness_index"
     ]
-    missing_t = [c for c in target_cols if c not in df.columns]
-    if missing_t:
-        print(f"⚠️ WARNING: target mancanti nel WIDE index: {missing_t}")
-    else:
-        print("✅ Target principali presenti nel WIDE index.")
 
-    # -------------------------
-    # 7) Salvataggio
-    # -------------------------
+    for c in key_cols:
+        print(f"  - {c}: {'OK' if c in df.columns else 'MISSING'}")
+
+    # --------------------------------------------------
+    # Salvataggio
+    # --------------------------------------------------
     OUT_WIDE_FILE.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(OUT_WIDE_FILE, index=False)
-    print(f"💾 Salvato WIDE index: {OUT_WIDE_FILE}")
-    print("🏁 STEP4A AFFINI INDEX WIDE V2 COMPLETATO")
+
+    print(f"💾 Salvato: {OUT_WIDE_FILE}")
     print("====================================================")
 
 
 if __name__ == "__main__":
     main()
- 

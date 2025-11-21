@@ -46,6 +46,7 @@ PATH_STEP1A = DATA_DIR / "step1a_elo.parquet"
 PATH_STEP1B = DATA_DIR / "step1b_form_recent.parquet"
 
 OUT_PATH = DATA_DIR / "step1c_dataset_with_elo_form.parquet"
+PATH_STEP1Z = DATA_DIR / "step1z_fixture_features.parquet"
 
 
 # ============================================
@@ -447,6 +448,13 @@ def main():
     df_elo = pd.read_parquet(PATH_STEP1A)
     df_form = pd.read_parquet(PATH_STEP1B)
 
+    df_fix = None
+    if PATH_STEP1Z.exists():
+        print(f"📥 STEP1Z trovato: {PATH_STEP1Z}")
+        df_fix = pd.read_parquet(PATH_STEP1Z)
+    else:
+        print("⚠️ Nessun step1z_fixture_features trovato → ignorato.")
+
     print(f"📏 Shape STEP0  (base) : {df0.shape}")
     print(f"📏 Shape STEP1A (elo)  : {df_elo.shape}")
     print(f"📏 Shape STEP1B (form) : {df_form.shape}")
@@ -509,6 +517,30 @@ def main():
     print(f"📏 Dopo merge con Elo : {df.shape}")
     df = df.merge(df_form_red, on="match_id", how="left")
     print(f"📏 Dopo merge con Form: {df.shape}")
+
+    # ======================================================
+    # 🔵 MERGE FIXTURE FEATURE (step1z)
+    #    → completa Elo + Form mancanti
+    # ======================================================
+    if df_fix is not None and not df_fix.empty:
+        print("🔄 Merge FEATURE FIXTURE (step1z)…")
+
+        before_missing = df["elo_home_pre"].isna().sum()
+        print(f"   Elo mancanti prima del merge: {before_missing}")
+
+        df = df.merge(df_fix, on="match_id", how="left", suffixes=("", "_fx"))
+
+        # Sostituisci solo se le versioni "normali" sono NaN
+        for col in ["elo_home_pre", "elo_away_pre", "elo_diff",
+                    "lambda_home_form", "lambda_away_form", "lambda_total_form"]:
+            fx_col = col + "_fx"
+            if fx_col in df.columns:
+                df[col] = df[col].fillna(df[fx_col])
+                df = df.drop(columns=[fx_col])
+
+        after_missing = df["elo_home_pre"].isna().sum()
+        print(f"   Elo mancanti dopo merge: {after_missing}")
+
 
     # Assicuriamoci che date sia datetime
     df["date"] = pd.to_datetime(df["date"], errors="coerce")

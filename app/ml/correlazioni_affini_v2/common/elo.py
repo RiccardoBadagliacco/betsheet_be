@@ -120,8 +120,13 @@ def compute_full_elo_history(df_step0: pd.DataFrame) -> pd.DataFrame:
         df_season = df[df["season"] == season]
         if df_season.empty:
             continue
+        print(f"Processing season: {season}", set(df_season["home_team"]))
+        # Rimuoviamo team mancanti/None per evitare errori di ordinamento
+        def _is_valid_team(t):
+            return isinstance(t, str) and t.strip() != ""
 
-        teams = sorted(set(df_season["home_team"]).union(df_season["away_team"]))
+        teams_raw = set(df_season["home_team"]).union(df_season["away_team"])
+        teams = sorted(t for t in teams_raw if _is_valid_team(t))
 
         # Elo iniziale
         elo = {}
@@ -135,6 +140,10 @@ def compute_full_elo_history(df_step0: pd.DataFrame) -> pd.DataFrame:
             away = r["away_team"]
             gh = r["home_ft"]
             ga = r["away_ft"]
+
+            # salta match senza team valido
+            if not (_is_valid_team(home) and _is_valid_team(away)):
+                continue
 
             # salta match senza risultato
             if pd.isna(gh) or pd.isna(ga):
@@ -184,6 +193,46 @@ def compute_full_elo_history(df_step0: pd.DataFrame) -> pd.DataFrame:
 
     return pd.DataFrame(rows)
 
+
+def last_elo_before(df_elo: pd.DataFrame, team: str, date: pd.Timestamp):
+    """
+    Restituisce l'ultimo elo_post disponibile PRIMA della data indicata.
+    Serve per calcolare elo_pre delle fixture.
+    """
+    df_team = df_elo[(df_elo["home_team"] == team) | (df_elo["away_team"] == team)]
+    df_team = df_team[df_team["date"] < date].sort_values("date")
+
+    if df_team.empty:
+        return BASE_ELO  # fallback
+
+    # Se il team era casa → elo_home_post, altrimenti elo_away_post
+    last_row = df_team.iloc[-1]
+    if last_row["home_team"] == team:
+        return float(last_row["elo_home_post"])
+    else:
+        return float(last_row["elo_away_post"])
+    
+def compute_fixture_elo(df_elo: pd.DataFrame, home: str, away: str, date_fixture):
+    """
+    Calcola Elo PRE (home/away), diff ed expected score per FIXTURE.
+    """
+    dh = pd.to_datetime(date_fixture)
+
+    elo_home_pre = last_elo_before(df_elo, home, dh)
+    elo_away_pre = last_elo_before(df_elo, away, dh)
+
+    elo_diff = elo_home_pre - elo_away_pre
+
+    exp_home = expected_score(elo_home_pre, elo_away_pre)
+    exp_away = 1.0 - exp_home
+
+    return {
+        "elo_home_pre": elo_home_pre,
+        "elo_away_pre": elo_away_pre,
+        "elo_diff": elo_diff,
+        "exp_home": exp_home,
+        "exp_away": exp_away,
+    }
 
 # =======================================================
 # RUNTIME STATE
