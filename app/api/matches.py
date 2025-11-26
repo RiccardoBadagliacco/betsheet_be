@@ -1,16 +1,25 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import or_
+from sqlalchemy.orm import Session, joinedload, load_only
 from uuid import UUID
 from typing import Dict
 
 from app.db.database_football import get_football_db
-from app.db.models import Match, Season, Fixture
+from app.db.models import Match, Season, Fixture, League
 from datetime import datetime
 
 router = APIRouter()
 
 import pandas as pd
 from pathlib import Path
+
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.orm import Session, joinedload
+from app.ml.correlazioni_affini_v2.common.soft_engine_api_v2 import (
+    run_soft_engine_api,
+)
+from app.ml.correlazioni_affini_v2.common.soft_engine_postprocess import full_postprocess
+from app.ml.correlazioni_affini_v2.common.load_affini_indexes import load_affini_indexes
 
 # Runtime pipeline
 
@@ -37,89 +46,120 @@ async def get_matches_by_date(
         date_obj = datetime.strptime(match_date, "%Y-%m-%d").date()
     except Exception:
         raise HTTPException(400, "match_date must be YYYY-MM-DD")
+    match_date_str = date_obj.isoformat()
 
     q = (
         db.query(Match)
         .options(
             joinedload(Match.home_team),
             joinedload(Match.away_team),
-            joinedload(Match.season).joinedload(Season.league),
+            joinedload(Match.season)
+            .load_only(Season.id, Season.league_id, Season.name, Season.code)
+            .joinedload(Season.league)
+            .load_only(League.id, League.code, League.name, League.country_id)
+            .joinedload(League.country),
         )
-        .filter(Match.match_date == date_obj)
+        .filter(
+            or_(Match.match_date == match_date_str, Match.match_date == date_obj),
+        )
     )
 
     matches = q.all()
-
     fq = (
         db.query(Fixture)
         .options(
             joinedload(Fixture.home_team),
             joinedload(Fixture.away_team),
-            joinedload(Fixture.season).joinedload(Season.league),
+            joinedload(Fixture.season)
+            .load_only(Season.id, Season.league_id, Season.name, Season.code)
+            .joinedload(Season.league)
+            .load_only(League.id, League.code, League.name, League.country_id)
+            .joinedload(League.country),
         )
-        .filter(Fixture.match_date == date_obj)
+        .filter(
+            or_(Fixture.match_date == match_date_str, Fixture.match_date == date_obj),
+            Fixture.match_date.isnot(None),
+        )
     )
     fixtures = fq.all()
-    leagues: Dict[str, Dict] = {}
+
+
+    country_map: Dict[str, Dict] = {}
+    matches_out = []
+
+    def add_country_and_league(league_obj):
+        if not league_obj:
+            return
+        country = getattr(league_obj, "country", None)
+        c_code = getattr(country, "code", None) or "UNKNOWN"
+        if c_code not in country_map:
+            country_map[c_code] = {
+                "code": c_code,
+                "name": getattr(country, "name", c_code),
+                "leagues": {},
+            }
+        l_code = getattr(league_obj, "code", "UNKNOWN")
+        country_map[c_code]["leagues"][l_code] = {
+            "code": l_code,
+            "name": getattr(league_obj, "name", l_code),
+        }
 
     for m in matches:
         season = m.season
         league = season.league if season else None
-        code = getattr(league, "code", "UNKNOWN")
+        add_country_and_league(league)
 
-        if code not in leagues:
-            leagues[code] = {
-                "league_name": getattr(league, "name", code),
-                "fixtures": [],
-            }
-
-        leagues[code]["fixtures"].append(
+        matches_out.append(
             {
-                "fixture_id": str(m.id),
+                "id": str(m.id),
                 "home_team": m.home_team.name if m.home_team else None,
                 "away_team": m.away_team.name if m.away_team else None,
                 "match_time": m.match_time,
                 "home_ft": m.home_goals_ft,
                 "away_ft": m.away_goals_ft,
                 "is_fixture": False,
+                "league_code": getattr(league, "code", None),
+                "league_name": getattr(league, "name", None),
+                "country_code": getattr(getattr(league, "country", None), "code", None),
+                "country_name": getattr(getattr(league, "country", None), "name", None),
             }
         )
 
     for f in fixtures:
         season = f.season
         league = season.league if season else None
-        code = getattr(league, "code", None) or getattr(f, "league_code", "UNKNOWN")
-        league_name = getattr(league, "name", None) or getattr(f, "league_name", code)
+        add_country_and_league(league)
 
-        if code not in leagues:
-            leagues[code] = {
-                "league_name": league_name,
-                "fixtures": [],
-            }
-
-        leagues[code]["fixtures"].append(
+        matches_out.append(
             {
-                "fixture_id": str(f.id),
+                "id": str(f.id),
                 "home_team": f.home_team.name if f.home_team else None,
                 "away_team": f.away_team.name if f.away_team else None,
                 "match_time": f.match_time,
                 "home_ft": f.home_goals_ft,
                 "away_ft": f.away_goals_ft,
                 "is_fixture": True,
+                "league_code": getattr(league, "code", None) or getattr(f, "league_code", None),
+                "league_name": getattr(league, "name", None) or getattr(f, "league_name", None),
+                "country_code": getattr(getattr(league, "country", None), "code", None),
+                "country_name": getattr(getattr(league, "country", None), "name", None),
             }
         )
 
-    return {"success": True, "date": match_date, "leagues": leagues}
+    countries = []
+    for country in country_map.values():
+        leagues = list(country["leagues"].values())
+        country["leagues"] = leagues
+        countries.append(country)
+
+    return {
+        "success": True,
+        "date": match_date,
+        "countries": countries,
+        "matches": matches_out,
+    }
 #
 
-
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session, joinedload
-from app.ml.correlazioni_affini_v2.common.soft_engine_api_v2 import (
-    run_soft_engine_api,
-)
-from app.ml.correlazioni_affini_v2.common.soft_engine_postprocess import full_postprocess
-from app.ml.correlazioni_affini_v2.common.load_affini_indexes import load_affini_indexes
 
 @router.get("/matches/{match_id}")
 async def analyze_match(

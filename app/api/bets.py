@@ -19,12 +19,6 @@ def _safe_parse_json(val: str):
         return val
 
 
-def _normalize_esito(esito: Optional[str]) -> Optional[str]:
-    if esito is None:
-        return None
-    return esito.strip().lower()
-
-
 def _canonicalize_esito(esito: Optional[str]) -> Optional[str]:
     """Map various esito representations to canonical 'vinta'/'persa'/'in_progress'."""
     if esito is None:

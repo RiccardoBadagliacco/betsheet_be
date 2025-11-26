@@ -7,6 +7,8 @@ import numbers
 from .betting_alert_model import BettingAlert
 from .rule_favorite_profile_signal import rule_favorite_profile_signal
 from .rule_over_signal import rule_over_signal
+from .rule_mg_signal import rule_mg_fav_signal
+from .rule_mg_signal_v2 import rule_mg_fav_signal_v2d
 # ============================================================
 #  BASE STRUCT
 # ============================================================
@@ -17,7 +19,9 @@ class RuleFn:
 
 REGISTERED_RULES = [
     rule_favorite_profile_signal,
-    rule_over_signal
+    rule_over_signal,
+    rule_mg_fav_signal,
+    rule_mg_fav_signal_v2d
 ]
 
 def evaluate_all_rules(t0: pd.Series, ctx: Optional[Dict[str, Any]] = None):

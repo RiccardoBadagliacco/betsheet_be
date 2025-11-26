@@ -487,11 +487,112 @@ def run_soft_engine_api(
 
     affini_list = affini_df.to_dict(orient="records")
 
+    target_date = pd.to_datetime(t0.get("date"), errors="coerce")
+
+    # Usa solo le partite della stessa season del match target (se disponibile)
+    season = t0.get("season")
+    if pd.notna(season) and "season" in wide.columns:
+        history_base = wide[wide["season"] == season]
+    else:
+        history_base = wide
+
+    history = history_base[["match_id", "date", "home_team", "away_team", "home_ft", "away_ft"]].copy()
+    history["date"] = pd.to_datetime(history["date"], errors="coerce")
+
+    # Tieni solo match precedenti alla data target (se disponibile)
+    if pd.notna(target_date):
+        history = history[(history["date"].notna()) & (history["date"] < target_date)].copy()
+
+    # Costruisco dizionario {team_name: [match_records]}
+    team_history = {}
+
+    for _, r in history.iterrows():
+        # considera solo partite con risultato completo
+        if pd.isna(r["home_ft"]) or pd.isna(r["away_ft"]):
+            continue
+
+        # home side
+        team_history.setdefault(r["home_team"], []).append({
+            "match_id": r["match_id"],
+            "date": r["date"],
+            "home_team": r["home_team"],
+            "away_team": r["away_team"],
+            "home_ft": int(r["home_ft"]),
+            "away_ft": int(r["away_ft"]),
+        })
+        # away side
+        team_history.setdefault(r["away_team"], []).append({
+            "match_id": r["match_id"],
+            "date": r["date"],
+            "home_team": r["home_team"],
+            "away_team": r["away_team"],
+            "home_ft": int(r["home_ft"]),
+            "away_ft": int(r["away_ft"]),
+        })
+
+    # Ordino le liste per data
+    for t in team_history:
+        team_history[t].sort(key=lambda x: x["date"])
+
+    home_team = t0.get("home_team")
+    if pd.notna(home_team) and home_team in team_history:
+        print(f"\nTutte le partite di {home_team} (stessa season):")
+        for m in team_history[home_team]:
+            d = m["date"].strftime("%Y-%m-%d") if pd.notna(m["date"]) else "N/A"
+            hf = m["home_ft"] if m["home_ft"] is not None else "-"
+            af = m["away_ft"] if m["away_ft"] is not None else "-"
+            print(f"  {d} | {m['home_team']} {hf} - {af} {m['away_team']}")
+        print("")
+    else:
+        print(f"\nNessuna history disponibile per il team di casa: {home_team}\n")
+
+    away_team = t0.get("away_team")
+    if pd.notna(away_team) and away_team in team_history:
+        print(f"Tutte le partite di {away_team} (stessa season):")
+        for m in team_history[away_team]:
+            d = m["date"].strftime("%Y-%m-%d") if pd.notna(m["date"]) else "N/A"
+            hf = m["home_ft"] if m["home_ft"] is not None else "-"
+            af = m["away_ft"] if m["away_ft"] is not None else "-"
+            print(f"  {d} | {m['home_team']} {hf} - {af} {m['away_team']}")
+        print("")
+    else:
+        print(f"Nessuna history disponibile per il team ospite: {away_team}\n")
+
     ctx = {
         "clusters": clusters_out,
         "soft_probs": soft_probs,
+        "team_history": team_history,
         # in futuro puoi aggiungere altre info di contesto qui
     }
+
+    ML_COLS = [
+        "home_form_matches_lastN",
+        "home_form_gf_avg_lastN",
+        "home_form_ga_avg_lastN",
+        "away_form_matches_lastN",
+        "away_form_gf_avg_lastN",
+        "away_form_ga_avg_lastN"
+    ]
+
+    # Se il target è storico ed esiste nel WIDE → merge diretto
+    if "match_id" in t0 and "match_id" in wide.columns:
+        wid = wide[wide["match_id"] == t0["match_id"]]
+
+        if len(wid) > 0:
+            w0 = wid.iloc[0]
+            for col in ML_COLS:
+                if col in w0.index:
+                    t0[col] = w0[col]
+                else:
+                    t0[col] = np.nan
+        else:
+            # Match futuro → assegna NaN
+            for col in ML_COLS:
+                t0[col] = np.nan
+    else:
+        # Caso generico → assegna NaN
+        for col in ML_COLS:
+            t0[col] = np.nan
 
     return {
         "status": "ok",

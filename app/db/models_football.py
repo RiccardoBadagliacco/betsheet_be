@@ -7,8 +7,73 @@ from sqlalchemy.orm import relationship
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
+from sqlalchemy.types import TypeDecorator
+import datetime as _dt
 
 from app.db.database_football import FootballBase
+
+
+# -------------------------------------------------
+# Tipi sicuri per date/datetime (tollerano stringhe vuote)
+# -------------------------------------------------
+class SafeDate(TypeDecorator):
+    """
+    Conserva le date come stringa ISO, restituendo None per valori vuoti/non parsabili.
+    Usa String per evitare conversioni automatiche.
+    """
+
+    impl = String
+    cache_ok = True
+
+    def process_bind_param(self, value, dialect):
+        if value in ("", None):
+            return None
+        if isinstance(value, _dt.date):
+            return value.isoformat()
+        try:
+            return _dt.date.fromisoformat(str(value)).isoformat()
+        except Exception:
+            return None
+
+    def process_result_value(self, value, dialect):
+        if value in ("", None):
+            return None
+        if isinstance(value, _dt.date):
+            return value
+        try:
+            return _dt.date.fromisoformat(str(value))
+        except Exception:
+            return None
+
+
+class SafeDateTime(TypeDecorator):
+    """
+    Conserva datetime come stringa ISO, restituendo None per valori vuoti/non parsabili.
+    Usa String per evitare conversioni automatiche.
+    """
+
+    impl = String
+    cache_ok = True
+
+    def process_bind_param(self, value, dialect):
+        if value in ("", None):
+            return None
+        if isinstance(value, _dt.datetime):
+            return value.isoformat()
+        try:
+            return _dt.datetime.fromisoformat(str(value)).isoformat()
+        except Exception:
+            return None
+
+    def process_result_value(self, value, dialect):
+        if value in ("", None):
+            return None
+        if isinstance(value, _dt.datetime):
+            return value
+        try:
+            return _dt.datetime.fromisoformat(str(value))
+        except Exception:
+            return None
 
 class Country(FootballBase):
     __tablename__ = "countries"
@@ -17,7 +82,7 @@ class Country(FootballBase):
     code = Column(String(3), unique=True, nullable=False, index=True)  # es. "ITA", "ENG"
     name = Column(String(100), nullable=False)  # es. "Italy", "England"
     flag_url = Column(String(255), nullable=True)  # URL icona bandiera
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(SafeDateTime, default=datetime.utcnow, nullable=False)
     
     # Relazioni
     leagues = relationship("League", back_populates="country", cascade="all, delete-orphan")
@@ -37,7 +102,7 @@ class League(FootballBase):
     tier = Column(Integer, nullable=True)  # 1 per serie A, 2 per serie B, etc.
     active = Column(Boolean, default=True)  # Se la lega è ancora attiva
     is_favorite = Column(Boolean, default=False, nullable=False)  # Lega preferita
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(SafeDateTime, default=datetime.utcnow, nullable=False)
     
     # Relazioni
     country = relationship("Country", back_populates="leagues")  # Rimosso delete-orphan
@@ -51,14 +116,14 @@ class Season(FootballBase):
     league_id = Column(UUID(as_uuid=True), ForeignKey("leagues.id"), nullable=False)
     name = Column(String(20), nullable=False)  # es. "2023/2024"
     code = Column(String(10), nullable=False)  # es. "2324"
-    start_date = Column(Date, nullable=True)  # Data prima partita
-    end_date = Column(Date, nullable=True)    # Data ultima partita (null se non conclusa)
+    start_date = Column(SafeDate, nullable=True)  # Data prima partita
+    end_date = Column(SafeDate, nullable=True)    # Data ultima partita (null se non conclusa)
     is_completed = Column(Boolean, default=False, nullable=False)  # True se stagione conclusa
     total_matches = Column(Integer, default=0)  # Numero totale partite
     processed_matches = Column(Integer, default=0)  # Partite elaborate nel DB
     csv_file_path = Column(String(255), nullable=True)  # Percorso file CSV originale
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at = Column(SafeDateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(SafeDateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     
     # Relazioni
     league = relationship("League", back_populates="seasons")
@@ -75,7 +140,7 @@ class Team(FootballBase):
     logo_url = Column(String(255), nullable=True)
     founded_year = Column(Integer, nullable=True)
     is_top = Column(Boolean, default=False, nullable=False)  # Squadra top
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(SafeDateTime, default=datetime.utcnow, nullable=False)
     
     # Relazioni
     country = relationship("Country")
@@ -92,7 +157,7 @@ class Match(FootballBase):
     away_team_id = Column(UUID(as_uuid=True), ForeignKey("teams.id"), nullable=False)
     
     # Dati temporali
-    match_date = Column(Date, nullable=False, index=True)
+    match_date = Column(SafeDate, nullable=False, index=True)
     match_time = Column(String(10), nullable=True)  # es. "15:00"
     
     # Risultati tempo pieno
@@ -118,7 +183,7 @@ class Match(FootballBase):
     
     # Metadati
     csv_row_number = Column(Integer, nullable=True)   # Numero riga nel CSV originale
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(SafeDateTime, default=datetime.utcnow, nullable=False)
     
     # Relazioni
     season = relationship("Season", back_populates="matches")
@@ -136,7 +201,7 @@ class Fixture(FootballBase):
     away_team_id = Column(UUID(as_uuid=True), ForeignKey("teams.id"), nullable=True)
     
     # Dati temporali
-    match_date = Column(Date, nullable=False, index=True)
+    match_date = Column(SafeDate, nullable=False, index=True)
     match_time = Column(String(10), nullable=True)  # es. "15:00"
     
     # Risultati tempo pieno (sempre NULL per fixtures)
@@ -166,7 +231,7 @@ class Fixture(FootballBase):
     
     # Metadati
     csv_row_number = Column(Integer, nullable=True)   # Numero riga nel CSV originale
-    downloaded_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    downloaded_at = Column(SafeDateTime, default=datetime.utcnow, nullable=False)
     
     # Relazioni (opzionali per fixtures)
     season = relationship("Season")

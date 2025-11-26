@@ -199,9 +199,6 @@ def build_bet_suggestions(bet_tags, severity: str, side: str):
 
         # 🔥 AGGIUNGIAMO LE STATISTICHE GLOBALI SE DISPONIBILI
         stats = BET_GLOBAL_STATS.get(tag)
-        print("🔍 data keys =", list(BET_GLOBAL_STATS.keys()))
-        print("🔍 BET_GLOBAL_STATS keys =", list(BET_GLOBAL_STATS.keys()))
-        print('Cerco statistiche per tag:', tag, '→', 'Trovate' if stats else 'Non trovate')
 
         suggestions.append({
             "tag_raw": tag,
