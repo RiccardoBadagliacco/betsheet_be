@@ -34,6 +34,7 @@ Funzione principale:
 
 import numpy as np
 import pandas as pd
+from typing import Optional
 from app.ml.correlazioni_affini_v2.common.betting_rules.index import evaluate_all_rules
 
 # ============================================================
@@ -170,10 +171,10 @@ def distances_to_weights(d: np.ndarray, alpha: float = 2.0) -> np.ndarray:
 # 3. ENGINE PRINCIPALE — API
 # ============================================================
 def run_soft_engine_api(
-    target_row: pd.Series | None = None,
-    target_match_id: str | None = None,
-    slim: pd.DataFrame | None = None,
-    wide: pd.DataFrame | None = None,
+    target_row: Optional[pd.Series] = None,
+    target_match_id: Optional[str] = None,
+    slim: Optional[pd.DataFrame] = None,
+    wide: Optional[pd.DataFrame] = None,
     top_n: int = 80,
     min_neighbors: int = 30,
 ):

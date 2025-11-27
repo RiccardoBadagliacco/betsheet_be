@@ -57,6 +57,13 @@ def load_data():
     df0 = pd.read_parquet(STEP0_PATH)
     df_elo = pd.read_parquet(ELO_PATH)
     df_form = pd.read_parquet(FORM_PATH)
+
+    # Filtra SOLO le colonne storiche (quelle senza suffisso _fx)
+    cols_storiche = [c for c in df_form.columns if not c.endswith("_fx")]
+    df_form = df_form[cols_storiche]
+
+    df_form["date"] = pd.to_datetime(df_form["date"], errors="coerce")
+    df_form = pd.read_parquet(FORM_PATH)
     return df0, df_elo, df_form
 
 

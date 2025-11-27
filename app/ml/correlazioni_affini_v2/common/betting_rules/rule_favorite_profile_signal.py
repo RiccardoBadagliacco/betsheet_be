@@ -1,6 +1,6 @@
 import pandas as pd
 import math
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from .betting_alert_model import BettingAlert
 from .bet_translation_engine import build_bet_suggestions
 
@@ -176,7 +176,7 @@ def _describe_strength(strength: str, fav_label: str) -> str:
     return f"una {fav_label} favorita solo sulla carta"
 
 
-def _describe_multigoal(multigoal_band: str | None, fav_label: str) -> str:
+def _describe_multigoal(multigoal_band: Optional[str], fav_label: str) -> str:
     if multigoal_band == "1_3":
         return f", con uno scenario frequente in cui la {fav_label} si ferma tra 1 e 3 gol"
     if multigoal_band == "1_4":
@@ -218,7 +218,7 @@ def _build_negative_message(
 def _build_positive_message(
     fav_label: str,
     strength: str,
-    multigoal_band: str | None,
+    multigoal_band: Optional[str],
 ) -> str:
     parts: List[str] = []
     parts.append(f"Profilo molto positivo per la {fav_label}: ")
@@ -238,7 +238,7 @@ def _build_positive_message(
 def _build_multigoal_only_message(
     fav_label: str,
     strength: str,
-    multigoal_band: str | None,
+    multigoal_band: Optional[str],
     win_risk: bool,
 ) -> str:
     parts: List[str] = []
@@ -270,7 +270,7 @@ def _build_standard_message(
     strength: str,
     win_risk: bool,
     goal_high: bool,
-    multigoal_band: str | None,
+    multigoal_band: Optional[str],
 ) -> str:
     parts: List[str] = []
     parts.append(f"Profilo equilibrato per la {fav_label}: ")
