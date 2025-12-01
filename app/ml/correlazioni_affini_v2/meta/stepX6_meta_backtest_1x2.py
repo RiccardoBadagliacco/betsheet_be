@@ -40,7 +40,7 @@ MODEL_DIR  = AFFINI_DIR / "models"
 MASTER_PATH     = DATA_DIR / "meta_1x2_master_train_v1.parquet"
 MODEL_PATH      = MODEL_DIR / "meta_1x2_catboost_v5.cbm"
 FEATURE_PATH    = MODEL_DIR / "meta_1x2_catboost_features_v5.json"
-CALIBRATOR_PATH = MODEL_DIR / "meta_1x2_calibrator_iso_v2.pkl"
+CALIBRATOR_PATH = MODEL_DIR / "meta_1x2_calibrator_iso_v5.pkl"
 
 OUT_PATH = DATA_DIR / "meta_1x2_backtest_v1.parquet"
 
@@ -78,6 +78,40 @@ def encode_outcome(df):
             return 0
         return np.nan
     return df.apply(f, axis=1)
+
+
+# ------------------------------------------------------------
+# CALIBRATOR HANDLING
+# ------------------------------------------------------------
+def extract_isotonic_calibrators(calibrator):
+    """
+    Supporta diversi formati di salvataggio:
+      - {"iso_0": ..., "iso_1": ..., "iso_2": ...}
+      - {"calibrators": {"0": ..., "1": ..., "2": ...}}
+      - lista/tupla [iso0, iso1, iso2]
+    Restituisce la terna (iso0, iso1, iso2) o solleva se mancano.
+    """
+    cal = calibrator
+    if isinstance(calibrator, dict):
+        cal = calibrator.get("calibrators", calibrator)
+
+    if isinstance(cal, (list, tuple)):
+        if len(cal) < 3:
+            raise RuntimeError("❌ Calibratore isotonic ha meno di 3 elementi")
+        return cal[0], cal[1], cal[2]
+
+    if isinstance(cal, dict):
+        iso0 = cal.get("iso_0") or cal.get("class_0") or cal.get("0") or cal.get(0)
+        iso1 = cal.get("iso_1") or cal.get("class_1") or cal.get("1") or cal.get(1)
+        iso2 = cal.get("iso_2") or cal.get("class_2") or cal.get("2") or cal.get(2)
+    else:
+        raise RuntimeError(f"❌ Formato calibratore inatteso: {type(calibrator)}")
+
+    if iso0 is None or iso1 is None or iso2 is None:
+        keys = list(cal.keys()) if isinstance(cal, dict) else "n/a"
+        raise RuntimeError(f"❌ Calibratore isotonic incompleto. Chiavi disponibili: {keys}")
+
+    return iso0, iso1, iso2
 
 
 # ------------------------------------------------------------
@@ -125,18 +159,14 @@ def main():
 
     # calibrated prediction per classe
     print("📊 Apply isotonic calibrator…")
-    cal = calibrator["calibrators"]
-
-    iso0 = cal[0]
-    iso1 = cal[1]
-    iso2 = cal[2]
+    iso0, iso1, iso2 = extract_isotonic_calibrators(calibrator)
 
     # Applico trasformazione isotonic
-    p0 = iso0.transform(proba_raw[:, 0].reshape(-1, 1)).flatten()
-    p1 = iso1.transform(proba_raw[:, 1].reshape(-1, 1)).flatten()
-    p2 = iso2.transform(proba_raw[:, 2].reshape(-1, 1)).flatten()
+    p0 = iso0.predict(proba_raw[:, 0])
+    p1 = iso1.predict(proba_raw[:, 1])
+    p2 = iso2.predict(proba_raw[:, 2])
 
-    p_sum = p0 + p1 + p2
+    p_sum = np.where(p0 + p1 + p2 <= 0, 1.0, p0 + p1 + p2)
     p0, p1, p2 = p0/p_sum, p1/p_sum, p2/p_sum
     proba_cal = np.vstack([p0, p1, p2]).T
 

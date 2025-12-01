@@ -17,11 +17,23 @@ STEPS_TRAIN = [
     "step2/step2b_ou15_features.py",
     "step2/step2b_ou25_features.py",
     "step2/step2b_1X2_features.py",
-    "step3/step3a_1x2_clustering_v2.py",  # TRAIN
-    "step3/step3b_ou25_clustering_v2.py", # TRAIN
-    "step3/step3c_ou15_clustering_v2.py", # TRAIN
+    "step3/step3a_1x2_clustering_v2.py",
+    "step3/step3b_ou25_clustering_v2.py",
+    "step3/step3c_ou15_clustering_v2.py",
     "step4/step4a_affini_index_wide_v2.py",
     "step4/step4b_affini_index_slim_v2.py",
+
+
+    # 🟦 NUOVI STEP NECESSARI
+    "meta/stepX1_build_master_1x2.py",
+    "meta/stepX2_train_meta_model_1x2.py",
+    "meta/stepX3_meta_catboost_1x2_v3.py",
+    "meta/stepX4_calibrate_meta_1x2.py",
+    "meta/stepX6_meta_backtest_1x2.py",
+    "meta/stepX7_meta_backtest_ev_1x2.py",
+    "meta/stepX5_build_bet_global_stats.py",
+
+
 ]
 
 # ------------------------------------------------------
@@ -31,7 +43,7 @@ STEPS_FULL = [
     "step0/step0_dataset_base_features.py",
     "step1/step1a_elo_v2.py",
     "step1/step1b_form_recent.py",
-    "step1/step1z_compute_fixture_features.py",   # 👈 AGGIUNTO QUI
+    "step1/step1z_compute_fixture_features.py",
     "step1/step1c_build_dataset_with_elo_form.py",
     "step2/step2a_picchetto_tech_v2.py",
     "step2/step2b_ou15_features.py",
@@ -39,6 +51,15 @@ STEPS_FULL = [
     "step2/step2b_1X2_features.py",
     "step4/step4a_affini_index_wide_v2.py",
     "step4/step4b_affini_index_slim_v2.py",
+
+    # 🟦 NUOVI STEP X
+    "meta/stepX1_build_master_1x2.py",
+    "meta/stepX2_train_meta_model_1x2.py",
+    "meta/stepX3_meta_catboost_1x2_v3.py",
+    "meta/stepX4_calibrate_meta_1x2.py",
+    "meta/stepX5_build_bet_global_stats.py",
+    "meta/stepX6_meta_backtest_1x2.py",
+    "meta/stepX7_meta_backtest_ev_1x2.py"
 ]
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

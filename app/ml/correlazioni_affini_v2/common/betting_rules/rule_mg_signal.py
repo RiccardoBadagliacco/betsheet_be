@@ -194,7 +194,7 @@ def build_mg14_stat_profile(t0: pd.Series, ctx: Dict[str, Any]) -> Dict[str, Any
 # REGOLA PRINCIPALE: MULTIGOL FAVORITA 1–4 (CHECKLIST STATISTICA)
 # ============================================================================
 
-def rule_mg_fav_signal(t0: pd.Series, ctx: Dict[str, Any]) -> List[BettingAlert]:
+def rule_mg_fav_signal_v1(t0: pd.Series, ctx: Dict[str, Any]) -> List[BettingAlert]:
     """
     MG_FAVORITA_SIGNAL (v1.0 - checklist statistica)
 
@@ -214,7 +214,7 @@ def rule_mg_fav_signal(t0: pd.Series, ctx: Dict[str, Any]) -> List[BettingAlert]
         → filtro di stabilità, non edge gigantesco ma solido per scremare le partite.
     """
     alerts: List[BettingAlert] = []
-
+    print('V1')
     try:
         print(f"    - t0: {t0.to_dict()}")
         print("    - Costruzione profilo MG favorita (checklist statistica)...")

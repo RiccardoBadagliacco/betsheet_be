@@ -91,6 +91,9 @@ def translate_single_bet(tag: str, side: str) -> str:
 
     if tag == "BET_FAV_1_5":
         return "Multigol Favorita 1–5"
+    
+    if tag== 'MG_FAVORITA_1_4':
+        return "MG FAVORITA 1 4"
 
     # -------------------------------
     # UNDER SPECIALI

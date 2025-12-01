@@ -20,7 +20,8 @@ from app.ml.correlazioni_affini_v2.common.soft_engine_api_v2 import (
 )
 from app.ml.correlazioni_affini_v2.common.soft_engine_postprocess import full_postprocess
 from app.ml.correlazioni_affini_v2.common.load_affini_indexes import load_affini_indexes
-
+from app.ml.correlazioni_affini_v2.meta.stepZ_decision_engine import run_decision
+from app.ml.correlazioni_affini_v2.meta.stepZ_formatter import build_final_forecast
 # Runtime pipeline
 
 
@@ -271,6 +272,12 @@ async def analyze_match(
         "affini_list": soft_model["affini_list"],   # FONDAMENTALE
     })
 
+    try:
+        stepz_raw = run_decision(str(m.id))
+        final = build_final_forecast(stepz_raw)
+    except Exception as e:
+        raise HTTPException(500, f"Errore decision engine: {e}")
+
     # --------------------------------------
     # 6) OUTPUT FINALE
     # --------------------------------------
@@ -286,4 +293,5 @@ async def analyze_match(
             "alerts": soft_model["alerts"],
         },
         "analytics": analytics,
+        "decision": final
     }

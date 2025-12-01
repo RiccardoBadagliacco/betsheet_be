@@ -49,13 +49,15 @@ MODEL_DIR  = AFF_DIR / "models"
 STEP1C_PATH       = DATA_DIR / "step1c_dataset_with_elo_form.parquet"
 FEATURES_JSON     = MODEL_DIR / "meta_1x2_catboost_features_v5.json"
 META_MODEL_PATH   = MODEL_DIR / "meta_1x2_catboost_v5.cbm"
-CALIBRATOR_PATH   = MODEL_DIR / "meta_1x2_calibrator_iso_v2.pkl"
+CALIBRATOR_PATH   = MODEL_DIR / "meta_1x2_calibrator_iso_v5.pkl"
 STEP2B_1X2_PATH   = DATA_DIR / "step2b_1x2_features_v2.parquet"
 
 # funzioni affini
 from app.ml.correlazioni_affini_v2.common.load_affini_indexes import load_affini_indexes
 from app.ml.correlazioni_affini_v2.common.soft_engine_api_v2 import run_soft_engine_api
 from app.ml.correlazioni_affini_v2.common.soft_engine_postprocess import full_postprocess
+from app.ml.correlazioni_affini_v2.meta.stepZ_formatter import build_final_forecast
+
 # funzione generatore riga feature runtime
 
 # ============================================================
@@ -75,6 +77,30 @@ def load_feature_cols():
     raise RuntimeError(f"Formato file feature non riconosciuto: {FEATURES_JSON}")
 
 
+def normalize_calibrators(raw_calibrator) -> dict:
+    """
+    Accetta diversi formati:
+      - {"calibrators": {...}}
+      - {"iso_0": ..., "iso_1": ..., "iso_2": ...}
+      - lista/tupla [iso0, iso1, iso2]
+    Restituisce sempre un dizionario interrogabile con get().
+    """
+    cal = raw_calibrator
+
+    if isinstance(cal, dict) and "calibrators" in cal:
+        cal = cal["calibrators"]
+
+    if isinstance(cal, dict):
+        return cal
+
+    if isinstance(cal, (list, tuple)):
+        if len(cal) < 3:
+            raise RuntimeError("❌ Calibratore isotonic ha meno di 3 elementi")
+        return {str(i): cal[i] for i in range(len(cal))}
+
+    raise RuntimeError(f"❌ Formato calibratore inatteso: {type(raw_calibrator)}")
+
+
 def meta_predict(row, feature_cols):
     """Ritorna proba calibrate {p_home, p_draw, p_away}."""
 
@@ -84,8 +110,13 @@ def meta_predict(row, feature_cols):
 
     # calibratore
     calib = joblib.load(CALIBRATOR_PATH)
-    calibrators = calib["calibrators"]
-    get_calib = lambda k: calibrators.get(k, calibrators.get(str(k)))
+    calibrators = normalize_calibrators(calib)
+    get_calib = lambda k: (
+        calibrators.get(f"class_{k}")
+        or calibrators.get(f"iso_{k}")
+        or calibrators.get(k)
+        or calibrators.get(str(k))
+    )
 
     X = row[feature_cols].astype(float).values.reshape(1, -1)
     raw = model.predict_proba(X)[0]      # ordine: [away, draw, home]
@@ -98,12 +129,16 @@ def meta_predict(row, feature_cols):
     if c0 is None or c1 is None or c2 is None:
         raise RuntimeError("Calibratori isotonic mancanti o con chiave inattesa")
 
-    p0 = c0.transform([raw[0]])[0]
-    p1 = c1.transform([raw[1]])[0]
-    p2 = c2.transform([raw[2]])[0]
+    p0 = c0.predict([raw[0]])[0]
+    p1 = c1.predict([raw[1]])[0]
+    p2 = c2.predict([raw[2]])[0]
 
     p = np.array([p0, p1, p2])
-    p /= p.sum()
+    s = p.sum()
+    if s <= 0:
+        p = np.full_like(p, 1.0 / len(p))
+    else:
+        p = p / s
 
     return {
         "p_away": float(p[0]),
@@ -153,13 +188,28 @@ def run_decision(match_id):
 
     if row_fx.empty:
         raise RuntimeError(f"match_id {match_id} NON trovato in step1c!")
+    
+    match_date = row_fx.iloc[0]["date"]
+
+    # Filtro dataset generale
+    df = df[df["date"] < match_date]
 
     # ----------------------------------------------------------
     # 2) Carica indici affini (riusati sia per target row sia per soft engine)
     # ----------------------------------------------------------
     slim, wide = load_affini_indexes()
 
-    target = wide.loc[wide["match_id"] == match_id]
+    # ----------------------------------------------------------
+    # FILTRO TEMPORALE ANCHE PER GLI INDICI AFFINI
+    # ----------------------------------------------------------
+    if "date" in slim.columns:
+        slim = slim[slim["date"] < match_date]
+
+    if "date" in wide.columns:
+        wide = wide[wide["date"] < match_date]
+
+    slim_all, wide_all = load_affini_indexes()
+    target = wide_all.loc[wide_all["match_id"] == match_id]
     if target.empty:
         raise RuntimeError(f"match_id {match_id} NON trovato in affini WIDE.")
 
@@ -279,7 +329,8 @@ def main():
     args = ap.parse_args()
 
     out = run_decision(args.match_id)
-    print(json.dumps(out, indent=2, default=str))
+    final = build_final_forecast(out)
+    print(json.dumps(final, indent=2, default=str))
 
 
 if __name__ == "__main__":

@@ -43,7 +43,7 @@ MODEL_DIR  = AFFINI_DIR / "models"
 MASTER_PATH      = DATA_DIR / "meta_1x2_master_train_v1.parquet"
 MODEL_PATH       = MODEL_DIR / "meta_1x2_catboost_v5.cbm"
 FEATURES_PATH    = MODEL_DIR / "meta_1x2_catboost_features_v5.json"
-CALIBRATOR_PATH  = MODEL_DIR / "meta_1x2_calibrator_iso_v2.pkl"
+CALIBRATOR_PATH  = MODEL_DIR / "meta_1x2_calibrator_iso_v5.pkl"
 BACKTEST_EV_PATH = DATA_DIR / "meta_1x2_backtest_ev_v1.parquet"
 
 
@@ -75,6 +75,30 @@ def load_feature_cols() -> list[str]:
     return data
 
 
+def normalize_calibrators(raw_calibrator) -> dict:
+    """
+    Gestisce diversi formati di salvataggio del calibratore isotonic:
+      - {"calibrators": {...}}
+      - {"iso_0": ..., "iso_1": ..., "iso_2": ...}
+      - lista/tupla [iso0, iso1, iso2]
+    Restituisce sempre un dizionario interrogabile con get().
+    """
+    cal = raw_calibrator
+
+    if isinstance(cal, dict) and "calibrators" in cal:
+        cal = cal["calibrators"]
+
+    if isinstance(cal, dict):
+        return cal
+
+    if isinstance(cal, (list, tuple)):
+        if len(cal) < 3:
+            raise RuntimeError("❌ Calibratore isotonic ha meno di 3 elementi")
+        return {str(i): cal[i] for i in range(len(cal))}
+
+    raise RuntimeError(f"❌ Formato calibratore inatteso: {type(raw_calibrator)}")
+
+
 def load_model_and_calibrator():
     print(f"📥 Carico modello CatBoost da: {MODEL_PATH}")
     model = CatBoostClassifier()
@@ -83,7 +107,7 @@ def load_model_and_calibrator():
     print(f"📥 Carico calibratore isotonic da: {CALIBRATOR_PATH}")
     calib = joblib.load(CALIBRATOR_PATH)
 
-    calibrators = calib["calibrators"]  # dict: "0","1","2" -> IsotonicRegression
+    calibrators = normalize_calibrators(calib)  # dict: "0","1","2" -> IsotonicRegression
     return model, calibrators
 
 
@@ -92,9 +116,24 @@ def apply_isotonic_calibration(proba_raw: np.ndarray, calibrators: dict) -> np.n
     Applica il calibratore isotonic classe per classe.
     """
     # supporta entrambe le versioni: "0"/"1"/"2" e "class_0"/"class_1"/"class_2"
-    iso0 = calibrators.get("class_0") or calibrators.get("0") or calibrators.get(0)
-    iso1 = calibrators.get("class_1") or calibrators.get("1") or calibrators.get(1)
-    iso2 = calibrators.get("class_2") or calibrators.get("2") or calibrators.get(2)
+    iso0 = (
+        calibrators.get("class_0")
+        or calibrators.get("iso_0")
+        or calibrators.get("0")
+        or calibrators.get(0)
+    )
+    iso1 = (
+        calibrators.get("class_1")
+        or calibrators.get("iso_1")
+        or calibrators.get("1")
+        or calibrators.get(1)
+    )
+    iso2 = (
+        calibrators.get("class_2")
+        or calibrators.get("iso_2")
+        or calibrators.get("2")
+        or calibrators.get(2)
+    )
 
     if iso0 is None or iso1 is None or iso2 is None:
         raise RuntimeError(
@@ -102,9 +141,10 @@ def apply_isotonic_calibration(proba_raw: np.ndarray, calibrators: dict) -> np.n
             f"Chiavi presenti: {list(calibrators.keys())}"
         )
 
-    p0 = iso0.transform(proba_raw[:, 0].reshape(-1, 1)).flatten()
-    p1 = iso1.transform(proba_raw[:, 1].reshape(-1, 1)).flatten()
-    p2 = iso2.transform(proba_raw[:, 2].reshape(-1, 1)).flatten()
+    # isotonic regression usa predict() su array 1D
+    p0 = iso0.predict(proba_raw[:, 0])
+    p1 = iso1.predict(proba_raw[:, 1])
+    p2 = iso2.predict(proba_raw[:, 2])
 
     P = np.vstack([p0, p1, p2]).T
     row_sum = P.sum(axis=1, keepdims=True)
