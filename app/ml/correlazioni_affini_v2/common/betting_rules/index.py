@@ -8,6 +8,7 @@ from .betting_alert_model import BettingAlert
 from .rule_favorite_profile_signal import rule_favorite_profile_signal
 from .rule_over_signal import rule_over_signal
 from .rule_mg_signal import rule_mg_fav_signal_v1
+from .rule_mg_optimum_from_decision import rule_mg_optimum_signal
 
 
 # ============================================================
@@ -21,7 +22,8 @@ class RuleFn:
 REGISTERED_RULES = [
     rule_favorite_profile_signal,
     rule_over_signal,
-    rule_mg_fav_signal_v1
+    rule_mg_fav_signal_v1,
+    rule_mg_optimum_signal
 ]
 
 from .rule_mg_optimum_from_decision import build_mg_fav_optimum_alert_from_decision

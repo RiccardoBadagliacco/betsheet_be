@@ -14,6 +14,12 @@ Obiettivi principali:
 - Derivare soglie di probabilità (mg_fav_1_4 / mg_fav_1_5) ottimali
 - Estrarre pseudo-regole in forma leggibile, utili per il motore di alert
 
+Novità di questa versione:
+- Binning della quota favorita con step di 0.05 su fav_odds_bin
+- Per ogni segmento forte trovato, viene riportata anche:
+    - copertura rispetto all'intero dataset
+    - copertura rispetto alla sola fascia di quota (fav_odds_bin)
+
 Uso principale:
     from analyze import run_deep_parquet_study
     results = run_deep_parquet_study("matches_fav_le_195.parquet")
@@ -133,17 +139,22 @@ def _add_score_pattern_features(df: pd.DataFrame) -> pd.DataFrame:
 def _add_bins(df: pd.DataFrame) -> pd.DataFrame:
     """
     Aggiunge binning per:
-    - fav_odds
+    - fav_odds (step 0.05)
     - mg_fav_1_3 / 1_4 / 1_5
     - differenze mg_15 - mg_14 e mg_15 - mg_13
     - numero di scoreline top4 con favorita 1-4 gol
     """
     df = df.copy()
 
-    # Bins quota favorita
+    # Bins quota favorita con step 0.05 (es. 1.00-1.05, 1.05-1.10, ..., 2.15-2.20)
+    # Adattato al range tipico dello studio (fav_odds <= 1.95), ma leggermente più largo.
+    min_odds = 1.00
+    max_odds = 2.20
+    fav_bins = np.arange(min_odds, max_odds + 0.001, 0.05)
+
     df["fav_odds_bin"] = pd.cut(
         df["fav_odds"],
-        bins=[1.00, 1.20, 1.40, 1.60, 1.80, 2.00, 2.20],
+        bins=fav_bins,
         include_lowest=True
     )
 
@@ -268,7 +279,7 @@ def _correlation_block(df: pd.DataFrame) -> pd.DataFrame:
 
 def _stats_by_fav_odds_bin(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Statistiche aggregate per bande di quota favorita.
+    Statistiche aggregate per bande di quota favorita (fav_odds_bin a step 0.05).
     """
     gb = df.groupby("fav_odds_bin").agg(
         n_matches=("is_mg14_real", "count"),
@@ -281,7 +292,7 @@ def _stats_by_fav_odds_bin(df: pd.DataFrame) -> pd.DataFrame:
         hit_top4=("hit_any_score_top4", "mean"),
     ).reset_index()
 
-    print("\n=== PER FASCIA DI QUOTA FAVORITA ===")
+    print("\n=== PER FASCIA DI QUOTA FAVORITA (step 0.05) ===")
     print(
         gb.assign(
             p_mg13_real=lambda d: (d["p_mg13_real"] * 100).round(2),
@@ -309,7 +320,7 @@ def _search_best_segments(
     """
     Cerca segmenti per il target (is_mg13_real / is_mg14_real / is_mg15_real)
     combinando:
-      - fav_odds_bin
+      - fav_odds_bin (step 0.05)
       - mg13_bin / mg14_bin / mg15_bin
       - mg_diff13_bin / mg_diff14_bin
       - score1_4_bin
@@ -317,6 +328,11 @@ def _search_best_segments(
     Restituisce i segmenti con:
       - almeno min_samples partite
       - probabilità target >= min_prob
+
+    In più aggiunge:
+      - n_bin          : numero totale di match nella fascia fav_odds_bin
+      - coverage_total : n_matches / len(df)
+      - coverage_in_bin: n_matches / n_bin
     """
     if target_col not in ("is_mg13_real", "is_mg14_real", "is_mg15_real"):
         raise ValueError("target_col deve essere uno tra is_mg13_real, is_mg14_real, is_mg15_real")
@@ -334,6 +350,7 @@ def _search_best_segments(
 
     group_cols = ["fav_odds_bin", mg_bin_col, diff_bin_col, "score1_4_bin"]
 
+    # Aggregazione principale
     g = (
         df
         .groupby(group_cols, observed=False)[target_col]
@@ -342,14 +359,49 @@ def _search_best_segments(
         .rename(columns={"count": "n_matches", "mean": "p_target"})
     )
 
+    # Conteggi per fascia di quota
+    bin_counts = (
+        df
+        .groupby("fav_odds_bin", observed=False)
+        .size()
+        .reset_index(name="n_bin")
+    )
+
+    # Merge per avere n_bin
+    g = g.merge(bin_counts, on="fav_odds_bin", how="left")
+
+    total_n = len(df)
+
+    # Filtra segmenti forti
     mask = (g["n_matches"] >= min_samples) & (g["p_target"] >= min_prob)
-    best = g[mask].sort_values(by="p_target", ascending=False)
+    best = g[mask].copy()
+
+    if not best.empty:
+        best["coverage_total"] = best["n_matches"] / total_n
+        best["coverage_in_bin"] = best["n_matches"] / best["n_bin"]
+
+    best = best.sort_values(by="p_target", ascending=False)
 
     print(f"\n=== SEGMENTI FORTI PER {target_col} (p >= {min_prob:.2f}, N >= {min_samples}) ===")
     if best.empty:
         print("Nessun segmento soddisfa i criteri. Prova ad abbassare min_prob o min_samples.")
     else:
-        print(best.to_string(index=False))
+        # Stampa tabellare compatta (senza coperture, che vengono dettagliate dopo)
+        print(
+            best[
+                [
+                    "fav_odds_bin",
+                    mg_bin_col,
+                    diff_bin_col,
+                    "score1_4_bin",
+                    "n_matches",
+                    "n_bin",
+                    "p_target",
+                    "coverage_total",
+                    "coverage_in_bin",
+                ]
+            ].to_string(index=False)
+        )
 
     return best
 
@@ -360,13 +412,16 @@ def _confidence_interval(p: float, n: int, z: float = 1.96) -> Tuple[float, floa
     """
     if n == 0:
         return (np.nan, np.nan)
-    se = np.sqrt(p * (p - 1) / n * -1) if 0 < p < 1 else 0.0
+    se = np.sqrt(p * (1 - p) / n) if 0 < p < 1 else 0.0
     return (p - z * se, p + z * se)
 
 
 def _print_segment_rules(best: pd.DataFrame, label: str) -> None:
     """
-    Genera una versione "regola leggibile" dei segmenti trovati.
+    Genera una versione "regola leggibile" dei segmenti trovati,
+    includendo la copertura:
+      - rispetto all'intero dataset
+      - rispetto alla sola fascia di quota (fav_odds_bin)
     """
     if best.empty:
         return
@@ -374,11 +429,19 @@ def _print_segment_rules(best: pd.DataFrame, label: str) -> None:
     print(f"\n=== PSEUDO-REGOLE DERIVATE PER {label} ===")
     for idx, row in best.iterrows():
         fav_odds_bin = row["fav_odds_bin"]
-        mg_bin = row[[c for c in row.index if "mg" in str(c) and "bin" in str(c)][0]]
-        diff_bin = row[[c for c in row.index if "diff" in str(c) and "bin" in str(c)][0]]
+        # trova la colonna mg_bin e diff_bin dinamicamente
+        mg_bin_col = [c for c in row.index if "mg" in str(c) and "bin" in str(c) and "diff" not in str(c)]
+        diff_bin_col = [c for c in row.index if "diff" in str(c) and "bin" in str(c)]
+
+        mg_bin = row[mg_bin_col[0]] if mg_bin_col else None
+        diff_bin = row[diff_bin_col[0]] if diff_bin_col else None
+
         score_bin = row["score1_4_bin"]
         n = int(row["n_matches"])
         p = float(row["p_target"])
+        n_bin = int(row.get("n_bin", np.nan))
+        cov_tot = float(row.get("coverage_total", np.nan))
+        cov_bin = float(row.get("coverage_in_bin", np.nan))
         lo, hi = _confidence_interval(p, n)
 
         print("\n---------------------------------------------")
@@ -386,7 +449,17 @@ def _print_segment_rules(best: pd.DataFrame, label: str) -> None:
         print(f" E prob_MG bin {mg_bin}")
         print(f" E diff_MG bin {diff_bin}")
         print(f" E score_top4_fav_1_4_bin = {score_bin}")
-        print(f"ALLORA P(target) ≈ {p*100:.2f}% (N={n}, CI95% ≈ [{lo*100:.1f}%, {hi*100:.1f}%])")
+        print(
+            f"ALLORA P(target) ≈ {p*100:.2f}% "
+            f"(N={n}, CI95% ≈ [{lo*100:.1f}%, {hi*100:.1f}%])"
+        )
+        if not np.isnan(cov_tot):
+            print(f"   Copertura su TUTTO il dataset : {cov_tot*100:.2f}%")
+        if not (np.isnan(cov_bin) or np.isnan(n_bin)):
+            print(
+                f"   Copertura nella FASCIA QUOTA  : {cov_bin*100:.2f}% "
+                f"(N_fascia={n_bin})"
+            )
 
 
 # ============================================================
@@ -445,8 +518,7 @@ def _find_best_threshold(
         y_hat = mask.astype(int)
         tp = int(((y_hat == 1) & (y == 1)).sum())
         fp = int(((y_hat == 1) & (y == 0)).sum())
-        fn = int(((y_hat == 0) & (y == 1)).sum())
-        # tn non ci serve per J
+        # fn e tn non servono esplicitamente per J
 
         tpr = tp / positives if positives > 0 else 0.0
         fpr = fp / negatives if negatives > 0 else 0.0
@@ -518,16 +590,16 @@ def run_deep_parquet_study(
     - Stampa statistiche globali, correlazioni, analisi per quota
     - Trova soglie ottimali su mg_fav_1_4 / 1_5 rispetto agli esiti reali
     - Cerca segmenti forti per MG 1-3, 1-4, 1-5
-    - Stampa pseudo-regole leggibili per MG 1-4 e 1-5
+    - Stampa pseudo-regole leggibili per MG 1-4 e 1-5, con coperture
 
     Ritorna un dict con:
       - "df"               : il DataFrame arricchito
       - "global_stats"     : DataFrame 1xN con stat globali
       - "corr"             : matrice di correlazione
-      - "by_fav_odds_bin"  : aggregazioni per fascia di quota
-      - "best_mg13"        : segmenti forti per MG 1-3
-      - "best_mg14"        : segmenti forti per MG 1-4
-      - "best_mg15"        : segmenti forti per MG 1-5
+      - "by_fav_odds_bin"  : aggregazioni per fascia di quota (step 0.05)
+      - "best_mg13"        : segmenti forti per MG 1-3 (con coperture)
+      - "best_mg14"        : segmenti forti per MG 1-4 (con coperture)
+      - "best_mg15"        : segmenti forti per MG 1-5 (con coperture)
       - "best_thresholds"  : soglie ottimali su mg_fav_1_4 / 1_5
     """
     parquet_path = Path(parquet_path)
@@ -561,7 +633,7 @@ def run_deep_parquet_study(
         df, target_col="is_mg15_real", min_samples=min_samples, min_prob=mg15_min_prob
     )
 
-    # Pseudo-regole leggibili per MG 1-4 e MG 1-5
+    # Pseudo-regole leggibili per MG 1-4 e MG 1-5, con coperture
     _print_segment_rules(best_mg14, "MG 1–4")
     _print_segment_rules(best_mg15, "MG 1–5")
 

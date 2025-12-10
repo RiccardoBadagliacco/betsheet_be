@@ -277,6 +277,38 @@ async def analyze_match(
         final = build_final_forecast(stepz_raw)
     except Exception as e:
         raise HTTPException(500, f"Errore decision engine: {e}")
+    
+    from app.ml.correlazioni_affini_v2.common.betting_rules.index import evaluate_decision_rules
+
+    decision_alerts = evaluate_decision_rules(final, meta)
+
+    if decision_alerts:
+        # Aggiungi dentro final["alerts"]
+        final.setdefault("alerts", [])
+        final["alerts"].extend(decision_alerts)
+
+        # Aggiungi GLI STESSI alert anche in soft_model["alerts"]
+        soft_model.setdefault("alerts", [])
+        soft_model["alerts"].extend(decision_alerts)
+    
+    """   # --------------------------------------
+        # 5.1) MG OPTIMUM ALERT BASATO SU "final"
+        # --------------------------------------
+        from app.ml.correlazioni_affini_v2.common.betting_rules.rule_mg_optimum_from_decision import (
+            build_mg_fav_optimum_alert_from_decision,
+        )
+
+        try:
+            mg_opt_alert = build_mg_fav_optimum_alert_from_decision(
+                meta=meta,
+                decision=final,
+            )
+            if mg_opt_alert:
+                if "alerts" not in final:
+                    final["alerts"] = []
+                final["alerts"].append(mg_opt_alert.to_dict())
+        except Exception as e:
+            print("MG OPTIMUM ERROR:", e) """
 
     # --------------------------------------
     # 6) OUTPUT FINALE

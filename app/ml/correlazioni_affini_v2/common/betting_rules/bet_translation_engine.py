@@ -94,6 +94,13 @@ def translate_single_bet(tag: str, side: str) -> str:
     
     if tag== 'MG_FAVORITA_1_4':
         return "MG FAVORITA 1 4"
+    
+        # --- MG OPTIMUM ---
+    if tag == "BET_MG14_FAV_OPT":
+        return "Multigol Favorita 1–4 (Optimum)"
+    if tag == "BET_MG14_FAV":
+        return "Multigol Favorita 1–4"
+    
 
     # -------------------------------
     # UNDER SPECIALI
@@ -148,6 +155,8 @@ BET_REASON = {
     "Segno 2": "La favorita ospite domina statisticamente in scenari analoghi.",
     "Evita giocata (contesto rischioso)": "Troppi indicatori contrari privi di coerenza.",
     "Nessuna giocata consigliata": "Indicatori contrastanti, match non giocabile.",
+    "Multigol Favorita 1–4 (Optimum)": "Pattern tecnico-statistico ottimale: favorita nel range 1–4 con massima coerenza storica.",
+    "Multigol Favorita 1–4": "La favorita resta fortemente ancorata al range realizzativo 1–4 nei match analoghi.",
 }
 
 
@@ -173,6 +182,8 @@ BET_PRIORITY = {
     "Favorita NON segna": 5,
     "Nessuna giocata consigliata": 10,
     "Evita giocata (contesto rischioso)": 10,
+    "Multigol Favorita 1–4 (Optimum)": 2,   # alta priorità
+    "Multigol Favorita 1–4": 3,
 }
 
 
