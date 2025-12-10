@@ -57,6 +57,9 @@ from app.ml.correlazioni_affini_v2.common.load_affini_indexes import load_affini
 from app.ml.correlazioni_affini_v2.common.soft_engine_api_v2 import run_soft_engine_api
 from app.ml.correlazioni_affini_v2.common.soft_engine_postprocess import full_postprocess
 from app.ml.correlazioni_affini_v2.meta.stepZ_formatter import build_final_forecast
+from app.ml.correlazioni_affini_v2.common.betting_rules.rule_mg_optimum_from_decision import (
+    build_mg_fav_optimum_alert_from_decision,
+)
 
 # funzione generatore riga feature runtime
 
@@ -182,7 +185,7 @@ def run_decision(match_id):
 
     # ----------------------------------------------------------
     # 1) Carica STEP1C per validare il match_id
-    # ----------------------------------------------------------
+    # ----------------------------------------------------------f
     df = pd.read_parquet(STEP1C_PATH)
     row_fx = df.loc[df["match_id"] == match_id]
 
@@ -329,8 +332,8 @@ def main():
     args = ap.parse_args()
 
     out = run_decision(args.match_id)
+    
     final = build_final_forecast(out)
-    print(json.dumps(final, indent=2, default=str))
 
 
 if __name__ == "__main__":

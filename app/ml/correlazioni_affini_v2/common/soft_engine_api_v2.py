@@ -36,7 +36,7 @@ import numpy as np
 import pandas as pd
 from typing import Optional
 from app.ml.correlazioni_affini_v2.common.betting_rules.index import evaluate_all_rules
-
+import math
 # ============================================================
 # 1. DISTANZA BLOCK-WEIGHTED
 # ============================================================
@@ -166,7 +166,93 @@ def distances_to_weights(d: np.ndarray, alpha: float = 2.0) -> np.ndarray:
     w = np.exp(-alpha * d_scaled)
     return w
 
+def _inject_mg_fav_and_top_scores(t0: pd.Series) -> None:
+    """
+    Calcola:
+      - mg_fav_1_3, mg_fav_1_4, mg_fav_1_5
+      - score1..score4 (top scoreline Poisson)
 
+    e li scrive direttamente dentro t0.
+    Se mancano i lambda o le quote, non fa nulla.
+    """
+    try:
+        lam_home = float(t0.get("lambda_home_form", math.nan))
+        lam_away = float(t0.get("lambda_away_form", math.nan))
+
+        if math.isnan(lam_home) or math.isnan(lam_away):
+            # Niente lambda → niente MG
+            return
+
+        # Determino la favorita dalle quote reali se ci sono,
+        # altrimenti uso fav_side_1x2
+        oh = t0.get("avg_home_odds", math.nan)
+        oa = t0.get("avg_away_odds", math.nan)
+        try:
+            oh = float(oh)
+        except Exception:
+            oh = math.nan
+        try:
+            oa = float(oa)
+        except Exception:
+            oa = math.nan
+
+        fav_side = None
+        if not math.isnan(oh) and not math.isnan(oa):
+            if oh < oa:
+                fav_side = "home"
+            elif oa < oh:
+                fav_side = "away"
+
+        if fav_side is None:
+            fs = t0.get("fav_side_1x2")
+            if fs in ("home", "away"):
+                fav_side = fs
+            else:
+                # fallback: se proprio non so, assumo home
+                fav_side = "home"
+
+        lam_fav = lam_home if fav_side == "home" else lam_away
+        if math.isnan(lam_fav) or lam_fav <= 0:
+            return
+
+        # Poisson PMF per G_fav = 0..5
+        pmf_fav = []
+        for k in range(0, 6):
+            pmf = math.exp(-lam_fav) * (lam_fav ** k) / math.factorial(k)
+            pmf_fav.append(pmf)
+
+        mg13 = sum(pmf_fav[1:4])   # 1–3
+        mg14 = sum(pmf_fav[1:5])   # 1–4
+        mg15 = sum(pmf_fav[1:6])   # 1–5
+
+        # Scrivo su t0
+        t0["mg_fav_1_3"] = float(mg13)
+        t0["mg_fav_1_4"] = float(mg14)
+        t0["mg_fav_1_5"] = float(mg15)
+
+        # ---------------------------
+        # Top 4 scoreline Poisson home/away
+        # ---------------------------
+        max_goals = 5
+        grid = []
+        for gh in range(0, max_goals + 1):
+            # Poisson home
+            ph = math.exp(-lam_home) * (lam_home ** gh) / math.factorial(gh)
+            for ga in range(0, max_goals + 1):
+                pa = math.exp(-lam_away) * (lam_away ** ga) / math.factorial(ga)
+                p = ph * pa
+                grid.append((p, gh, ga))
+
+        # ordina per probabilità decrescente e prendi i primi 4
+        grid.sort(key=lambda x: x[0], reverse=True)
+        top4 = grid[:4]
+
+        for i, (_, gh, ga) in enumerate(top4, start=1):
+            t0[f"score{i}"] = f"{gh}-{ga}"
+
+    except Exception as e:
+        # In caso di problemi non blocchiamo tutto il motore
+        print("    - ERRORE in _inject_mg_fav_and_top_scores:", e)
 # ============================================================
 # 3. ENGINE PRINCIPALE — API
 # ============================================================
@@ -537,25 +623,21 @@ def run_soft_engine_api(
 
     home_team = t0.get("home_team")
     if pd.notna(home_team) and home_team in team_history:
-        print(f"\nTutte le partite di {home_team} (stessa season):")
         for m in team_history[home_team]:
             d = m["date"].strftime("%Y-%m-%d") if pd.notna(m["date"]) else "N/A"
             hf = m["home_ft"] if m["home_ft"] is not None else "-"
             af = m["away_ft"] if m["away_ft"] is not None else "-"
             print(f"  {d} | {m['home_team']} {hf} - {af} {m['away_team']}")
-        print("")
     else:
         print(f"\nNessuna history disponibile per il team di casa: {home_team}\n")
 
     away_team = t0.get("away_team")
     if pd.notna(away_team) and away_team in team_history:
-        print(f"Tutte le partite di {away_team} (stessa season):")
         for m in team_history[away_team]:
             d = m["date"].strftime("%Y-%m-%d") if pd.notna(m["date"]) else "N/A"
             hf = m["home_ft"] if m["home_ft"] is not None else "-"
             af = m["away_ft"] if m["away_ft"] is not None else "-"
             print(f"  {d} | {m['home_team']} {hf} - {af} {m['away_team']}")
-        print("")
     else:
         print(f"Nessuna history disponibile per il team ospite: {away_team}\n")
 
@@ -565,6 +647,11 @@ def run_soft_engine_api(
         "team_history": team_history,
         # in futuro puoi aggiungere altre info di contesto qui
     }
+
+    # =====================================================
+    # 7) INIEZIONE MG FAVORITA + TOP SCORE PER LE REGOLE
+    # =====================================================
+    _inject_mg_fav_and_top_scores(t0)
 
     ML_COLS = [
         "home_form_matches_lastN",

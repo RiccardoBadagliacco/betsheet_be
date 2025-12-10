@@ -214,19 +214,14 @@ def rule_mg_fav_signal_v1(t0: pd.Series, ctx: Dict[str, Any]) -> List[BettingAle
         → filtro di stabilità, non edge gigantesco ma solido per scremare le partite.
     """
     alerts: List[BettingAlert] = []
-    print('V1')
     try:
-        print(f"    - t0: {t0.to_dict()}")
-        print("    - Costruzione profilo MG favorita (checklist statistica)...")
 
         profile = build_mg14_stat_profile(t0, ctx)
         if not profile.get("has_profile", False):
-            print('Check 1')
             return alerts
 
         if not profile.get("in_context", False):
             # favorita fuori range quota → nessun alert MG
-            print('Check 2')
             return alerts
 
         if not profile.get("checklist_pass", False):
@@ -254,26 +249,6 @@ def rule_mg_fav_signal_v1(t0: pd.Series, ctx: Dict[str, Any]) -> List[BettingAle
                 eq_odds = 1.0 / fav_prob if fav_prob and fav_prob > 0 else math.nan
             except Exception:
                 eq_odds = math.nan
-
-            print("    - [MG] CHECKLIST FALLITA (Check3):")
-            print(f"        fav_side={fav_side}, fav_prob={fmt(fav_prob)}, eq_odds≈{fmt(eq_odds)}")
-            print(
-                "        "
-                f"fav_matches={fav_matches}, "
-                f"opp_matches={opp_matches}, "
-                f"lambda_fav={fmt(lambda_fav)}, "
-                f"fav_gf_avg={fmt(fav_gf_avg)}, "
-                f"opp_ga_avg={fmt(opp_ga_avg)}, "
-                f"lambda_total={fmt(lambda_total)}"
-            )
-            print(
-                "        FLAGS: "
-                f"fav_enough={fav_enough}, "
-                f"opp_enough={opp_enough}, "
-                f"fav_att_ok={fav_att_ok}, "
-                f"opp_def_permeable={opp_def_permeable}, "
-                f"total_ok={total_ok}"
-            )
 
             return alerts
 

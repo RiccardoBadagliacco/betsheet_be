@@ -8,6 +8,8 @@ from .betting_alert_model import BettingAlert
 from .rule_favorite_profile_signal import rule_favorite_profile_signal
 from .rule_over_signal import rule_over_signal
 from .rule_mg_signal import rule_mg_fav_signal_v1
+
+
 # ============================================================
 #  BASE STRUCT
 # ============================================================
@@ -19,8 +21,29 @@ class RuleFn:
 REGISTERED_RULES = [
     rule_favorite_profile_signal,
     rule_over_signal,
-    rule_mg_fav_signal_v1,
+    rule_mg_fav_signal_v1
 ]
+
+from .rule_mg_optimum_from_decision import build_mg_fav_optimum_alert_from_decision
+
+def evaluate_decision_rules(decision: Dict[str, Any], meta: Optional[Dict[str, Any]] = None):
+    """
+    Regole basate sul JSON di decisione finale (stepZ_formatter).
+    Esempio: MG optimum favorita.
+    """
+    alerts: List[Dict[str, Any]] = []
+
+    try:
+        alert = build_mg_fav_optimum_alert_from_decision(
+            meta=meta or {},
+            decision=decision,
+        )
+        if alert is not None:
+            alerts.append(alert.to_output())
+    except Exception as e:
+        print("MG Optimum error:", e)
+
+    return alerts
 
 def evaluate_all_rules(t0: pd.Series, ctx: Optional[Dict[str, Any]] = None):
     """
@@ -39,8 +62,6 @@ def evaluate_all_rules(t0: pd.Series, ctx: Optional[Dict[str, Any]] = None):
 
     raw: List[BettingAlert] = []
 
-    print("  - Esecuzione regole betting...")
-
     # -----------------------------------------------
     # PASSO 1: esegui tutte le regole registrate
     # -----------------------------------------------
@@ -57,8 +78,6 @@ def evaluate_all_rules(t0: pd.Series, ctx: Optional[Dict[str, Any]] = None):
 
     # Memorizziamo gli alert preliminari
     ctx["alerts_pre"] = base_outputs.copy()
-
-    print(f"    - Totale alert preliminari: {len(base_outputs)}")
 
 
     return base_outputs
