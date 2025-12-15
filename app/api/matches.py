@@ -1,36 +1,82 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy import or_
 from sqlalchemy.orm import Session, joinedload, load_only
-from uuid import UUID
 from typing import Dict
+from datetime import datetime
+from pathlib import Path
+import pandas as pd
 
 from app.db.database_football import get_football_db
 from app.db.models import Match, Season, Fixture, League
-from datetime import datetime
+
+# ============================
+# PROFETA IMPORT
+# ============================
+
+from app.ml.profeta.step2_profeta import ProfetaEngine
+from app.ml.profeta.state_engine import (
+    compute_control_state,
+    compute_goal_state,
+)
+from app.ml.profeta.alert_engine import run_alert_engine
+
+# ============================
+# STEP0 LOAD (una sola volta)
+# ============================
+
+ROOT_DIR = Path(__file__).resolve().parents[2]
+DATA_DIR = ROOT_DIR / "app" / "ml" / "profeta" / "data"
+STEP0_PATH = DATA_DIR / "step0_profeta.parquet"
+
+try:
+    STEP0_DF = pd.read_parquet(STEP0_PATH)
+except Exception as e:
+    raise RuntimeError(f"Impossibile caricare step0_profeta.parquet: {e}")
+
+STEP0_BY_ID = STEP0_DF.set_index("match_id")
+
+# ============================
+# ROUTER
+# ============================
 
 router = APIRouter()
 
-import pandas as pd
-from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session, joinedload
-from app.ml.correlazioni_affini_v2.common.soft_engine_api_v2 import (
-    run_soft_engine_api,
-)
-from app.ml.correlazioni_affini_v2.common.soft_engine_postprocess import full_postprocess
-from app.ml.correlazioni_affini_v2.common.load_affini_indexes import load_affini_indexes
-from app.ml.correlazioni_affini_v2.meta.stepZ_decision_engine import run_decision
-from app.ml.correlazioni_affini_v2.meta.stepZ_formatter import build_final_forecast
-# Runtime pipeline
+# ============================
+# HELPER — PROFETA ALERT
+# ============================
+
+def compute_profeta_alerts(match_id: str, is_fixture: bool):
+    """
+    Calcola alert Profeta per un match / fixture.
+    Se il match non è presente nello step0 → ritorna [].
+    """
+    if match_id not in STEP0_BY_ID.index:
+        return []
+
+    row = STEP0_BY_ID.loc[match_id]
+
+    if bool(row["is_fixture"]) != bool(is_fixture):
+        return []
+
+    engine = ProfetaEngine(max_goals=10)
+    result = engine.predict_from_row(row)
+
+    control_state = compute_control_state(result["markets"])
+    goal_state = compute_goal_state(result["markets"])
+
+    alerts = run_alert_engine(
+        markets=result["markets"],
+        control_state=control_state,
+        goal_state=goal_state,
+    )
+
+    return alerts
 
 
-APP_DIR = Path(__file__).resolve().parents[1]
-AFFINI_DIR = APP_DIR / "ml" / "correlazioni_affini_v2"
-DATA_DIR = AFFINI_DIR / "data"
-
-SLIM_PATH = DATA_DIR / "step4b_affini_index_slim_v2.parquet"
-WIDE_PATH = DATA_DIR / "step4a_affini_index_wide_v2.parquet"
+# ============================
+# ENDPOINT
+# ============================
 
 @router.get("/matches/by_date")
 async def get_matches_by_date(
@@ -38,8 +84,9 @@ async def get_matches_by_date(
     db: Session = Depends(get_football_db),
 ):
     """
-    Ritorna le partite per una certa data, raggruppate per league.
+    Ritorna le partite per una certa data, con ALERT PROFETA inclusi.
     """
+
     if match_date is None:
         match_date = datetime.now().date().isoformat()
 
@@ -47,7 +94,12 @@ async def get_matches_by_date(
         date_obj = datetime.strptime(match_date, "%Y-%m-%d").date()
     except Exception:
         raise HTTPException(400, "match_date must be YYYY-MM-DD")
+
     match_date_str = date_obj.isoformat()
+
+    # ============================
+    # MATCH STORICI
+    # ============================
 
     q = (
         db.query(Match)
@@ -66,6 +118,11 @@ async def get_matches_by_date(
     )
 
     matches = q.all()
+
+    # ============================
+    # FIXTURE
+    # ============================
+
     fq = (
         db.query(Fixture)
         .options(
@@ -82,8 +139,12 @@ async def get_matches_by_date(
             Fixture.match_date.isnot(None),
         )
     )
+
     fixtures = fq.all()
 
+    # ============================
+    # OUTPUT STRUCTURE
+    # ============================
 
     country_map: Dict[str, Dict] = {}
     matches_out = []
@@ -93,22 +154,33 @@ async def get_matches_by_date(
             return
         country = getattr(league_obj, "country", None)
         c_code = getattr(country, "code", None) or "UNKNOWN"
+
         if c_code not in country_map:
             country_map[c_code] = {
                 "code": c_code,
                 "name": getattr(country, "name", c_code),
                 "leagues": {},
             }
+
         l_code = getattr(league_obj, "code", "UNKNOWN")
         country_map[c_code]["leagues"][l_code] = {
             "code": l_code,
             "name": getattr(league_obj, "name", l_code),
         }
 
+    # ============================
+    # MATCH STORICI LOOP
+    # ============================
+
     for m in matches:
         season = m.season
         league = season.league if season else None
         add_country_and_league(league)
+
+        alerts = compute_profeta_alerts(
+            match_id=str(m.id),
+            is_fixture=False,
+        )
 
         matches_out.append(
             {
@@ -123,13 +195,23 @@ async def get_matches_by_date(
                 "league_name": getattr(league, "name", None),
                 "country_code": getattr(getattr(league, "country", None), "code", None),
                 "country_name": getattr(getattr(league, "country", None), "name", None),
+                "alerts": alerts,
             }
         )
+
+    # ============================
+    # FIXTURE LOOP
+    # ============================
 
     for f in fixtures:
         season = f.season
         league = season.league if season else None
         add_country_and_league(league)
+
+        alerts = compute_profeta_alerts(
+            match_id=str(f.id),
+            is_fixture=True,
+        )
 
         matches_out.append(
             {
@@ -144,13 +226,17 @@ async def get_matches_by_date(
                 "league_name": getattr(league, "name", None) or getattr(f, "league_name", None),
                 "country_code": getattr(getattr(league, "country", None), "code", None),
                 "country_name": getattr(getattr(league, "country", None), "name", None),
+                "alerts": alerts,
             }
         )
 
+    # ============================
+    # COUNTRIES OUTPUT
+    # ============================
+
     countries = []
     for country in country_map.values():
-        leagues = list(country["leagues"].values())
-        country["leagues"] = leagues
+        country["leagues"] = list(country["leagues"].values())
         countries.append(country)
 
     return {
@@ -158,172 +244,4 @@ async def get_matches_by_date(
         "date": match_date,
         "countries": countries,
         "matches": matches_out,
-    }
-#
-
-
-@router.get("/matches/{match_id}")
-async def analyze_match(
-    match_id: str,
-    top_n: int = Query(80, ge=10, le=200),
-    min_neighbors: int = Query(30, ge=5, le=100),
-    is_fixture: bool = Query(False, description="Se true recupera la fixture invece del match storico"),
-    db: Session = Depends(get_football_db),
-):
-    print("Analyzing match_id:", match_id)
-
-    # --------------------------------------
-    # 1) MATCH DAL DB
-    # --------------------------------------
-    try:
-        match_uuid = UUID(match_id)
-    except ValueError:
-        raise HTTPException(400, "match_id must be a valid UUID")
-
-    if is_fixture:
-        m = (
-            db.query(Fixture)
-            .options(
-                joinedload(Fixture.season).joinedload(Season.league),
-                joinedload(Fixture.home_team),
-                joinedload(Fixture.away_team),
-            )
-            .filter(Fixture.id == match_uuid)
-            .first()
-        )
-        if m is None:
-            raise HTTPException(404, "Fixture non trovata")
-    else:
-        m = (
-            db.query(Match)
-            .options(
-                joinedload(Match.season).joinedload(Season.league),
-                joinedload(Match.home_team),
-                joinedload(Match.away_team),
-            )
-            .filter(Match.id == match_uuid)
-            .first()
-        )
-        if m is None:
-            raise HTTPException(404, "Match non trovato")
-        
-
-    league = m.season.league if m.season else None
-
-    # --------------------------------------
-    # 2) META INFO
-    # --------------------------------------
-    meta = {
-        "match_id": str(m.id),
-        "home_team": m.home_team.name,
-        "away_team": m.away_team.name,
-        "league_name": league.name if league else None,
-        "league_code": league.code if league else None,
-        "match_date": m.match_date.isoformat() if m.match_date else None,
-        "match_time": str(m.match_time) if getattr(m, "match_time", None) else None,
-        "odds": {
-            "avg_home_odds": m.avg_home_odds,
-            "avg_draw_odds": m.avg_draw_odds,
-            "avg_away_odds": m.avg_away_odds,
-            "avg_over_25_odds": m.avg_over_25_odds,
-            "avg_under_25_odds": m.avg_under_25_odds,
-        },
-        "result": {
-            "home_ft": m.home_goals_ft,
-            "away_ft": m.away_goals_ft
-        },
-        "is_fixture": is_fixture,
-    }
-
-    # --------------------------------------
-    # 3) CARICO INDICI AFFINI (SLIM + WIDE)
-    # --------------------------------------
-    slim_index, wide_index = load_affini_indexes()
-    print(f"Loaded indexes: SLIM={len(slim_index)} rows, WIDE={len(wide_index)} rows")
-
-    # --------------------------------------
-    # 4) SOFT ENGINE (USANDO IL MATCH STORICO O FIXTURE)
-    # --------------------------------------
-    soft_model = run_soft_engine_api(
-        target_row=None,                      # per match storico non serve
-        target_match_id=str(m.id),            # match/fixture da cercare in SLIM
-        slim=slim_index,
-        wide=wide_index,
-        top_n=top_n,
-        min_neighbors=min_neighbors,
-    )
-
-    if soft_model["status"] != "ok":
-        return {
-            "success": False,
-            "meta": meta,
-            "reason": soft_model.get("reason", "soft_engine_failed"),
-            "debug": soft_model,
-        }
-
-    # --------------------------------------
-    # 5) POSTPROCESS (GG/NG, PMF, multigoal)
-    # --------------------------------------
-    analytics = full_postprocess({
-        "meta": meta,
-        "clusters": soft_model["clusters"],
-        "soft_probs": soft_model["soft_probs"],
-        "affini_stats": soft_model["affini_stats"],
-        "affini_list": soft_model["affini_list"],   # FONDAMENTALE
-    })
-
-    try:
-        stepz_raw = run_decision(str(m.id))
-        final = build_final_forecast(stepz_raw)
-    except Exception as e:
-        raise HTTPException(500, f"Errore decision engine: {e}")
-    
-    from app.ml.correlazioni_affini_v2.common.betting_rules.index import evaluate_decision_rules
-
-    decision_alerts = evaluate_decision_rules(final, meta)
-
-    if decision_alerts:
-        # Aggiungi dentro final["alerts"]
-        final.setdefault("alerts", [])
-        final["alerts"].extend(decision_alerts)
-
-        # Aggiungi GLI STESSI alert anche in soft_model["alerts"]
-        soft_model.setdefault("alerts", [])
-        soft_model["alerts"].extend(decision_alerts)
-    
-    """   # --------------------------------------
-        # 5.1) MG OPTIMUM ALERT BASATO SU "final"
-        # --------------------------------------
-        from app.ml.correlazioni_affini_v2.common.betting_rules.rule_mg_optimum_from_decision import (
-            build_mg_fav_optimum_alert_from_decision,
-        )
-
-        try:
-            mg_opt_alert = build_mg_fav_optimum_alert_from_decision(
-                meta=meta,
-                decision=final,
-            )
-            if mg_opt_alert:
-                if "alerts" not in final:
-                    final["alerts"] = []
-                final["alerts"].append(mg_opt_alert.to_dict())
-        except Exception as e:
-            print("MG OPTIMUM ERROR:", e) """
-
-    # --------------------------------------
-    # 6) OUTPUT FINALE
-    # --------------------------------------
-    return {
-        "success": True,
-        "meta": meta,
-        "model": {
-            "status": "ok",
-            "clusters": soft_model["clusters"],
-            "soft_probs": soft_model["soft_probs"],
-            "affini_stats": soft_model["affini_stats"],
-            "config_used": soft_model["config_used"],
-            "alerts": soft_model["alerts"],
-        },
-        "analytics": analytics,
-        "decision": final
     }

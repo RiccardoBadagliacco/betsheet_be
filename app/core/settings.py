@@ -4,6 +4,7 @@ This module is compatible with both pydantic v1 and v2+ (which moved
 BaseSettings to the separate `pydantic-settings` package).
 """
 
+from pathlib import Path
 from typing import List, Optional
 
 # BaseSettings moved to pydantic-settings in pydantic v2. Try to import
@@ -21,12 +22,15 @@ except Exception:
     from pydantic.networks import AnyHttpUrl
 
 
+BASE_DIR = Path(__file__).resolve().parents[2]
+
+
 class Settings(BaseSettings):
     APP_NAME: str = "BetSheet API"
     DEBUG: bool = False
     # Support both sqlite and postgres urls
-    SQLALCHEMY_DATABASE_URL: str = "sqlite:///./data/bets.db"
-    FOOTBALL_DATABASE_URL: str = "sqlite:///./data/football_dataset.db"
+    SQLALCHEMY_DATABASE_URL: str = f"sqlite:///{BASE_DIR / 'data' / 'bets.db'}"
+    FOOTBALL_DATABASE_URL: str = f"sqlite:///{BASE_DIR / 'data' / 'football_dataset.db'}"
     # Comma-separated origins or list
     CORS_ORIGINS: List[AnyHttpUrl] = ["http://localhost:4200", "http://127.0.0.1:8000","http://localhost:3000"]
     SECRET_KEY: str = "replace-me"
